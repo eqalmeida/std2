@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./WEB-INF/templates/templatePrincipal.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+    <ui:define name="top">
+
+        <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
+
+    </ui:define>
+
+    <ui:define name="left">
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml" />
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl autoUpdate="true" id="message"/>
+
+        <h:outputScript name="locales_prime.js" library="js" /> 
+        <h:form id="form">
+            <p:panelGrid columns="5" style="width: 100%">
+                <h:outputText value="Mês:" />
+                <p:spinner value="#{boletoMB.filtMes}" max="12" min="1" required="true"/>
+
+                <h:outputText value="Ano:" />
+                <p:spinner value="#{boletoMB.filtAno}" required="true" min="1990"/>
+
+                <p:commandButton value="Atualizar" actionListener="#{boletoMB.updateDatas}" update=":formTable, :form" />               
+
+            </p:panelGrid>
+
+        </h:form>
+        <p:spacer height="10"/>
+
+        <h:form id="formTable">
+            
+            <p:contextMenu for="tbl">  
+                <p:menuitem value="Ver Pedido" actionListener="#{boletoMB.verPedido}" icon="ui-icon-pencil"/>  
+            </p:contextMenu>  
+
+
+            <p:dataTable lazy="true" var="it" id="tbl"
+                         selection="#{boletoMB.selected}" selectionMode="single" rowKey="#{it.id}"
+                         value="#{boletoMB.lazyList}" rows="20"
+                         paginatorAlwaysVisible="false" 
+                         rowStyleClass="#{it.situacao eq 1 ? 'red' : null}"
+                         paginator="true">
+
+                <p:column headerText="Vencimento" sortBy="#{it.vencimento}"  style="text-align: center">
+                    <h:outputText value="#{it.vencimento}" >
+                        <f:convertDateTime />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Parcela" style="text-align: center">
+                    #{it.numParcela} / #{it.pedidoPag.numParcelas}
+                </p:column>
+
+                <p:column headerText="Valor" sortBy="#{it.valor}" style="text-align: center">
+                    <h:outputText value="#{it.valor}" >
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Tipo" sortBy="#{it.pedidoPag.tipoPagto.descricao}" style="text-align: center">
+                    <h:outputText value="#{it.pedidoPag.tipoPagto.descricao}" >
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Cliente" sortBy="#{it.cliente.nome}" styleClass="#{it.situacao eq 1 ? 'red':null}">
+                    #{it.cliente.nome}
+                </p:column>
+
+                <p:column headerText="Situação" sortBy="#{it.situacao}" style="text-align: center">
+                    #{it.situacao}
+                </p:column>
+
+            </p:dataTable>
+            
+            <p:spacer height="10" />
+            
+            <p:panelGrid columns="2">
+                <h:outputText value="Valor total (mês):"/>
+                <h:outputText value="#{boletoMB.totalMes}" style="font-weight: bold">
+                    <f:convertNumber type="currency"/>
+                </h:outputText>
+            </p:panelGrid>
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>

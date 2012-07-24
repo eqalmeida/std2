@@ -1,0 +1,38 @@
+body {
+    margin: 10px;
+}
+
+.painel1 {
+    vertical-align: top;
+    
+}
+
+.painel2{
+    width: 100%;
+    vertical-align: top;
+}
+
+.ui-widget, .ui-widget .ui-widget {
+font-size: 90% !important;
+}
+
+.ui-state-hover{
+    font-weight: normal;
+    text-decoration: none;
+}
+
+.label {
+    text-align: right;
+}
+
+.field {
+    
+}
+
+.red{
+    color: red; 
+}
+
+a:hover {
+    font-weight: normal;
+}

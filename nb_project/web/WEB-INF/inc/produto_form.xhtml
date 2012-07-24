@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:inputHidden value="#{selected.id}" />
+
+    <h:panelGrid columns="2">
+        <h:outputText value="Tipo:" style="font-weight: bold"/>
+        <p:selectOneButton value="#{selected.tipo}" >
+            <f:selectItem itemLabel="Veículo" itemValue="1" />
+            <f:selectItem itemLabel="Outros" itemValue="0" />
+            <p:ajax process="@this" update="@form" />
+        </p:selectOneButton>
+    </h:panelGrid>
+
+    <p:separator />
+
+    <p:panelGrid columns="2">
+
+
+        <h:outputLabel value="Placa"  rendered="#{selected.tipo == 1}"/>
+        <p:inputMask value="#{selected.placa}" required="true" mask="aaa-9999" rendered="#{selected.tipo == 1}"/>
+
+        <h:outputLabel value="Modelo:"  rendered="#{selected.tipo == 1}"/>
+        <p:inputText value="#{selected.modelo}" rendered="#{selected.tipo == 1}"/>
+
+        <h:outputLabel value="Frabricante:"  rendered="#{selected.tipo == 1}"/>
+        <p:inputText value="#{selected.fabricante}" rendered="#{selected.tipo == 1}"/>
+
+        <h:outputLabel value="Cor:"  rendered="#{selected.tipo == 1}"/>
+        <p:inputText value="#{selected.cor}" rendered="#{selected.tipo == 1}"/>
+
+        <h:outputLabel value="Ano:"  rendered="#{selected.tipo == 1}"/>
+        <p:inputText value="#{selected.ano}" rendered="#{selected.tipo == 1}"/>
+
+        <h:outputLabel value="Chassi:"  rendered="#{selected.tipo == 1}"/>
+        <p:inputText value="#{selected.chassi}" rendered="#{selected.tipo == 1}"/>
+
+        <h:outputLabel value="Cilindradas:"  rendered="#{selected.tipo == 1}"/>
+        <p:inputText value="#{selected.cilindradas}" rendered="#{selected.tipo == 1}"/>
+
+        <h:outputLabel value="Combustível:"  rendered="#{selected.tipo == 1}"/>
+        <p:selectOneButton value="#{selected.combustivel}" rendered="#{selected.tipo == 1}">
+            <f:selectItems value="#{produtoBean.tipoCombustivel}" />
+        </p:selectOneButton>
+
+        <h:outputLabel value="Descrição:"  rendered="#{selected.tipo == 0}"/>
+        <p:inputText value="#{selected.descricao}" required="true" maxlength="50" size="35" rendered="#{selected.tipo == 0}"/>
+
+        <h:outputLabel value="Valor:"/>
+        <p:inputText value="#{selected.valor}" >
+            <f:convertNumber type="currency"/>
+        </p:inputText>
+
+
+    </p:panelGrid>
+
+</ui:composition>

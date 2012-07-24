@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./WEB-INF/templates/templatePrincipal.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+    <ui:define name="top">
+
+        <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
+
+    </ui:define>
+
+    <ui:define name="left">
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml" />
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl autoUpdate="true" id="message"/>
+
+
+        <h:form id="form">
+
+            <p:menubar>
+                <p:menuitem value="Novo" actionListener="#{clienteMB.novo}" update=":formDialog" oncomplete="cliForm.show()"/>
+            </p:menubar>
+
+            <p:spacer height="5" />
+
+
+        </h:form>
+
+        <h:form id="formTable">
+
+            <p:contextMenu for="tbl">  
+                <p:menuitem value="Editar" update=":formDialog" actionListener="#{clienteMB.editar}" icon="ui-icon-pencil" oncomplete="cliForm.show()"/>  
+                <p:menuitem value="Excluir" update="tbl" icon="ui-icon-trash" actionListener="#{clienteMB.excluir}"/>  
+                <p:menuitem value="Adicionar ao Pedido" update="tbl" icon="ui-icon-plus" actionListener="#{clienteMB.addToPedido}"/>
+            </p:contextMenu>  
+
+
+            <p:dataTable lazy="true" var="it" id="tbl"
+                         selectionMode="single" selection="#{clienteMB.selected}"
+                         value="#{clienteMB.lazyList}" rows="10"
+                         paginatorAlwaysVisible="false"
+                         paginator="true">
+
+                <p:column headerText="ID" sortBy="#{it.id}">#{it.id}</p:column>
+
+                <p:column headerText="Nome" sortBy="#{it.nome}" filterBy="#{it.nome}">
+                    #{it.nome}
+                </p:column>
+
+                <p:column headerText="CPF">#{it.cpf}</p:column>
+
+                <p:column headerText="Telefones">#{it.telefones}</p:column>
+
+
+            </p:dataTable>
+
+        </h:form>
+
+        <h:form id="formDialog">
+
+            <p:dialog id="cliFormId" widgetVar="cliForm" modal="true" resizable="false">
+
+                <h:inputHidden value="#{clienteMB.selected.id}" />
+
+                <f:facet name="header">
+                    <h:outputText value="Editar "  rendered="#{clienteMB.selected.id > 0}"/>
+                    <h:outputText value="Novo "  rendered="#{clienteMB.selected.id == null}"/>
+                    <h:outputText value="Cliente"/>
+                </f:facet>
+
+                <p:panelGrid columnClasses="label,field,label,field" id="frm">
+
+                    <p:row>
+                        <p:column styleClass="label">
+                            <h:outputText value="Nome:"/>
+                        </p:column>
+                        <p:column colspan="3">
+                            <p:inputText value="#{clienteMB.selected.nome}" label="Nome" required="true" size="50"/>
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column styleClass="label">CPF:</p:column>
+                        <p:column>
+                            <p:inputText value="#{clienteMB.selected.cpf}" label="CPF"/>
+                        </p:column>
+                        <p:column styleClass="label">RG:</p:column>
+                        <p:column>
+                            <p:inputText value="#{clienteMB.selected.rg}" label="RG"/>
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column styleClass="label">Tel. Res.:</p:column>
+                        <p:column>
+                            <p:inputText value="#{clienteMB.selected.telRes}" label="Tel. Res."/>
+                        </p:column>
+                        <p:column styleClass="label">Tel. Cel.:</p:column>
+                        <p:column>
+                            <p:inputText value="#{clienteMB.selected.telCel}" label="Tel. Cel."/>
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column styleClass="label">Tel. COM.:</p:column>
+                        <p:column colspan="3">
+                            <p:inputText value="#{clienteMB.selected.telCom}" label="Tel. COM."/>
+                        </p:column>
+                    </p:row>
+
+
+                    <p:row>
+                        <p:column styleClass="label">Endereço:</p:column>
+                        <p:column colspan="3">
+                            <p:inputText value="#{clienteMB.selected.endRua}" label="Endereço" size="50"/>
+                        </p:column>
+                    </p:row>
+
+
+                    <p:row>
+                        <p:column styleClass="label">Num.:</p:column>
+                        <p:column>
+                            <p:inputText value="#{clienteMB.selected.endNum}" label="Num."/>
+                        </p:column>
+                        <p:column styleClass="label">Complemento:</p:column>
+                        <p:column>
+                            <p:inputText value="#{clienteMB.selected.endCompl}" label="Complemento"/>
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column styleClass="label">Bairro:</p:column>
+                        <p:column>
+                            <p:inputText value="#{clienteMB.selected.endBairro}" label="Bairro"/>
+                        </p:column>
+                        <p:column styleClass="label">Município:</p:column>
+                        <p:column>
+                            <p:inputText value="#{clienteMB.selected.endMunicipio}" label="Município"/>
+                        </p:column>
+                    </p:row>
+
+                </p:panelGrid>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Gravar" actionListener="#{clienteMB.gravar}" update=":formTable, frm"/>
+                    <p:commandButton value="Cancela" oncomplete="cliForm.hide()" immediate="true"/>
+                </f:facet>
+
+            </p:dialog>
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>

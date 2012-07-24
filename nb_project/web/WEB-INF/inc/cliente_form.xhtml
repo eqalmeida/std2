@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:h="http://java.sun.com/jsf/html">
+
+    <h:inputHidden value="#{cliente.id}" />
+    
+    <h:panelGrid columns="2">
+        <h:outputLabel for="clnome" value="Nome"/>
+        <p:inputText value="#{cliente.nome}" required="true" maxlength="50" size="35"/>
+
+        <h:outputLabel for="cltelefoneres" value="Telefone Res."/>
+        <p:inputText value="#{cliente.telRes}" maxlength="15"/>
+
+        <h:outputLabel for="cltelcel" value="Telefone Cel."/>
+        <p:inputText value="#{cliente.telCel}" maxlength="15"/>
+
+        <h:outputLabel for="clcpf" value="CPF"/>
+        <p:inputText value="#{cliente.cpf}" maxlength="20"/>
+
+        <h:outputLabel for="clrg" value="RG"/>
+        <p:inputText value="#{cliente.rg}" maxlength="15"/>
+
+
+        <h:outputLabel for="clrua" value="Endereço"/>
+
+        <h:panelGrid columns="5">
+            <p:inputText value="#{cliente.endRua}" maxlength="50" size="35"/>
+
+            <h:outputLabel for="clnum" value="Num."/>
+            <p:inputText value="#{cliente.endNum}" maxlength="6" size="6" />
+
+            <h:outputLabel for="clcpl" value="Complemento"/>
+            <p:inputText value="#{cliente.endCompl}" maxlength="10" size="10" />
+
+        </h:panelGrid>
+
+
+    </h:panelGrid>
+
+</ui:composition>

@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./WEB-INF/templates/templatePrincipal.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+    <ui:define name="top">
+
+        <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
+
+    </ui:define>
+
+    <ui:define name="left">
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml" />
+    </ui:define>
+
+    <ui:define name="content">
+
+
+
+
+
+        <h:form id="form">
+
+
+            <p:growl autoUpdate="true" id="message"/>
+
+
+            <p:confirmDialog id="excluirDialog" message="Confirma a exclusão do Cliente?"  
+                             header="Excluir" severity="alert" widgetVar="confirmation">  
+
+                <p:commandButton id="confirm" value="Sim" update=":form" oncomplete="confirmation.hide()"  
+                                 actionListener="#{clienteBean.excluirCliente}" />  
+                <p:commandButton id="decline" value="Não" onclick="confirmation.hide()" type="button" />   
+
+            </p:confirmDialog>             
+
+            <h:panelGroup rendered="#{clienteBean.tela == 1}" >
+
+                <p:panel header="Novo Cliente">
+                    
+                    <ui:include src="./WEB-INF/inc/cliente_form.xhtml">
+                        <ui:param name="cliente" value="#{clienteBean.cliente}" />
+                    </ui:include>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Gravar" actionListener="#{clienteBean.inserirCliente}" icon="ui-icon-disk" update=":form"/>  
+                        <p:commandButton value="Cancelar" actionListener="#{clienteBean.exibirClientes}" 
+                                         icon="ui-icon-arrowreturnthick-1-w" immediate="true" update=":form"/>  
+                    </f:facet>
+
+                </p:panel>
+
+            </h:panelGroup>
+
+
+            <h:panelGroup rendered="#{clienteBean.tela == 2}" >
+
+                <p:panel header="Editar Cliente">
+                    
+                    <ui:include src="./WEB-INF/inc/cliente_form.xhtml">
+                        <ui:param name="cliente" value="#{clienteBean.cliente}" />
+                    </ui:include>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Gravar" actionListener="#{clienteBean.salvarCliente}" icon="ui-icon-disk" update=":form"/>  
+                        <p:commandButton value="Cancelar" actionListener="#{clienteBean.exibirClientes}" 
+                                         icon="ui-icon-arrowreturnthick-1-w" immediate="true" update=":form"/>  
+                    </f:facet>
+
+                </p:panel>
+
+            </h:panelGroup>
+
+
+            <h:panelGroup rendered="#{clienteBean.tela == 0}" >
+
+
+                <h:panelGrid columns="2" columnClasses="painel1, painel2">
+
+                    <p:dataTable value="#{clienteBean.todosClientes}" var="cliente" id="tabela"
+                                 rowKey="#{cliente.id}"  
+                                 selection="#{clienteBean.cliente}" selectionMode="single">
+
+
+                        <p:ajax event="rowSelect" listener="#{clienteBean.onRowSelect}" 
+                                update=":form:display" />  
+
+
+
+                        <p:column headerText="ID">
+                            #{cliente.id}
+                        </p:column>
+
+                        <p:column headerText="Nome">
+                            #{cliente.nome}
+                        </p:column>
+
+                    </p:dataTable>
+
+                    <h:panelGroup id="display">
+
+                        <p:menubar>
+                            <p:menuitem value="Novo"  icon="ui-icon-plus" actionListener="#{clienteBean.novoCliente}" update=":form" immediate="true"/>
+                            <p:menuitem value="Editar" icon="ui-icon-pencil" disabled="#{clienteBean.cliente.id == null}" actionListener="#{clienteBean.editarCliente}" immediate="true" update="@form"/>
+                            <p:menuitem value="Excluir"  icon="ui-icon-trash" onclick="confirmation.show()" disabled="#{clienteBean.cliente.id == null}"/>
+                        </p:menubar>
+
+
+                        <p:panel header="Detalhe do cliente COD: #{clienteBean.cliente.id}" rendered="#{clienteBean.cliente.id != null}">  
+
+                            <h:panelGrid columns="2" cellpadding="4">  
+
+                                <h:outputText value="Nome:" />  
+                                <h:outputText value="#{clienteBean.cliente.nome}" style="font-weight:bold"/>  
+
+                                <h:outputText value="Telefone:" />  
+                                <h:outputText value="#{clienteBean.cliente.telefones}" style="font-weight:bold"/>  
+
+                                <h:outputText value="Endereço:" />  
+                                <h:outputText value="#{clienteBean.cliente.endereco}" style="font-weight:bold"/>  
+
+                            </h:panelGrid>  
+                        </p:panel>              
+
+
+                    </h:panelGroup>
+
+                </h:panelGrid>
+
+            </h:panelGroup>
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>

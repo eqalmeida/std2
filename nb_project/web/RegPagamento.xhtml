@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./WEB-INF/templates/templatePrincipal.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+
+
+    <ui:define name="top">
+
+        <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
+
+    </ui:define>
+
+    <ui:define name="left">
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml" />
+    </ui:define>
+
+    <ui:define name="content">
+
+        <f:metadata>
+            <f:viewParam name="id" value="#{pagMB.id}"/>
+        </f:metadata>
+
+        <p:growl autoUpdate="true" id="message"/>
+
+        <h:outputScript name="locales_prime.js" library="js" /> 
+
+<!--
+                Verifica se a informação é válida
+-->
+        <h:panelGroup rendered="#{pagMB.pedidoPag eq null}">
+            <p:panel header="Atenção">
+                A forma de pagamento não foi selecionada!
+            </p:panel>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{pagMB.pedidoPag != null}">
+
+            <h:form id="form">
+
+                <p:dataTable value="#{pagMB.pedidoPag.parcelas}" var="it">
+
+                    <f:facet name="header">
+                        Parcelas
+                    </f:facet>
+
+                    <p:column headerText="Parcela">
+                        #{it.numParcela}
+                    </p:column>
+
+                    <p:column headerText="Vencimento">
+                        <h:outputText value="#{it.vencimento}">
+                            <f:convertDateTime/>
+                        </h:outputText>    
+                    </p:column>
+
+                    <p:column headerText="Valor">
+                        <h:outputText value="#{it.valor}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Data Pagto">
+                        <h:outputText value="#{it.dataPag}">
+                            <f:convertDateTime/>
+                        </h:outputText>    
+                    </p:column>
+
+                    <p:column headerText="Valor Pago">
+                        <h:outputText value="#{it.valorPago}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Valor Faltante">
+                        <h:outputText value="#{it.valorFaltante}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
+
+                </p:dataTable>
+
+            </h:form>            
+            <br/>
+            <h:form>
+                <p:panelGrid columns="2">
+
+                    <h:outputText value="Data:"/>
+                    <p:inputText value="#{pagMB.pagamento.dataInformada}" label="Data" 
+                                 valueChangeListener="#{pagMB.dataChanged}">
+                        <f:convertDateTime type="date" timeZone="#{app.timeZone}"/>
+                        <f:ajax render="@form" />
+                    </p:inputText>
+
+                    <h:outputText value="Valor em atraso:" />
+                    <h:outputText value="#{pagMB.pagamento.valorDevido}">
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>
+
+                    <h:outputText value="Multa:" />
+                    <h:outputText value="#{pagMB.pagamento.multa}">
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>
+
+                    <h:outputText value="Juros:" />
+                    <h:outputText value="#{pagMB.pagamento.juros}">
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>
+
+                    <h:outputText value="Total:" />
+                    <h:outputText value="#{pagMB.pagamento.valorTotal}">
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>
+
+
+                    <h:outputText value="Valor:"/>
+                    <p:inputText value="#{pagMB.pagamento.valor}" label="Valor"/>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Registrar"/>
+                    </f:facet>
+
+                </p:panelGrid>
+            </h:form>
+        </h:panelGroup>
+    </ui:define>
+
+</ui:composition>

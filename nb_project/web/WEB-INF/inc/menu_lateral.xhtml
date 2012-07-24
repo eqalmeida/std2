@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:h="http://java.sun.com/jsf/html">
+    <h:form>
+        
+        <p:panel styleClass="ui-shadow">
+
+        <p:menu>  
+            <p:submenu label="Cadastros">  
+                <p:menuitem value="Clientes" action="ManterCliente" icon="ui-icon-disk" ajax="false" immediate="true"/>  
+                <p:menuitem value="Produtos" action="ManterProduto" icon="ui-icon-disk" ajax="false" immediate="true"/>  
+            </p:submenu>  
+            <p:submenu label="Configurações">  
+                <p:menuitem value="Tab. Financ." action="ManterTabelaFinanc" icon="ui-icon-disk" ajax="false" immediate="true"/>  
+                <p:menuitem value="Tipo Pagamento" action="ManterTipoPagto" icon="ui-icon-disk" ajax="false" immediate="true"/>  
+                <p:menuitem value="Pedido" action="ManterPedido" icon="ui-icon-disk" ajax="false" immediate="true"/>  
+            </p:submenu>  
+            <p:submenu label="Consultas">
+                <p:menuitem value="Boletos" action="ManterBoleto" icon="ui-icon-disk" ajax="false" immediate="true"/>  
+            </p:submenu>
+        </p:menu>  
+        </p:panel>
+    </h:form>
+
+
+</ui:composition>

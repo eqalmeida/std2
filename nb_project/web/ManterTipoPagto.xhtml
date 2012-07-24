@@ -1,0 +1,195 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:head></h:head>
+    <h:body>
+
+        <ui:composition template="./WEB-INF/templates/templatePrincipal.xhtml">
+
+            <ui:define name="top">
+
+                <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
+
+            </ui:define>
+
+            <ui:define name="left">
+                <ui:include src="./WEB-INF/inc/menu_lateral.xhtml" />
+            </ui:define>
+
+            <ui:define name="content">
+
+                <h:form id="form">
+
+                    <p:growl autoUpdate="true" id="message"/>
+
+                    <p:menubar>
+
+
+                        <p:menuitem 
+                            value="Novo"
+                            icon="ui-icon-plus" 
+                            actionListener="#{tipoPagtoBean.novo}" 
+                            update=":formIns"
+                            immediate="true" 
+                            oncomplete="insDlg.show()"/>
+
+
+                    </p:menubar>
+
+                    <p:spacer height="5" width="100" />
+
+                    <p:contextMenu for="tbl">  
+                        <p:menuitem value="Editar" update=":formEdit" icon="ui-icon-pencil" oncomplete="editDlg.show()"/>  
+                        <p:menuitem value="Excluir" update="tbl" icon="ui-icon-trash" actionListener="#{tipoPagtoBean.excluir}"/>  
+                        <p:menuitem value="Tabelas Financ." update=":formPick" icon="ui-icon-note" oncomplete="lstDlg.show()"/>  
+                    </p:contextMenu>  
+
+                    <p:dataTable id="tbl" value="#{tipoPagtoBean.lista}" 
+                                 rowKey="#{it.id}"
+                                 selectionMode="single"
+                                 selection="#{tipoPagtoBean.selected}"
+                                 var="it" tableStyle="width: auto">
+
+                        <p:ajax event="rowSelect" update=":formPick" listener="#{tipoPagtoBean.onRowSelect}"/>
+
+                        <p:column headerText="Id">
+                            <h:outputText value="#{it.id}"/>
+                        </p:column>
+
+                        <p:column headerText="Descrição">
+                            <h:outputText value="#{it.descricao}"/>
+                        </p:column>
+
+                        <p:column headerText="Gera Boleto?">
+                            <h:outputText value="Sim" rendered="#{it.geraBoleto == true}" />
+                            <h:outputText value="Não" rendered="#{it.geraBoleto == false}" />
+                        </p:column>
+
+                    </p:dataTable>
+
+                </h:form>
+
+
+                <h:form 
+                    id="formPick">
+
+                    <p:dialog
+                        modal="true"
+                        resizable="false"
+                        hideEffect="explode"
+                        widgetVar="lstDlg"
+                        header="Tabelas de financiamento para: #{tipoPagtoBean.selected.descricao}" 
+                        style="width: 500px" id="lst">
+
+                        <p:pickList value="#{tipoPagtoBean.tabelas}" 
+                                    style="width: auto"
+                                    itemLabel="#{its.descricao}"
+                                    itemValue="#{its.id}"
+                                    var="its" >
+
+                        </p:pickList>
+
+
+                        <f:facet name="footer">
+                            <p:commandButton value="OK" 
+                                             oncomplete="lstDlg.hide()"
+                                             actionListener="#{tipoPagtoBean.onTransfer}"/>
+                        </f:facet>
+
+                    </p:dialog>
+
+                </h:form>
+
+
+                <h:form id="formIns">
+                    <p:dialog id="insDialog" 
+                              modal="true"
+                              showHeader="false"
+                              resizable="false"
+                              hideEffect="explode"
+                              widgetVar="insDlg">
+
+                        <p:panelGrid columns="2">
+
+                            <f:facet name="header">Novo Tipo de Pagamento</f:facet>
+
+                            <h:outputText value="Descrição:" />
+                            <p:inputText value="#{tipoPagtoBean.selected.descricao}" required="true"/>
+
+                            <h:outputText value="Gera Boleto:" />
+                            <p:selectBooleanButton value="#{tipoPagtoBean.selected.geraBoleto}" offLabel="Não" onLabel="Sim"/>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Gravar" 
+                                                 actionListener="#{tipoPagtoBean.inserir}" 
+                                                 update=":form" 
+                                                 oncomplete="handleDialog('insDialog',insDlg ,xhr, status, args)"/>
+
+                                <p:commandButton value="Cancela" 
+                                                 immediate="true"
+                                                 actionListener="#{tipoPagtoBean.cancela}" 
+                                                 update=":form" 
+                                                 oncomplete="insDlg.hide()" />
+                            </f:facet>
+                        </p:panelGrid>
+                    </p:dialog>
+                </h:form>
+
+
+
+                <h:form id="formEdit">
+                    <p:dialog id="editDialog" 
+                              modal="true"
+                              resizable="false"
+                              showHeader="false"
+                              hideEffect="explode"
+                              widgetVar="editDlg">
+
+                        <h:inputHidden value="#{tipoPagtoBean.selected.id}"/>
+
+                        <p:panelGrid columns="2">
+                            
+                            <f:facet name="header">Editar Tipo de Pagamento</f:facet>
+
+                            <h:outputText value="Descrição:" />
+                            <p:inputText value="#{tipoPagtoBean.selected.descricao}" required="true"/>
+
+                            <h:outputText value="Gera Boleto:" />
+                            <p:selectBooleanButton value="#{tipoPagtoBean.selected.geraBoleto}" offLabel="Não" onLabel="Sim"/>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Gravar" 
+                                                 actionListener="#{tipoPagtoBean.salvar}" 
+                                                 update=":form" 
+                                                 oncomplete="handleDialog('editDialog',editDlg ,xhr, status, args)"/>
+
+                                <p:commandButton value="Cancela" 
+                                                 immediate="true"
+                                                 actionListener="#{tipoPagtoBean.cancela}" 
+                                                 update=":form" 
+                                                 oncomplete="editDlg.hide()" />
+                            </f:facet>
+                        </p:panelGrid>
+                    </p:dialog>
+                </h:form>
+
+
+                <script type="text/javascript">  
+                    function handleDialog(dlgid, dlgw, xhr, status, args) {  
+                        if(args.validationFailed) {  
+                            jQuery('#'+dlgid).effect("shake", { times:3 }, 100);  
+                        } else {  
+                            dlgw.hide();  
+                        }  
+                    }  
+                </script>          
+
+            </ui:define>
+        </ui:composition> 
+    </h:body> 
+</html>

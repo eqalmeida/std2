@@ -1,0 +1,334 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./WEB-INF/templates/templatePrincipal.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+    <ui:define name="top">
+
+        <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
+
+    </ui:define>
+
+    <ui:define name="left">
+
+        <h:form>
+            <p:panel styleClass="ui-shadow" rendered="#{showPedidoMB.pedidoId == null}">
+
+                <f:facet name="header">Filtros</f:facet>
+
+                <h:panelGrid columns="2">
+                    Mês:
+                    <p:selectOneListbox value="#{showPedidoMB.mes}" valueChangeListener="#{showPedidoMB.mesChanged}">
+                        <f:selectItem itemValue="0" itemLabel="Janeiro"/>
+                        <f:selectItem itemValue="1" itemLabel="Fevereiro"/>
+                        <f:selectItem itemValue="2" itemLabel="Março"/>
+                        <f:selectItem itemValue="3" itemLabel="Abril"/>
+                        <f:selectItem itemValue="4" itemLabel="Maio"/>
+                        <f:selectItem itemValue="5" itemLabel="Junho"/>
+                        <f:selectItem itemValue="6" itemLabel="Julho"/>
+                        <f:selectItem itemValue="7" itemLabel="Agosto"/>
+                        <f:selectItem itemValue="8" itemLabel="Setembro"/>
+                        <f:selectItem itemValue="9" itemLabel="Outubro"/>
+                        <f:selectItem itemValue="10" itemLabel="Novembro"/>
+                        <f:selectItem itemValue="11" itemLabel="Dezembro"/>
+                        <f:ajax render=":formTable:tbl" />
+                    </p:selectOneListbox>
+
+                    Ano:
+                    <p:spinner min="1990" maxlength="5" size="5" value="#{showPedidoMB.ano}" valueChangeListener="#{showPedidoMB.anoChanged}">
+                        <f:ajax render=":formTable:tbl" />
+                    </p:spinner>
+                </h:panelGrid>
+
+            </p:panel>
+            <p:panel styleClass="ui-shadow" rendered="#{showPedidoMB.pedidoId != null}">
+
+                <f:facet name="header">Opções</f:facet>
+                <p:menu>
+                    <p:menuitem value="Imprimir" icon="ui-icon-print"/>
+                    <p:menuitem value="Excluir" icon="ui-icon-trash"/>
+                </p:menu>
+            </p:panel>
+        </h:form>
+
+
+
+    </ui:define>
+
+    <ui:define name="content">
+
+        <f:metadata>
+            <f:viewParam name="pedidoId" value="#{showPedidoMB.pedidoId}"/>
+        </f:metadata>
+
+        <p:growl autoUpdate="true" id="message"/>
+
+        <h:panelGroup rendered="#{showPedidoMB.pedidoId == null}">
+
+            <h:form id="formTable">
+
+                <p:dataTable lazy="true" var="it" id="tbl"
+                             selection="#{showPedidoMB.pedido}" selectionMode="single" 
+                             rowKey="#{it.id}"
+                             value="#{showPedidoMB.lista}" rows="10"
+                             paginatorAlwaysVisible="false" 
+                             paginator="true">
+
+                    <p:ajax event="rowSelect" listener="#{showPedidoMB.onRowSelected}"
+                            update=":detPedido"/>  
+
+                    <p:column headerText="Número" sortBy="#{it.id}">
+                        <h:outputText value="#{it.id}" />
+                    </p:column>
+
+
+                    <p:column headerText="Data" sortBy="#{it.data}">
+                        <h:outputText value="#{it.data}">
+                            <f:convertDateTime/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Cliente" sortBy="#{it.cliente.nome}">
+                        <h:outputText value="#{it.cliente.nome}" />
+                    </p:column>
+
+                    <p:column headerText="Valor" sortBy="#{it.valorTotal}">
+                        <h:outputText value="#{it.valorTotal}">
+                            <f:convertNumber type="currency" />
+                        </h:outputText>
+                    </p:column>
+
+                </p:dataTable>
+                <br />
+
+            </h:form>
+
+        </h:panelGroup>
+        <p:panel id="detPedido">
+
+            <f:facet name="header">Detalhes do Pedido</f:facet>
+
+            <h:form id="form" rendered="#{showPedidoMB.pedido != null}">
+
+                <p:panel rendered="#{showPedidoMB.pedido == null}">
+                    Pedido #{showPedidoMB.pedidoId} inexistente!
+                </p:panel>
+
+                <h:panelGroup rendered="#{showPedidoMB.pedido != null}" style="width:100%">
+
+                    <p:panelGrid columns="4" style="width: 100%">
+
+                        <f:facet name="header">Dados do Pedido</f:facet>
+
+                        <h:outputText value="Pedido:"/>
+                        <h:outputText value="#{showPedidoMB.pedido.id}"/>
+
+                        <h:outputText value="Data:"/>
+                        <h:outputText value="#{showPedidoMB.pedido.data}"><f:convertDateTime /> </h:outputText>
+
+                        <h:outputText value="Cliente:"/>
+                        <h:outputText value="#{showPedidoMB.pedido.cliente.nome}"/>
+
+                        <h:outputText value="Usuário:"/>
+                        <h:outputText value="#{showPedidoMB.pedido.usuario}"/>
+
+                        <h:outputText value="Status:"/>
+                        <h:outputText value="#{showPedidoMB.pedido.status}"/>
+
+                        <h:outputText value="Valor total:"/>
+                        <h:outputText value="#{showPedidoMB.pedido.valorTotal}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+
+                    </p:panelGrid>
+
+                    <br />
+
+                    <p:panelGrid columns="4" style="width: 100%">
+
+                        <f:facet name="header">Dados do Cliente</f:facet>
+
+                        <h:outputText value="CPF:"/>
+                        <h:outputText value="#{showPedidoMB.pedido.cliente.cpf}"/>
+
+                        <h:outputText value="RG:"/>
+                        <h:outputText value="#{showPedidoMB.pedido.cliente.rg}"/>
+
+                        <h:outputText value="Telefones:"/>
+                        <h:outputText value="#{showPedidoMB.pedido.cliente.telefones}"/>
+
+                        <h:outputText value="Endereço:"/>
+                        <h:outputText value="#{showPedidoMB.pedido.cliente.endereco}"/>
+                    </p:panelGrid>
+
+
+                    <h:panelGroup rendered="#{showPedidoMB.pedido.veiculo != null}">
+                        <br/>
+                        <p:panelGrid columns="4" style="width: 100%">
+
+                            <f:facet name="header">Dados do Veículo</f:facet>
+
+                            <h:outputText value="Marca/Modelo:"/>
+                            <h:outputText value="#{showPedidoMB.pedido.veiculo.produto.fabricante}/#{showPedidoMB.pedido.veiculo.produto.modelo}"/>
+
+                            <h:outputText value="Placa:"/>
+                            <h:outputText value="#{showPedidoMB.pedido.veiculo.produto.placa}"/>
+
+                            <h:outputText value="Chassi:"/>
+                            <h:outputText value="#{showPedidoMB.pedido.veiculo.produto.chassi}"/>
+
+                            <h:outputText value="Combustível:"/>
+                            <h:outputText value="#{showPedidoMB.pedido.veiculo.produto.combustivel}"/>
+
+                            <h:outputText value="Ano:"/>
+                            <h:outputText value="#{showPedidoMB.pedido.veiculo.produto.ano}"/>
+
+                            <h:outputText value="Cor:"/>
+                            <h:outputText value="#{showPedidoMB.pedido.veiculo.produto.cor}"/>
+                        </p:panelGrid>
+                    </h:panelGroup>
+                    <br/>
+
+                    <p:dataTable value="#{showPedidoMB.pedido.itens}" var="it">
+
+                        <f:facet name="header">Itens do Pedido</f:facet>
+
+                        <p:column headerText="Produto">
+                            #{it.produto}
+                        </p:column>
+
+                        <p:column headerText="Valor Unit.">
+                            <h:outputText value="#{it.valor}">
+                                <f:convertNumber type="currency"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Desconto">
+                            <h:outputText value="#{it.desconto}"/>
+                        </p:column>
+
+                        <p:column headerText="Valor Total">
+                            <h:outputText value="#{it.valorTotal}">
+                                <f:convertNumber type="currency"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+
+                    <p:spacer height="10"/>
+
+                    <p:dataTable var="it" value="#{showPedidoMB.pedido.pagamentos}" tableStyle="width:100%" >
+
+                        <f:facet name="header">Formas de Pagamento</f:facet>
+
+                        <p:column headerText="Tipo">
+                            #{it.tipoPagto}
+                        </p:column>
+
+                        <p:column headerText="Valor">
+                            <h:outputText value="#{it.valor}">
+                                <f:convertNumber type="currency"/>
+                            </h:outputText> 
+                        </p:column>
+
+                        <p:column headerText="Data">
+                            <h:outputText value="#{it.dataVenc}">
+                                <f:convertDateTime/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Num. Parcelas">
+                            #{it.numParcelas}
+                        </p:column>
+                        
+                        <p:column>
+                            <p:commandButton value="Registrar Pagamento" action="#{showPedidoMB.regPag}">
+                                <f:setPropertyActionListener target="#{showPedidoMB.pedidoPagSelected}" value="#{it}" />
+                            </p:commandButton>
+                        </p:column>
+
+                    </p:dataTable>
+
+                    <br/>
+
+                    <ui:repeat value="#{showPedidoMB.pedido.pagamentos}" var="it" id="pagTables">
+
+                        <h:panelGroup rendered="#{it.parcelas.size() gt 0}">
+
+                            <p:dataTable 
+                                id="tbl_#{par.id}"
+                                value="#{it.parcelas}" 
+                                var="par" 
+                                >
+
+                                <f:facet name="header">Parcelas em #{it.tipoPagto}</f:facet>
+
+                                <p:column headerText="Parcela">
+                                    #{par.numParcela}
+                                </p:column>
+
+                                <p:column headerText="Vencimento">
+                                    <h:outputText value="#{par.vencimento}">
+                                        <f:convertDateTime/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="Valor">
+                                    <h:outputText value="#{par.valor}">
+                                        <f:convertNumber type="currency"/>
+                                    </h:outputText>
+                                </p:column>
+                                
+                                <p:column headerText="Valor Pago">
+                                    <h:outputText value="#{par.valorPago}">
+                                        <f:convertNumber type="currency"/>
+                                    </h:outputText>
+                                </p:column>
+                                
+                                <p:column headerText="Valor Faltante">
+                                    <h:outputText value="#{par.valorFaltante}">
+                                        <f:convertNumber type="currency"/>
+                                    </h:outputText>
+                                </p:column>
+                                
+                                <p:column headerText="Data Pagamento">
+                                    <h:outputText value="#{par.dataPag}">
+                                        <f:convertDateTime/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="Situação">
+                                    #{par.situacao}
+                                </p:column>
+
+                            </p:dataTable>
+                            
+                            <p:spacer height="5"/>
+                            
+                        </h:panelGroup>
+                    </ui:repeat>
+                    <br/>
+
+                </h:panelGroup>
+                
+            </h:form>
+
+            <h:form id="formPag">
+                <p:dialog widgetVar="pagDialog" modal="true" resizable="false" header="Pagamento">
+                    <p:panelGrid columns="2">
+                        <h:outputText value="Data:" />
+                        <p:calendar value="#{showPedidoMB.pagamento.data}"/>
+
+                        <h:outputText value="Valor:" />
+                        <p:inputText value="#{showPedidoMB.pagamento.valor}"/>
+
+                    </p:panelGrid>
+                </p:dialog>
+            </h:form>
+
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

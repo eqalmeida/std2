@@ -1,0 +1,211 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:head></h:head>
+    <h:body>
+
+        <ui:composition template="./WEB-INF/templates/templatePrincipal.xhtml">
+
+            <ui:define name="top">
+
+                <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
+
+            </ui:define>
+
+            <ui:define name="left">
+                <ui:include src="./WEB-INF/inc/menu_lateral.xhtml" />
+            </ui:define>
+
+            <ui:define name="content">
+
+                <h:form id="form">
+
+                    <p:growl autoUpdate="true" id="message"/>
+
+                    <p:menubar>
+
+
+                        <p:menuitem 
+                            icon="ui-icon-plus" 
+                            actionListener="#{tabelaFinancBean.novo}" 
+                            update=":formIns"
+                            immediate="true" 
+                            oncomplete="tblDlg.show()"/>
+
+                        <p:menuitem 
+                            icon="ui-icon-pencil" 
+                            update=":formEdit" 
+                            immediate="true"
+                            oncomplete="altTbl.show()" />
+                        
+                        <p:menuitem
+                            icon="ui-icon-trash"
+                            update=":form"
+                            actionListener="#{tabelaFinancBean.excluir}"/>
+
+                        <p:menuitem 
+                            icon="ui-icon-circle-triangle-w" 
+                            actionListener="#{tabelaFinancBean.decPos}" 
+                            disabled="#{tabelaFinancBean.tabelaPos == 0}"
+                            immediate="true"
+                            update="@form, :formEdit"/>
+
+                        <p:menuitem 
+                            icon="ui-icon-circle-triangle-e" 
+                            actionListener="#{tabelaFinancBean.incPos}" 
+                            disabled="#{tabelaFinancBean.tabelaPos == (tabelaFinancBean.maxTabelas-1)}"
+                            immediate="true"
+                            update="@form, :formEdit"/>
+
+                    </p:menubar>
+
+                    <p:spacer height="5" width="100" />
+
+                    <p:contextMenu for="tbl">  
+                        <p:menuitem value="Editar" update=":formECoef" icon="ui-icon-pencil" oncomplete="ecoefDlg.show()"/>  
+                        <p:menuitem value="Excluir" update="tbl" icon="ui-icon-trash" actionListener="#{tabelaFinancBean.excluirCoef}"/>  
+                    </p:contextMenu>  
+
+                    <p:dataTable id="tbl" value="#{tabelaFinancBean.subItems}" 
+                                 rowKey="#{coef.coeficientePK}"
+                                 selectionMode="single"
+                                 selection="#{tabelaFinancBean.subItem}"
+                                 var="coef" tableStyle="width: auto">
+
+                        <f:facet name="header">
+                            <h:outputText value="#{tabelaFinancBean.selected.descricao}" />
+                        </f:facet>
+
+                        <f:facet name="footer">
+                            <p:commandButton icon="ui-icon-plus" value="Novo coeficiente" 
+                                             oncomplete="ncoefDlg.show()"
+                                             update=":formNCoef"
+                                             actionListener="#{tabelaFinancBean.novoCoef}" />
+                        </f:facet>
+
+                        <p:column headerText="Num. Parcelas">
+                            <h:outputText value="#{coef.coeficientePK.numParcelas}"/>
+                        </p:column>
+
+                        <p:column headerText="Coeficiente">
+                            <h:outputText value="#{coef.coeficiente}"/>
+                        </p:column>
+
+                    </p:dataTable>
+
+                </h:form>
+
+
+                <h:form id="formIns">
+                    <p:dialog id="tabelaDlg" widgetVar="tblDlg">
+                        <h:inputHidden value="#{tabelaFinancBean.selected.id}" />
+                        <h:panelGrid columns="2">
+                            <h:outputText value="Descrição da Tabela" />
+                            <p:inputText value="#{tabelaFinancBean.selected.descricao}" required="true"/>
+                        </h:panelGrid>
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Gravar" 
+                                             actionListener="#{tabelaFinancBean.inserir}" 
+                                             update=":form" 
+                                             oncomplete="handleDialog('tabelaDlg',tblDlg ,xhr, status, args)"/>
+
+                            <p:commandButton value="Cancela" 
+                                             actionListener="#{tabelaFinancBean.cancela}" 
+                                             update=":form" 
+                                             oncomplete="tblDlg.hide()" />
+                        </f:facet>
+                    </p:dialog>
+                </h:form>
+
+                <h:form id="formEdit">
+                    <p:dialog id="altTabela" widgetVar="altTbl" header="Edição de Tabela">
+                        <h:inputHidden value="#{tabelaFinancBean.selected.id}" />
+                        <h:panelGrid columns="2">
+                            <h:outputText value="Descrição da Tabela" />
+                            <p:inputText value="#{tabelaFinancBean.selected.descricao}" required="true"/>
+                        </h:panelGrid>
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Gravar" actionListener="#{tabelaFinancBean.salvar}" update=":form" oncomplete="altTbl.hide()" />
+                            <p:commandButton value="Cancela" actionListener="#{tabelaFinancBean.cancela}" update=":form" oncomplete="altTbl.hide()" />
+                        </f:facet>
+                    </p:dialog>
+                </h:form>
+
+                <h:form id="formNCoef">
+                    <p:dialog id="ncoefDialog" widgetVar="ncoefDlg" header="Novo Coeficiente">
+                        <h:panelGrid columns="2">
+
+                            <h:outputText value="N. Parcelas:" />
+                            <p:inputText value="#{tabelaFinancBean.subItem.coeficientePK.numParcelas}" required="true"/>
+
+                            <h:outputText value="Coeficiente:" />
+                            <p:inputText value="#{tabelaFinancBean.subItem.coeficiente}" required="true"/>
+
+                        </h:panelGrid>
+
+                        <f:facet name="footer">
+
+                            <p:commandButton value="Gravar" 
+                                             actionListener="#{tabelaFinancBean.inserirCoef}" 
+                                             update=":form" 
+                                             oncomplete="handleDialog('ncoefDialog',ncoefDlg ,xhr, status, args)"/>
+
+                            <p:commandButton value="Cancela" 
+                                             actionListener="#{tabelaFinancBean.cancela}" 
+                                             update=":form" oncomplete="ncoefDlg.hide()" 
+                                             immediate="true"/>
+                        </f:facet>
+                    </p:dialog>
+                </h:form>
+
+                <h:form id="formECoef">
+                    <p:dialog id="ecoefDialog" widgetVar="ecoefDlg" header="Editar Coeficiente">
+                        
+                        <h:inputHidden value="#{tabelaFinancBean.subItem.coeficientePK.tabelaFinanc}" />
+                        
+                        <h:panelGrid columns="2">
+
+                            <h:outputText value="N. Parcelas:" />
+                            <p:inputText value="#{tabelaFinancBean.subItem.coeficientePK.numParcelas}" required="true"/>
+
+                            <h:outputText value="Coeficiente:" />
+                            <p:inputText value="#{tabelaFinancBean.subItem.coeficiente}" required="true"/>
+
+                        </h:panelGrid>
+
+                        <f:facet name="footer">
+
+                            <p:commandButton value="Gravar" 
+                                             actionListener="#{tabelaFinancBean.salvarCoef}" 
+                                             update=":form" 
+                                             oncomplete="handleDialog('ecoefDialog',ecoefDlg ,xhr, status, args)"/>
+
+                            <p:commandButton value="Cancela" 
+                                             actionListener="#{tabelaFinancBean.cancela}" 
+                                             update=":form" oncomplete="ecoefDlg.hide()" 
+                                             immediate="true"/>
+                        </f:facet>
+                    </p:dialog>
+                </h:form>
+
+                <script type="text/javascript">  
+                    function handleDialog(dlgid, dlgw, xhr, status, args) {  
+                        if(args.validationFailed) {  
+                            jQuery('#'+dlgid).effect("shake", { times:3 }, 100);  
+                        } else {  
+                            dlgw.hide();  
+                        }  
+                    }  
+                </script>          
+
+            </ui:define>
+        </ui:composition> 
+    </h:body> 
+</html>

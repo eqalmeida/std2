@@ -1,0 +1,264 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./WEB-INF/templates/templatePrincipal.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+    <ui:define name="top">
+
+        <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
+
+    </ui:define>
+
+    <ui:define name="left">
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml" />
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl autoUpdate="true" id="message"/>
+
+
+        <p:panel header="Atenção" rendered="#{pedidoMB.items.size() == 0 or pedidoMB.pedido.cliente.id == null}">
+            Este pedido está incompleto. Você deve selecionar um cliente no Cadastro de Clientes 
+            e ao menos um produto no Cadastro de Produtos.
+        </p:panel>
+
+
+        <p:panelGrid columns="4" rendered="#{pedidoMB.pedido.cliente.id > 0}" style="width: 100%">
+            <f:facet name="header">Dados do cliente</f:facet>
+
+            <h:outputText value="Nome:"/>
+            <h:outputText value="#{pedidoMB.pedido.cliente.nome}" />
+
+            <h:outputText value="CPF:"/>
+            <h:outputText value="#{pedidoMB.pedido.cliente.cpf}" />
+
+            <h:outputText value="RG:"/>
+            <h:outputText value="#{pedidoMB.pedido.cliente.rg}" />
+
+            <h:outputText value="Endereço:"/>
+            <h:outputText value="#{pedidoMB.pedido.cliente.endereco}" />
+
+        </p:panelGrid>
+
+        <p:spacer height="10"/>
+
+
+        <h:form id="formItem">
+
+            <p:dialog id="itFormId" 
+                      widgetVar="itForm" 
+                      modal="true" 
+                      resizable="false">
+
+                <h:inputHidden value="#{pedidoMB.itemSelected.pedidoProdutoPK.pedido}" />
+                <h:inputHidden value="#{pedidoMB.itemSelected.pedidoProdutoPK.produto}" />
+
+                <f:facet name="header">Editar Item</f:facet>
+
+
+                <p:panelGrid columns="2" columnClasses="label,field,label,field" id="frm2">
+
+                    <h:outputText value="Valor:"/>
+                    <p:inputText value="#{pedidoMB.itemSelected.valor}" 
+                                 disabled="#{pedidoMB.itemSelected.produto.valor > 0.0}"
+                                 label="Valor" styleClass="valor">
+                        <f:convertNumber pattern="#,##0.00" />
+                    </p:inputText>
+
+                    <h:outputText value="Desconto:"/>
+                    <p:inputText value="#{pedidoMB.itemSelected.desconto}" label="Desconto">
+                        
+                    </p:inputText>
+
+                </p:panelGrid>
+                
+                <f:facet name="footer">
+                    <p:commandButton value="Gravar" actionListener="#{pedidoMB.gravarItem}" update=":form:itemsTable, frm2"/>
+                    <p:commandButton value="Cancela" oncomplete="itForm.hide()" immediate="true"/>
+                </f:facet>
+
+            </p:dialog>
+
+        </h:form>
+
+
+        <h:form id="form">
+
+            <p:contextMenu for="itemsTable">  
+                <p:menuitem value="Editar" update=":formItem" icon="ui-icon-pencil" oncomplete="itForm.show()"/>  
+                <p:menuitem value="Excluir" actionListener="#{pedidoMB.excluirPag}" update=":form" icon="ui-icon-trash"/>  
+            </p:contextMenu>  
+
+            <p:dataTable value="#{pedidoMB.items}" var="it" 
+                         id="itemsTable"
+                         selection="#{pedidoMB.itemSelected}"
+                         selectionMode="single"
+                         rowKey="#{it.pedidoProdutoPK}"
+                         rendered="#{pedidoMB.items.size() > 0}">
+
+                <f:facet name="header">Ítens do Pedido</f:facet>
+
+                <p:column headerText="Produto">
+                    #{it.produto.descricaoGeral}
+                </p:column>
+
+                <p:column headerText="Qtd" style="text-align: center">
+                    #{it.qtd}
+                </p:column>
+
+                <p:column headerText="Valor Unitário" style="text-align: center">
+                    <h:outputText value="#{it.valor}" >
+                        <f:convertNumber type="currency" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Desconto" style="text-align: center">
+                    <h:outputText value="#{it.desconto}%" >
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Valor total" style="text-align: center">
+                    <h:outputText value="#{it.valorTotal}" >
+                        <f:convertNumber type="currency" />
+                    </h:outputText>
+                </p:column>
+
+
+                <f:facet name="footer">
+
+                    <p:column colspan="2">
+                        <h:outputText value="Valor Total: " />
+                    </p:column>
+
+                    <p:column>
+                        <h:outputText value="#{pedidoMB.valorTotalPedido}" >
+                            <f:convertNumber type="currency" />
+                        </h:outputText>
+                    </p:column>
+
+                </f:facet>
+
+            </p:dataTable>
+
+            <p:spacer height="10"/>
+
+            <p:contextMenu for="pagTable">  
+                <p:menuitem value="Editar" actionListener="#{pedidoMB.editarPag}" update=":formPagDialog" icon="ui-icon-pencil" oncomplete="pagForm.show()"/>  
+                <p:menuitem value="Excluir" actionListener="#{pedidoMB.excluirPag}" update=":form" icon="ui-icon-trash"/>  
+            </p:contextMenu>  
+
+            <p:dataTable value="#{pedidoMB.pagamentos}" 
+                         var="it" id="pagTable"  rowKey="#{it.id}"
+                         selectionMode="single"
+                         selection="#{pedidoMB.pagamento}"
+                         rendered="#{pedidoMB.items.size() > 0}">
+
+                <f:facet name="header">Pagamento</f:facet>
+
+                <p:column headerText="Item">
+                    #{it.id}
+                </p:column>
+
+                <p:column headerText="Valor">
+                    <h:outputText value="#{it.valor}" >
+                        <f:convertNumber type="currency" currencySymbol="" />
+                    </h:outputText>
+
+                </p:column>
+
+                <p:column headerText="Tipo">
+                    #{it.tipoPagto.descricao}
+                </p:column>
+
+                <p:column headerText="Parcelas">
+                    #{it.numParcelas}
+                </p:column>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Adicionar" actionListener="#{pedidoMB.novoPag}" update=":formPagDialog"/>
+                </f:facet>
+
+            </p:dataTable>
+
+        </h:form>
+
+
+
+        <h:form id="formPagDialog">
+
+            <p:dialog id="pagFormId" 
+                      widgetVar="pagForm" 
+                      modal="true" 
+                      showHeader="true" resizable="false">
+
+                <h:inputHidden value="#{pedidoMB.pagamento.id}" />
+                <f:facet name="header">
+                    <h:outputText value="Editar "  rendered="#{pedidoMB.pagamento.id > 0}"/>
+                    <h:outputText value="Novo "  rendered="#{pedidoMB.pagamento.id == null}"/>
+                    <h:outputText value="Pagamento"/>
+                </f:facet>
+
+
+                <p:panelGrid columns="2" columnClasses="label,field,label,field" id="frm">
+
+                    <h:outputText value="Valor"/>
+                    <p:inputText value="#{pedidoMB.pagamento.valor}" label="Valor" required="true" styleClass="valor" 
+                                 valueChangeListener="#{pedidoMB.valorChanged}" >
+                        <f:convertNumber  pattern="#,##0.00"/>
+                        <f:ajax render="selTabela selParcelas"/>
+                    </p:inputText>
+
+                    <h:outputText value="Forma de Pagto:"/>
+                    <p:selectOneMenu value="#{pedidoMB.tipoPagtoSelected}" 
+                                     valueChangeListener="#{pedidoMB.tipoChanged}"
+                                     label="Forma de Pagto" required="true">
+                        <f:selectItem itemValue="" itemLabel="-- Selecione --" />
+                        <f:selectItems var="item" value="#{pedidoMB.tipoPagtoList}" itemValue="#{item.id}" itemLabel="#{item.descricao}"/>
+                        <f:ajax render="selTabela selParcelas selData"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Tabela de financiamento:"/>
+                    <p:selectOneMenu value="#{pedidoMB.tabelaId}" 
+                                     valueChangeListener="#{pedidoMB.tabelaChanged}"
+                                     id="selTabela" 
+                                     disabled="#{!(pedidoMB.tabelaFinancList.size() > 1)}">
+                        
+                        <f:selectItem itemValue="" itemLabel="-- Selecione --" />
+                        
+                        <f:selectItems value="#{pedidoMB.tabelaFinancList}" var="it" itemValue="#{it.id}" itemLabel="#{it.descricao}"/>
+                        <f:ajax render="selParcelas"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Parcelas:"/>
+                    <p:selectOneMenu value="#{pedidoMB.numParcelas}" id="selParcelas" disabled="#{!(pedidoMB.parcelaList.size() > 1)}">
+                        <f:selectItem itemValue="" itemLabel="-- Selecione --" />
+                        <f:selectItems value="#{pedidoMB.parcelaList}" 
+                                       var="i" 
+                                       itemValue="#{i.coeficientePK.numParcelas}" 
+                                       itemLabel="#{i.coeficientePK.numParcelas}"/>
+
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Data:"/>
+                    <p:calendar value="#{pedidoMB.pagamento.dataVenc}" id="selData"/>
+
+                </p:panelGrid>
+                <f:facet name="footer">
+                    <p:commandButton value="Gravar" actionListener="#{pedidoMB.gravarPag}" update=":form:pagTable, frm"/>
+                    <p:commandButton value="Cancela" oncomplete="pagForm.hide()" immediate="true"/>
+                </f:facet>
+
+            </p:dialog>
+
+        </h:form>
+        
+        <h:form>
+            <p:commandButton actionListener="#{pedidoMB.gravaPedido}" value="Gravar Pedido" update=":formPagDialog, :formItem, :form"/>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

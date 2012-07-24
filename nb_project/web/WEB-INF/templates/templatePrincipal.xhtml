@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link href="./resources/css/default.css" rel="stylesheet" type="text/css" />
+        <link href="./resources/css/cssLayout.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="./resources/js/jquery.maskMoney.js" />
+        <title>Loja Standard</title>
+
+        <script type="text/javascript">
+            $(document).ajaxSuccess(function(){
+                $(".valor").maskMoney({symbol:"",  decimal:",", thousands:"."});
+            })
+            
+            $(document).ready(function() {
+                $(".valor").maskMoney({symbol:"",  decimal:",", thousands:"."});
+            })    
+        </script>
+
+
+    </h:head>
+
+    <h:body>
+        
+        <div id="top" class="top">
+
+            <ui:insert name="top">Top</ui:insert>
+            <h:form id="menuBarForm">
+
+                <p:menubar>
+
+                    <p:submenu label="Cadastros" icon="ui-icon-note">  
+                        <p:menuitem value="Clientes" action="ManterCliente" icon="ui-icon-disk" update=":corpoId"/>  
+                        <p:menuitem value="Produtos" action="ManterProduto" icon="ui-icon-disk" update=":corpoId"/>  
+                    </p:submenu>  
+                    <p:submenu label="Configurações" icon="ui-icon-wrench">  
+                        <p:menuitem value="Tab. Financ." action="ManterTabelaFinanc" icon="ui-icon-disk" update=":corpoId"/>  
+                        <p:menuitem value="Tipo Pagamento" action="ManterTipoPagto" icon="ui-icon-disk" update=":corpoId"/>  
+                        <p:menuitem value="Pedido" action="ManterPedido" icon="ui-icon-disk" ajax="false" update=":corpoId"/>  
+                    </p:submenu>  
+                    <p:submenu label="Consultas" icon="ui-icon-document">
+                        <p:menuitem value="Pedidos" action="ShowPedido" icon="ui-icon-disk" update=":corpoId" ajax="false"/>  
+                        <p:menuitem value="Boletos" action="ManterBoleto" icon="ui-icon-disk" update=":corpoId"/>  
+                    </p:submenu>
+
+                    <p:submenu icon="ui-icon-person" label="#{loginMB.usuario}" rendered="#{loginMB.usuario != null}">
+                        <p:menuitem value="Sair" actionListener="#{loginMB.logoff}"  update=":corpoId"/>
+                    </p:submenu>
+
+
+
+                </p:menubar>
+
+            </h:form>
+        </div>
+        <h:panelGroup id="corpoId">
+        <table cellpadding="5" cellspacing="0" width="100%">
+            <tr>
+                <td style="vertical-align: top">
+                    <ui:insert name="left">Left</ui:insert>
+                </td>
+                <td style="vertical-align: top; width: 100%">
+                    <ui:insert name="content">Content</ui:insert>    
+
+
+                    <h:form id="loginForm">
+
+                        <h:panelGroup>
+                            <p:dialog widgetVar="loginDialog" closable="false" modal="true" visible="#{loginMB.usuario eq null?'true':'false'}" resizable="false" header="Login de Usuário">
+                            <p:panelGrid columns="2">
+                                <h:outputText value="Login:" />
+                                <p:inputText value="#{loginMB.login}" required="true" label="Login"/>
+                                
+                                
+                                <h:outputText value="Senha:" />
+                                <p:password value="#{loginMB.senha}" required="true" label="Senha"/>
+                                <f:facet name="footer">
+                                    <p:commandButton value="Efetuar Login" actionListener="#{loginMB.login}" update=":loginForm, :menuBarForm"/>
+                                </f:facet>
+                            </p:panelGrid>
+
+                        </p:dialog>
+                            
+                        </h:panelGroup>
+
+                    </h:form>
+
+
+
+
+                </td>
+            </tr>
+        </table>
+        </h:panelGroup>
+    </h:body>
+
+</html>

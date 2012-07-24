@@ -1,0 +1,156 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./WEB-INF/templates/templatePrincipal.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+    <ui:define name="top">
+
+        <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
+
+    </ui:define>
+
+    <ui:define name="left">
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml" />
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl autoUpdate="true" id="message"/>
+
+
+        <h:form id="form">
+
+            <p:menubar>
+                <p:submenu icon="ui-icon-plus" label="Novo" >
+                    <p:menuitem value="Veículo" actionListener="#{produtoBean.novoVeiculo}" update=":formNewCar" oncomplete="dialogNewCar.show()"/>
+                    <p:menuitem value="Outro" actionListener="#{produtoBean.novoProduto}" update=":formNewCar" oncomplete="dialogNewCar.show()"/>
+                </p:submenu>
+            </p:menubar>
+
+            <p:spacer height="5" />
+
+
+        </h:form>
+
+        <h:form id="formTable">
+
+            <p:contextMenu for="tbl">  
+                <p:menuitem value="Editar" update=":formNewCar" actionListener="#{produtoBean.editar}" icon="ui-icon-pencil"/>  
+                <p:menuitem value="Excluir" update="tbl" icon="ui-icon-trash" actionListener="#{produtoBean.excluir}"/>  
+                <p:menuitem value="Adicionar ao Pedido" update="tbl" icon="ui-icon-plus" actionListener="#{produtoBean.addToPedido}"/>
+            </p:contextMenu>  
+
+            <p:dataTable lazy="true" var="it" id="tbl"
+                         selectionMode="single" selection="#{produtoBean.selected}"
+                         value="#{produtoBean.lazyList}" rows="10"
+                         paginatorAlwaysVisible="false"
+                         paginator="true">
+
+                <p:column headerText="Tipo" sortBy="#{it.tipo}">
+                    <h:outputText value="Veículo" rendered="#{it.tipo == 1}"/>
+                    <h:outputText value="Outros" rendered="#{it.tipo == 0}"/>
+                </p:column>
+
+                <p:column headerText="Descrição">
+                    #{it.descricaoGeral}
+                </p:column>
+
+                <p:column headerText="Placa" sortBy="#{it.placa}">
+                    #{it.placa}
+                </p:column>
+
+                <p:column headerText="Fabricante" sortBy="#{it.fabricante}">
+                    #{it.fabricante}
+                </p:column>
+
+                <p:column headerText="Modelo" sortBy="#{it.modelo}">
+                    #{it.modelo}
+                </p:column>
+
+                <p:column headerText="Ano" sortBy="#{it.ano}">
+                    #{it.ano}
+                </p:column>
+
+                <p:column headerText="Valor" sortBy="#{it.valor}">
+                    <h:outputText  value="#{it.valor}" rendered="#{it.valor > 0.0}">
+                        <f:convertNumber type="currency" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Estoque" sortBy="#{it.qtdEstoque}" 
+                          filterBy="#{it.qtdEstoque}" filterOptions="#{produtoBean.optFilterEstoque}">
+                    <h:outputText value="#{it.qtdEstoque}" rendered="#{it.qtdEstoque >= 0}" />
+                </p:column>
+
+
+            </p:dataTable>
+
+        </h:form>
+
+        <h:form id="formNewCar">
+
+            <p:dialog id="dlgNewCar" widgetVar="dialogNewCar" modal="true" resizable="false">
+
+                <h:inputHidden value="#{produtoBean.selected.id}" />
+
+                <f:facet name="header">
+                    <h:outputText value="Editar "  rendered="#{produtoBean.selected.id > 0}"/>
+                    <h:outputText value="Novo "  rendered="#{produtoBean.selected.id == null}"/>
+                    <h:outputText value="Veículo"  rendered="#{produtoBean.selected.tipo == 1}"/>
+                    <h:outputText value="Produto"  rendered="#{produtoBean.selected.tipo == 0}"/>
+                </f:facet>
+
+                <p:panelGrid columns="#{2*(produtoBean.selected.tipo + 1)}" columnClasses="label,field,label,field" id="frm">
+
+                    <h:outputText value="Placa:"  rendered="#{produtoBean.selected.tipo == 1}"/>
+                    <p:inputText value="#{produtoBean.selected.placa}" required="true" maxlength="8" size="8" rendered="#{produtoBean.selected.tipo == 1}"/>
+
+                    <h:outputText value="Fabricante:"  rendered="#{produtoBean.selected.tipo == 1}"/>
+                    <p:inputText value="#{produtoBean.selected.fabricante}" required="true" rendered="#{produtoBean.selected.tipo == 1}"/>
+
+                    <h:outputText value="Descrição:"  rendered="#{produtoBean.selected.tipo == 0}"/>
+                    <p:inputText value="#{produtoBean.selected.descricao}" required="true" rendered="#{produtoBean.selected.tipo == 0}"/>
+
+                    <h:outputText value="Modelo:"  rendered="#{produtoBean.selected.tipo == 1}"/>
+                    <p:inputText value="#{produtoBean.selected.modelo}" required="true" rendered="#{produtoBean.selected.tipo == 1}"/>
+
+                    <h:outputText value="Cilindradas:"  rendered="#{produtoBean.selected.tipo == 1}"/>
+                    <p:inputText value="#{produtoBean.selected.cilindradas}" rendered="#{produtoBean.selected.tipo == 1}"/>
+
+                    <h:outputText value="Ano:"  rendered="#{produtoBean.selected.tipo == 1}"/>
+                    <p:inputText value="#{produtoBean.selected.ano}" required="true" rendered="#{produtoBean.selected.tipo == 1}"/>
+
+                    <h:outputText value="Cor:" rendered="#{produtoBean.selected.tipo == 1}" />
+                    <p:inputText value="#{produtoBean.selected.cor}" required="true" rendered="#{produtoBean.selected.tipo == 1}"/>
+
+                    <h:outputText value="Combustível:" rendered="#{produtoBean.selected.tipo == 1}" />
+                    <p:selectOneMenu value="#{produtoBean.selected.combustivel}"  rendered="#{produtoBean.selected.tipo == 1}">
+                        <f:selectItems value="#{produtoBean.tipoCombustivel}" />
+                    </p:selectOneMenu>
+
+                    <h:outputText value="Chassi:"  rendered="#{produtoBean.selected.tipo == 1}"/>
+                    <p:inputText value="#{produtoBean.selected.chassi}" rendered="#{produtoBean.selected.tipo == 1}"/>
+
+                    <h:outputText value="Valor:" />
+                    <p:inputText value="#{produtoBean.selected.valor}" styleClass="valor">
+                        <f:convertNumber  pattern="#,##0.00"/>
+                    </p:inputText>
+
+
+                    <h:outputText value="Estoque: (-1 para não controlar)" />
+                    <p:spinner min="-1" value="#{produtoBean.selected.qtdEstoque}" size="5"/>
+
+                </p:panelGrid>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Gravar" actionListener="#{produtoBean.inserir}" update=":formTable, frm"/>
+                    <p:commandButton value="Cancela" oncomplete="dialogNewCar.hide()" immediate="true"/>
+                </f:facet>
+
+            </p:dialog>
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>
