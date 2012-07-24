@@ -178,6 +178,9 @@ public class PagtoRecebido implements Serializable {
         return val;
     }
     
+    /**
+     * Converte a Data em um número que representa os dias
+     **/
     private long getDias(Calendar c) {
         c.set(Calendar.HOUR, 0);
         c.set(Calendar.MINUTE, 0);
