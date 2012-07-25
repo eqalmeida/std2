@@ -63,12 +63,14 @@ public class PagamentoBean extends ControllerBase {
     }
 
     public PagtoRecebido getPagamento() {
+        /*
         if(pagamento == null){
             pagamento = new PagtoRecebido();
             pagamento.setPedidoPag(getPedidoPag());
             pagamento.setDataInformada(new Date());
             pagamento.calculaValorDevido();
         }
+        */ 
         return pagamento;
     }
 
@@ -77,13 +79,17 @@ public class PagamentoBean extends ControllerBase {
     }
     
     public void dataChanged(ValueChangeEvent ev){
-        Util.debug("EV " +ev);
+/*        
         Date data = (Date) ev.getNewValue();
-        Calendar datac = Calendar.getInstance();
-        datac.setTime(data);
-        Util.debug("Valor recebido: "+ datac.getTime());
-        pagamento.setDataInformada(datac.getTime());
+        
+        pedidoPag = null;
+        
+        pagamento.setPedidoPag(getPedidoPag());
+        
+        pagamento.setDataInformada(data);
         pagamento.calculaValorDevido();
+  
+  */
     }
 
 }

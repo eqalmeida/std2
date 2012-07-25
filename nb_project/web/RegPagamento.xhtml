@@ -70,12 +70,24 @@
                         </h:outputText>    
                     </p:column>
 
+                    <p:column headerText="Multa">
+                        <h:outputText value="#{it.multa}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Juros">
+                        <h:outputText value="#{it.juros}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
+
                     <p:column headerText="Valor Pago">
                         <h:outputText value="#{it.valorPago}">
                             <f:convertNumber type="currency"/>
                         </h:outputText>
                     </p:column>
-
+                    
                     <p:column headerText="Valor Faltante">
                         <h:outputText value="#{it.valorFaltante}">
                             <f:convertNumber type="currency"/>
@@ -93,7 +105,7 @@
                     <p:inputText value="#{pagMB.pagamento.dataInformada}" label="Data" 
                                  valueChangeListener="#{pagMB.dataChanged}">
                         <f:convertDateTime type="date" timeZone="#{app.timeZone}"/>
-                        <f:ajax render="@form" />
+                        <f:ajax render="@form :form" />
                     </p:inputText>
 
                     <h:outputText value="Valor em atraso:" />

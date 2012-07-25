@@ -6,8 +6,12 @@ package model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,6 +21,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -32,13 +38,10 @@ import javax.persistence.TemporalType;
 public class Boleto implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
     public static Short ATIVO = 0;
     public static Short PAGO = 1;
     public static Short PAGO_PARCIAL = 2;
     public static Short CANCELADO = 3;
-    
-    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -61,33 +64,28 @@ public class Boleto implements Serializable {
     @JoinColumn(name = "pedido_pag_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private PedidoPag pedidoPag;
-
     @Column(name = "parcela_n")
     private short numParcela;
-    
-    @Column(name = "valorPago")
-    private BigDecimal valorPago;
-    
-    @Column(name = "valorFaltante")
+    @Column(name = "valor_faltante")
     private BigDecimal valorFaltante;
-
-    @Column(name = "dataPag")
+    @Column(name = "data_pag")
     @Temporal(TemporalType.DATE)
     private Date dataPag;
-    
     @javax.persistence.Transient
     private Short situacao = null;
-    
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "boleto_id")
+    private Collection<PagtoRecebido> pagamentos;
 
     public Boleto() {
     }
 
-    public BigDecimal getValorPago() {
-        return valorPago;
+    public Collection<PagtoRecebido> getPagamentos() {
+        return pagamentos;
     }
 
-    public void setValorPago(BigDecimal valorPago) {
-        this.valorPago = valorPago;
+    public void setPagamentos(Collection<PagtoRecebido> pagamentos) {
+        this.pagamentos = pagamentos;
     }
 
     public BigDecimal getValorFaltante() {
@@ -106,7 +104,6 @@ public class Boleto implements Serializable {
         this.dataPag = dataPag;
     }
 
-    
     public Boleto(Integer id) {
         this.id = id;
     }
@@ -180,17 +177,90 @@ public class Boleto implements Serializable {
                 situacao = 0;
             } else {
 
-//                Calendar data = Calendar.getInstance();
-
-                if (this.getVencimento().before( new Date() )) {
+                if (this.getVencimento().before(new Date())) {
                     situacao = 1;
-                }else{
+                } else {
                     situacao = 0;
                 }
 
             }
         }
         return situacao;
+    }
+
+    /**
+     * Converte a Data em um número que representa os dias
+     *
+     */
+    private long getDias(Date data) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(data);
+        long d = (c.getTimeInMillis() / (24 * 60 * 60 * 1000));
+        return d;
+    }
+
+    public boolean isAtrasado(Date data) {
+
+        if (status == Boleto.CANCELADO || status == Boleto.PAGO) {
+            return false;
+        }
+
+        if (status == PAGO_PARCIAL) {
+            return true;
+        }
+
+        long diasDataPag = getDias(data);
+        long diasVencimento = getDias(vencimento);
+        long atraso = diasDataPag - diasVencimento;
+
+        if (atraso >= 0) {
+            return true;
+        }
+
+        return false;
+
+    }
+
+    public BigDecimal getValorDevido(Date data) {
+        BigDecimal val = BigDecimal.ZERO;
+
+        if (status == ATIVO) {
+
+            long diasDataPag = getDias(data);
+            long diasVencimento = getDias(vencimento);
+            long atraso = diasDataPag - diasVencimento;
+
+            BigDecimal juros, multa;
+
+            if (atraso == 0) {
+                val = getValor();
+            } else if (atraso > 0) {
+                val = getValor();
+                juros = val.multiply(new BigDecimal(atraso)).divide(new BigDecimal(100)).setScale(2, RoundingMode.FLOOR);
+                multa = val.multiply(new BigDecimal(10)).divide(new BigDecimal(100)).setScale(2, RoundingMode.FLOOR);
+                val = val.add(juros);
+                val = val.add(multa);
+            }
+
+        }
+        
+        else if (status == PAGO_PARCIAL){
+            long diasDataPag = getDias(data);
+            long diasVencimento = getDias(dataPag);
+            long atraso = diasDataPag - diasVencimento;
+
+
+            if (atraso == 0) {
+                val = getValorFaltante();
+            } else if (atraso > 0) {
+                BigDecimal juros;
+                val = getValorFaltante();
+                juros = val.multiply(new BigDecimal(atraso)).divide(new BigDecimal(100)).setScale(2, RoundingMode.FLOOR);
+                val = val.add(juros);
+            }
+        }
+
+        return val;
     }
 
     @Override

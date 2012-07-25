@@ -63,9 +63,9 @@ public class PagtoRecebido implements Serializable {
     @JoinColumn(name = "receb_usuario_id", referencedColumnName = "id")
     @ManyToOne
     private Usuario recebUsuario;
-    @JoinColumn(name = "pedido_pag_id", referencedColumnName = "id")
+    @JoinColumn(name = "boleto_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private PedidoPag pedidoPag;
+    private Boleto boleto;
     
     public PagtoRecebido() {
     }
@@ -119,14 +119,15 @@ public class PagtoRecebido implements Serializable {
     public void setRecebUsuario(Usuario recebUsuario) {
         this.recebUsuario = recebUsuario;
     }
-    
-    public PedidoPag getPedidoPag() {
-        return pedidoPag;
+
+    public Boleto getBoleto() {
+        return boleto;
+    }
+
+    public void setBoleto(Boleto boleto) {
+        this.boleto = boleto;
     }
     
-    public void setPedidoPag(PedidoPag pedidoPag) {
-        this.pedidoPag = pedidoPag;
-    }
     
     public Date getDataInformada() {
         return dataInformada;
@@ -178,72 +179,8 @@ public class PagtoRecebido implements Serializable {
         return val;
     }
     
-    /**
-     * Converte a Data em um número que representa os dias
-     **/
-    private long getDias(Calendar c) {
-        c.set(Calendar.HOUR, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        long d = (c.getTimeInMillis() / (24 * 60 * 60 * 1000));
-        return d;
-    }
-    
-    private long difData(Calendar ini, Calendar fin) {
-        long dias = 0;
-        
-        Util.debug("Ini " + ini.getTime().toString());
-        Util.debug("Fin " + fin.getTime().toString());
-        
-        if (ini.get(Calendar.YEAR) == fin.get(Calendar.YEAR)
-                && ini.get(Calendar.MONTH) == fin.get(Calendar.MONTH)
-                && ini.get(Calendar.DATE) == fin.get(Calendar.DATE)) {
-            Util.debug("Ini equal " + ini.toString());
-            Util.debug("Fin equal " + fin.toString());
-            
-            return 0;
-        }
-        
-        ini.set(Calendar.HOUR_OF_DAY, 0);
-        ini.set(Calendar.MINUTE, 0);
-        ini.set(Calendar.SECOND, 0);
-        ini.set(Calendar.MILLISECOND, 0);
-        
-        Util.debug("Ini " + ini.toString());
-        Util.debug("Fin " + fin.toString());
-        
-        
-        fin.set(Calendar.HOUR_OF_DAY, 0);
-        fin.set(Calendar.MINUTE, 0);
-        fin.set(Calendar.SECOND, 0);
-        fin.set(Calendar.MILLISECOND, 0);
-        
-        Util.debug("Ini " + ini.toString());
-        Util.debug("Fin " + fin.toString());
-        
-        
-        
-        if (ini.before(fin)) {
-            Util.debug("Ini before ");
-            
-            
-            while (ini.before(fin)) {
-                ini.add(Calendar.DATE, 1);
-                dias++;
-            }
-        } else if (fin.before(ini)) {
-            Util.debug("Fin before");
-            while (fin.before(ini)) {
-                fin.add(Calendar.DATE, 1);
-                dias--;
-            }
-        }
-        return dias;
-    }
-    
     public void calculaValorDevido() {
-        
+/*        
         if (dataInformada == null) {
             return;
         }
@@ -252,48 +189,22 @@ public class PagtoRecebido implements Serializable {
             return;
         }
         
-        Calendar dataInf = Calendar.getInstance();
-        
-        dataInf.setTime(dataInformada);
-        
-        long dataInfL = getDias(dataInf);
-        
         valorDevido = BigDecimal.ZERO;
         juros = BigDecimal.ZERO;
         multa = BigDecimal.ZERO;
         
         for (Boleto boleto : pedidoPag.getParcelas()) {
             
-            if (boleto.getStatus() == Boleto.ATIVO) {
-                
-                Calendar venc = Calendar.getInstance();
-                venc.setTime(boleto.getVencimento());
-
-                // Ignora sabado e domingo
-                while (venc.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY
-                        || venc.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
-                    venc.add(Calendar.DATE, 1);
-                }
-
-                // Quantos dias de atraso
-//                long atraso = dataInfL - getDias(venc);
-                long atraso = difData(venc, dataInf);
-
-                // Se vence hoje
-                if (atraso == 0) {
-                    valorDevido = valorDevido.add(boleto.getValor());
-                } // se já venceu
-                else if (atraso > 0) {
-                    valorDevido = valorDevido.add(boleto.getValor());
-                    juros = juros.add(boleto.getValor().multiply(new BigDecimal(atraso)).divide(new BigDecimal(100.0)));
-                    multa = multa.add(boleto.getValor().multiply(new BigDecimal(10)).divide(new BigDecimal(100)));
-                }
+            if(boleto.isAtrasado(dataInformada)){
+                boleto.setDataPag(dataInformada);
+                boleto.calculaJuros();
+                valorDevido = valorDevido.add(boleto.getValor());
+                juros = juros.add(boleto.getJuros());
+                multa = multa.add(boleto.getMulta());
             }
+            
         }
-        
-        valorDevido = valorDevido.setScale(2, RoundingMode.DOWN);
-        juros = juros.setScale(2, RoundingMode.DOWN);
-        multa = multa.setScale(2, RoundingMode.DOWN);
+  */      
     }
     
     
