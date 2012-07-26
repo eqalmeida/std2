@@ -16,7 +16,15 @@
     </ui:define>
 
     <ui:define name="left">
-        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml" />
+        <h:form>
+        <p:menu>
+            <p:menuitem 
+                value="Novo Pagamento" 
+                actionListener="#{pagMB.novoPagamento}" 
+                update=":formDialog" />
+
+        </p:menu>
+        </h:form>
     </ui:define>
 
     <ui:define name="content">
@@ -29,9 +37,9 @@
 
         <h:outputScript name="locales_prime.js" library="js" /> 
 
-<!--
-                Verifica se a informação é válida
--->
+        <!--
+                        Verifica se a informação é válida
+        -->
         <h:panelGroup rendered="#{pagMB.pedidoPag eq null}">
             <p:panel header="Atenção">
                 A forma de pagamento não foi selecionada!
@@ -82,61 +90,48 @@
                         </h:outputText>
                     </p:column>
 
-                    <p:column headerText="Valor Pago">
-                        <h:outputText value="#{it.valorPago}">
-                            <f:convertNumber type="currency"/>
-                        </h:outputText>
-                    </p:column>
-                    
                     <p:column headerText="Valor Faltante">
                         <h:outputText value="#{it.valorFaltante}">
                             <f:convertNumber type="currency"/>
                         </h:outputText>
+                    </p:column>
+                    
+                    <p:column headerText="Status">
+                        #{it.statusStr}
                     </p:column>
 
                 </p:dataTable>
 
             </h:form>            
             <br/>
-            <h:form>
-                <p:panelGrid columns="2">
+            <h:form id="formDialog">
 
-                    <h:outputText value="Data:"/>
-                    <p:inputText value="#{pagMB.pagamento.dataInformada}" label="Data" 
-                                 valueChangeListener="#{pagMB.dataChanged}">
-                        <f:convertDateTime type="date" timeZone="#{app.timeZone}"/>
-                        <f:ajax render="@form :form" />
-                    </p:inputText>
+                <p:dialog widgetVar="pagDialog">
 
-                    <h:outputText value="Valor em atraso:" />
-                    <h:outputText value="#{pagMB.pagamento.valorDevido}">
-                        <f:convertNumber type="currency"/>
-                    </h:outputText>
+                    <p:panelGrid columns="2">
 
-                    <h:outputText value="Multa:" />
-                    <h:outputText value="#{pagMB.pagamento.multa}">
-                        <f:convertNumber type="currency"/>
-                    </h:outputText>
+                        <h:outputText value="Data:"/>
+                        <p:inputText value="#{pagMB.data}" label="Data" 
+                                     valueChangeListener="#{pagMB.dataChanged}">
+                            <f:convertDateTime type="date" timeZone="#{app.timeZone}"/>
+                            <f:ajax render="vdev" />
+                        </p:inputText>
 
-                    <h:outputText value="Juros:" />
-                    <h:outputText value="#{pagMB.pagamento.juros}">
-                        <f:convertNumber type="currency"/>
-                    </h:outputText>
+                        <h:outputText value="Valor devido:" />
+                        <h:outputText value="#{pagMB.valorDevido}" id="vdev">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
 
-                    <h:outputText value="Total:" />
-                    <h:outputText value="#{pagMB.pagamento.valorTotal}">
-                        <f:convertNumber type="currency"/>
-                    </h:outputText>
+                        <h:outputText value="Valor:"/>
+                        <p:inputText value="#{pagMB.valorRecebido}" label="Valor"/>
 
+                        <f:facet name="footer">
+                            <p:commandButton value="Registrar" actionListener="#{pagMB.registrar}" update=":form"/>
+                        </f:facet>
 
-                    <h:outputText value="Valor:"/>
-                    <p:inputText value="#{pagMB.pagamento.valor}" label="Valor"/>
+                    </p:panelGrid>
 
-                    <f:facet name="footer">
-                        <p:commandButton value="Registrar"/>
-                    </f:facet>
-
-                </p:panelGrid>
+                </p:dialog>
             </h:form>
         </h:panelGroup>
     </ui:define>

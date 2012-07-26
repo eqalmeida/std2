@@ -7,6 +7,7 @@ package model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -22,7 +23,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -66,6 +66,10 @@ public class Boleto implements Serializable {
     private PedidoPag pedidoPag;
     @Column(name = "parcela_n")
     private short numParcela;
+    @Column(name = "juros")
+    private BigDecimal juros;
+    @Column(name = "multa")
+    private BigDecimal multa;
     @Column(name = "valor_faltante")
     private BigDecimal valorFaltante;
     @Column(name = "data_pag")
@@ -78,6 +82,22 @@ public class Boleto implements Serializable {
     private Collection<PagtoRecebido> pagamentos;
 
     public Boleto() {
+    }
+
+    public BigDecimal getJuros() {
+        return juros;
+    }
+
+    public void setJuros(BigDecimal juros) {
+        this.juros = juros;
+    }
+
+    public BigDecimal getMulta() {
+        return multa;
+    }
+
+    public void setMulta(BigDecimal multa) {
+        this.multa = multa;
     }
 
     public Collection<PagtoRecebido> getPagamentos() {
@@ -221,46 +241,171 @@ public class Boleto implements Serializable {
 
     }
 
-    public BigDecimal getValorDevido(Date data) {
-        BigDecimal val = BigDecimal.ZERO;
+    public boolean regPagamento(BigDecimal valor, Date dataInf, Usuario usuario) throws Exception {
+
+        BigDecimal val = getValorDevido(dataInf);
+
+        long diasHoje = getDias(new Date());
+        long diasPag = getDias(dataInf);
+
+        if (diasPag > diasHoje) {
+            throw new Exception("Data de Pagamento Inválida");
+        }
+
+        if (valor.compareTo(val) > 0) {
+            throw new Exception("Valor de Pagamento inválido");
+        }
+
+        PagtoRecebido pag = new PagtoRecebido();
+        pag.setBoleto(this);
+        pag.setData(new Date());
+        pag.setDataInformada(dataInf);
+        pag.setValorDevido(val);
+        pag.setValor(valor);
+        pag.setRecebUsuario(usuario);
+
+        BigDecimal temp = getJuros();
+
+        if (temp == null) {
+            temp = BigDecimal.ZERO;
+        }
+
+        temp = temp.add(getJuros(dataInf));
+
+        setJuros(temp);
+
+        temp = getMulta();
+
+        if (temp == null) {
+            temp = BigDecimal.ZERO;
+        }
+
+        temp = temp.add(getMulta(dataInf));
+
+        setMulta(temp);
 
         if (status == ATIVO) {
 
-            long diasDataPag = getDias(data);
+            // Calcula o Valor total devido
+            temp = getValor().add(getJuros()).add(getMulta());
+
+            setValorFaltante(temp.subtract(valor));
+            if (getValorFaltante().longValue() > 0.0) {
+                setStatus(PAGO_PARCIAL);
+            } else {
+                setStatus(PAGO);
+            }
+        } else if (status == PAGO_PARCIAL) {
+
+            // Calcula o Valor total devido
+            temp = getValorFaltante().add(getJuros()).add(getMulta());
+
+            // Salva o novo valor faltante
+            setValorFaltante(temp.subtract(valor));
+
+            if (getValorFaltante().longValue() > 0.0) {
+                setStatus(PAGO_PARCIAL);
+            } else {
+                setStatus(PAGO);
+            }
+        }
+
+        setDataPag(dataInf);
+
+        if (getPagamentos() == null) {
+            setPagamentos(new ArrayList<PagtoRecebido>());
+        }
+
+        getPagamentos().add(pag);
+
+        return true;
+    }
+
+    public BigDecimal getValorDevido(Date data) {
+
+        BigDecimal val = BigDecimal.ZERO;
+
+        if (status == ATIVO) {
+            val = getValor();
+        } else if (status == PAGO_PARCIAL) {
+            val = getValorFaltante();
+        }
+
+        val = val.add(getJuros(data)).add(getMulta(data));
+
+        return val;
+    }
+
+    private BigDecimal getJuros(Date data) {
+
+        long diasDataPag = getDias(data);
+
+        if (status == ATIVO) {
+
             long diasVencimento = getDias(vencimento);
             long atraso = diasDataPag - diasVencimento;
 
-            BigDecimal juros, multa;
 
-            if (atraso == 0) {
-                val = getValor();
-            } else if (atraso > 0) {
-                val = getValor();
-                juros = val.multiply(new BigDecimal(atraso)).divide(new BigDecimal(100)).setScale(2, RoundingMode.FLOOR);
-                multa = val.multiply(new BigDecimal(10)).divide(new BigDecimal(100)).setScale(2, RoundingMode.FLOOR);
-                val = val.add(juros);
-                val = val.add(multa);
+            if (atraso > 0) {
+                BigDecimal temp = getValor().multiply(new BigDecimal(atraso)).divide(new BigDecimal(100.0)).setScale(2, RoundingMode.DOWN);
+                return (temp);
+
+            } else {
+                return (BigDecimal.ZERO);
+            }
+        } else if (status == PAGO_PARCIAL) {
+
+            long diasVencimento = getDias(dataPag);
+            long diasVencimentoPrincipal = getDias(vencimento);
+            
+            long atraso;
+
+            if (diasVencimentoPrincipal > diasVencimento) {
+                atraso = diasDataPag - diasVencimentoPrincipal;
+            } else {
+                atraso = diasDataPag - diasVencimento;
             }
 
+
+            if (atraso > 0) {
+                BigDecimal temp = getValorFaltante().multiply(new BigDecimal(atraso)).divide(new BigDecimal(100.0)).setScale(2, RoundingMode.DOWN);
+                return (temp);
+            } else {
+                return (BigDecimal.ZERO);
+            }
         }
-        
-        else if (status == PAGO_PARCIAL){
-            long diasDataPag = getDias(data);
-            long diasVencimento = getDias(dataPag);
+        return (BigDecimal.ZERO);
+    }
+
+    private BigDecimal getMulta(Date data) {
+
+        long diasDataPag = getDias(data);
+
+        if (status == ATIVO) {
+
+            long diasVencimento = getDias(vencimento);
             long atraso = diasDataPag - diasVencimento;
 
 
-            if (atraso == 0) {
-                val = getValorFaltante();
-            } else if (atraso > 0) {
-                BigDecimal juros;
-                val = getValorFaltante();
-                juros = val.multiply(new BigDecimal(atraso)).divide(new BigDecimal(100)).setScale(2, RoundingMode.FLOOR);
-                val = val.add(juros);
-            }
-        }
+            if (atraso > 0) {
+                BigDecimal temp = getValor().multiply(new BigDecimal(10)).divide(new BigDecimal(100)).setScale(2, RoundingMode.DOWN);
+                return (temp);
 
-        return val;
+            } else {
+                return (BigDecimal.ZERO);
+            }
+
+        }
+        return (BigDecimal.ZERO);
+    }
+
+    public String getStatusStr() {
+        String str[] = {
+            "ATIVO",
+            "PAGO",
+            "PAGO PARCIAL",
+            "CANCELADO",};
+        return str[status];
     }
 
     @Override
