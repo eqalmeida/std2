@@ -70,6 +70,10 @@ public class Boleto implements Serializable {
     private BigDecimal juros;
     @Column(name = "multa")
     private BigDecimal multa;
+    
+    @Column(name="valor_pago")
+    private BigDecimal valorPago;
+    
     @Column(name = "valor_faltante")
     private BigDecimal valorFaltante;
     @Column(name = "data_pag")
@@ -82,6 +86,14 @@ public class Boleto implements Serializable {
     private Collection<PagtoRecebido> pagamentos;
 
     public Boleto() {
+    }
+
+    public BigDecimal getValorPago() {
+        return valorPago;
+    }
+
+    public void setValorPago(BigDecimal valorPago) {
+        this.valorPago = valorPago;
     }
 
     public BigDecimal getJuros() {
@@ -255,6 +267,13 @@ public class Boleto implements Serializable {
         if (valorRecebido.compareTo(val) > 0) {
             throw new Exception("Valor de Pagamento inválido");
         }
+        
+        for(PagtoRecebido pr : this.getPagamentos()){
+            long dp = getDias( pr.getDataInformada() );
+            if(dp > diasPag){
+                throw new Exception("Este boleto já possui um pagamento com data posterior a esta!");
+            }
+        }
 
         PagtoRecebido pag = new PagtoRecebido();
         pag.setBoleto(this);
@@ -285,6 +304,8 @@ public class Boleto implements Serializable {
         this.setMulta(temp);
 
         if (this.status == ATIVO) {
+            
+            this.setValorPago(valorRecebido);
 
             // Calcula o Valor total devido
             temp = this.getValor().add(this.getJuros()).add(this.getMulta());
@@ -302,6 +323,17 @@ public class Boleto implements Serializable {
 
             // Salva o novo valor faltante
             setValorFaltante(temp.subtract(valorRecebido));
+
+            temp = this.getValorPago();
+            
+            if(temp == null){
+                temp = BigDecimal.ONE;
+            }
+            
+            /**
+             * O Valor Pago é somado ao valor anterior
+             */
+            this.setValorPago(valorRecebido.add(temp));
 
             if (getValorFaltante().doubleValue() > 0.0) {
                 setStatus(PAGO_PARCIAL);

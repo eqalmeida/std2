@@ -22,18 +22,7 @@
                 <h:panelGrid columns="2">
                     Mês:
                     <p:selectOneListbox value="#{showPedidoMB.mes}" valueChangeListener="#{showPedidoMB.mesChanged}">
-                        <f:selectItem itemValue="0" itemLabel="Janeiro"/>
-                        <f:selectItem itemValue="1" itemLabel="Fevereiro"/>
-                        <f:selectItem itemValue="2" itemLabel="Março"/>
-                        <f:selectItem itemValue="3" itemLabel="Abril"/>
-                        <f:selectItem itemValue="4" itemLabel="Maio"/>
-                        <f:selectItem itemValue="5" itemLabel="Junho"/>
-                        <f:selectItem itemValue="6" itemLabel="Julho"/>
-                        <f:selectItem itemValue="7" itemLabel="Agosto"/>
-                        <f:selectItem itemValue="8" itemLabel="Setembro"/>
-                        <f:selectItem itemValue="9" itemLabel="Outubro"/>
-                        <f:selectItem itemValue="10" itemLabel="Novembro"/>
-                        <f:selectItem itemValue="11" itemLabel="Dezembro"/>
+                        <f:selectItems value="#{app.meses}"/>
                         <f:ajax render=":formTable:tbl" />
                     </p:selectOneListbox>
 
@@ -208,7 +197,7 @@
 
                         <p:column headerText="Desconto">
                             <h:outputText value="#{it.desconto}"/>
-                        </p:column>
+                        </p:column> 
 
                         <p:column headerText="Valor Total">
                             <h:outputText value="#{it.valorTotal}">
@@ -299,8 +288,8 @@
                                     </h:outputText>
                                 </p:column>
 
-                                <p:column headerText="Situação">
-                                    #{par.situacao}
+                                <p:column headerText="Status">
+                                    #{par.statusStr}
                                 </p:column>
 
                             </p:dataTable>

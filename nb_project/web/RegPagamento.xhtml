@@ -17,13 +17,13 @@
 
     <ui:define name="left">
         <h:form>
-        <p:menu>
-            <p:menuitem 
-                value="Novo Pagamento" 
-                actionListener="#{pagMB.novoPagamento}" 
-                update=":formDialog" />
+            <p:menu>
+                <p:menuitem 
+                    value="Novo Pagamento" 
+                    actionListener="#{pagMB.novoPagamento}" 
+                    update=":formDialog" />
 
-        </p:menu>
+            </p:menu>
         </h:form>
     </ui:define>
 
@@ -95,7 +95,7 @@
                             <f:convertNumber type="currency"/>
                         </h:outputText>
                     </p:column>
-                    
+
                     <p:column headerText="Status">
                         #{it.statusStr}
                     </p:column>
@@ -106,16 +106,25 @@
             <br/>
             <h:form id="formDialog">
 
-                <p:dialog widgetVar="pagDialog">
+                <p:dialog widgetVar="pagDialog" header="Registro de Pagamento" modal="true" resizable="false">
 
-                    <p:panelGrid columns="2">
+                    <p:panelGrid columns="2" id="npag_panel">
 
                         <h:outputText value="Data:"/>
-                        <p:inputText value="#{pagMB.data}" label="Data" 
+                        <p:inputText value="#{pagMB.data}" label="Data" required="true"
                                      valueChangeListener="#{pagMB.dataChanged}">
-                            <f:convertDateTime type="date" timeZone="#{app.timeZone}"/>
+                            <f:convertDateTime type="date"  timeZone="#{app.timeZone}"/>
                             <f:ajax render="vdev" />
                         </p:inputText>
+
+                        <h:outputText value="Num.:"/>
+                        <h:outputText value="#{pagMB.boletoSel.numParcela}"/>
+
+                        <h:outputText value="Vencimento:"/>
+                        <h:outputText value="#{pagMB.boletoSel.vencimento}">
+                            <f:convertDateTime timeZone="#{app.timeZone}" />
+                        </h:outputText>
+
 
                         <h:outputText value="Valor devido:" />
                         <h:outputText value="#{pagMB.valorDevido}" id="vdev">
@@ -123,10 +132,12 @@
                         </h:outputText>
 
                         <h:outputText value="Valor:"/>
-                        <p:inputText value="#{pagMB.valorRecebido}" label="Valor"/>
+                        <p:inputText value="#{pagMB.valorRecebido}" label="Valor" styleClass="valor" required="true">
+                            <f:convertNumber  pattern="#,##0.00"/>
+                        </p:inputText>
 
                         <f:facet name="footer">
-                            <p:commandButton value="Registrar" actionListener="#{pagMB.registrar}" update=":form"/>
+                            <p:commandButton value="Registrar" actionListener="#{pagMB.registrar}" update=":form npag_panel"/>
                         </f:facet>
 
                     </p:panelGrid>
