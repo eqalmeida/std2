@@ -5,24 +5,17 @@
 package controller;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.ValueChangeEvent;
-import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import model.Boleto;
-import model.PagtoRecebido;
 import model.PedidoPag;
 import model.Usuario;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.SelectEvent;
 import repo.PedidoPagJpaController;
-import util.Util;
 
 /**
  *
@@ -60,11 +53,9 @@ public class PagamentoBean extends ControllerBase {
     }
 
     public PedidoPag getPedidoPag() {
-        if (pedidoPag == null) {
-            try {
-                pedidoPag = pagService.findPedidoPag(id);
-            } catch (Exception ex) {
-            }
+        try {
+            pedidoPag = pagService.findPedidoPag(id);
+        } catch (Exception ex) {
         }
         return pedidoPag;
     }
