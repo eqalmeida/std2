@@ -241,7 +241,7 @@ public class Boleto implements Serializable {
 
     }
 
-    public boolean regPagamento(BigDecimal valor, Date dataInf, Usuario usuario) throws Exception {
+    public boolean regPagamento(BigDecimal valorRecebido, Date dataInf, Usuario usuario) throws Exception {
 
         BigDecimal val = getValorDevido(dataInf);
 
@@ -252,7 +252,7 @@ public class Boleto implements Serializable {
             throw new Exception("Data de Pagamento Inválida");
         }
 
-        if (valor.compareTo(val) > 0) {
+        if (valorRecebido.compareTo(val) > 0) {
             throw new Exception("Valor de Pagamento inválido");
         }
 
@@ -261,7 +261,7 @@ public class Boleto implements Serializable {
         pag.setData(new Date());
         pag.setDataInformada(dataInf);
         pag.setValorDevido(val);
-        pag.setValor(valor);
+        pag.setValor(valorRecebido);
         pag.setRecebUsuario(usuario);
 
         BigDecimal temp = getJuros();
@@ -272,38 +272,38 @@ public class Boleto implements Serializable {
 
         temp = temp.add(getJuros(dataInf));
 
-        setJuros(temp);
+        this.setJuros(temp);
 
-        temp = getMulta();
+        temp = this.getMulta();
 
         if (temp == null) {
             temp = BigDecimal.ZERO;
         }
 
-        temp = temp.add(getMulta(dataInf));
+        temp = temp.add(this.getMulta(dataInf));
 
-        setMulta(temp);
+        this.setMulta(temp);
 
-        if (status == ATIVO) {
+        if (this.status == ATIVO) {
 
             // Calcula o Valor total devido
-            temp = getValor().add(getJuros()).add(getMulta());
+            temp = this.getValor().add(this.getJuros()).add(this.getMulta());
 
-            setValorFaltante(temp.subtract(valor));
+            this.setValorFaltante(temp.subtract(valorRecebido));
             if (getValorFaltante().longValue() > 0.0) {
                 setStatus(PAGO_PARCIAL);
             } else {
                 setStatus(PAGO);
             }
-        } else if (status == PAGO_PARCIAL) {
+        } else if (this.status == PAGO_PARCIAL) {
 
             // Calcula o Valor total devido
-            temp = getValorFaltante().add(getJuros()).add(getMulta());
+            temp = getValorFaltante().add(this.getJuros()).add(this.getMulta());
 
             // Salva o novo valor faltante
-            setValorFaltante(temp.subtract(valor));
+            setValorFaltante(temp.subtract(valorRecebido));
 
-            if (getValorFaltante().longValue() > 0.0) {
+            if (getValorFaltante().doubleValue() > 0.0) {
                 setStatus(PAGO_PARCIAL);
             } else {
                 setStatus(PAGO);
@@ -316,7 +316,7 @@ public class Boleto implements Serializable {
             setPagamentos(new ArrayList<PagtoRecebido>());
         }
 
-        getPagamentos().add(pag);
+        this.getPagamentos().add(pag);
 
         return true;
     }
