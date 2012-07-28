@@ -10,6 +10,7 @@
     <class>model.Coeficiente</class>
     <class>model.PedidoOld</class>
     <class>model.Pedido</class>
+    <class>model.Config</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/std_loja"/>

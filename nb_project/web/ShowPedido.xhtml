@@ -55,7 +55,7 @@
 
         <p:growl autoUpdate="true" id="message"/>
 
-        <h:panelGroup rendered="#{showPedidoMB.pedidoId == null}">
+        <h:panelGroup rendered="#{showPedidoMB.pedidoId == null}" id="shpedido">
 
             <h:form id="formTable">
 
@@ -99,6 +99,12 @@
         <p:panel id="detPedido">
 
             <f:facet name="header">Detalhes do Pedido</f:facet>
+            <h:form>
+                <p:commandButton value="Imprimir" ajax="false" icon="ui-icon-print">
+                    <p:printer target=":form"/>
+                </p:commandButton>
+
+            </h:form>
 
             <h:form id="form" rendered="#{showPedidoMB.pedido != null}">
 
@@ -106,7 +112,7 @@
                     Pedido #{showPedidoMB.pedidoId} inexistente!
                 </p:panel>
 
-                <h:panelGroup rendered="#{showPedidoMB.pedido != null}" style="width:100%">
+                <h:panelGroup rendered="#{showPedidoMB.pedido != null}" style="width:100%" styleClass="print">
 
                     <p:panelGrid columns="4" style="width: 100%">
 
@@ -181,7 +187,7 @@
                     </h:panelGroup>
                     <br/>
 
-                    <p:dataTable value="#{showPedidoMB.pedido.itens}" var="it">
+                    <p:dataTable value="#{showPedidoMB.pedido.itens}" var="it" styleClass="print">
 
                         <f:facet name="header">Itens do Pedido</f:facet>
 
@@ -231,11 +237,16 @@
                         <p:column headerText="Num. Parcelas">
                             #{it.numParcelas}
                         </p:column>
-                        
+
                         <p:column>
-                            <p:commandButton value="Registrar Pagamento" action="#{showPedidoMB.regPag}">
+                            <p:commandLink value="Registrar Pagamento" action="#{showPedidoMB.regPag}">
                                 <f:setPropertyActionListener target="#{showPedidoMB.pedidoPagSelected}" value="#{it}" />
-                            </p:commandButton>
+                            </p:commandLink>
+                            <p:spacer width="5"/>
+                            <p:commandLink value="Imprimir Boletos" action="#{showPedidoMB.printBoletos}">
+                                <f:setPropertyActionListener target="#{showPedidoMB.pedidoPagSelected}" value="#{it}" />
+                            </p:commandLink>
+                            
                         </p:column>
 
                     </p:dataTable>
@@ -269,19 +280,19 @@
                                         <f:convertNumber type="currency"/>
                                     </h:outputText>
                                 </p:column>
-                                
+
                                 <p:column headerText="Valor Pago">
                                     <h:outputText value="#{par.valorPago}">
                                         <f:convertNumber type="currency"/>
                                     </h:outputText>
                                 </p:column>
-                                
+
                                 <p:column headerText="Valor Faltante">
                                     <h:outputText value="#{par.valorFaltante}">
                                         <f:convertNumber type="currency"/>
                                     </h:outputText>
                                 </p:column>
-                                
+
                                 <p:column headerText="Data Pagamento">
                                     <h:outputText value="#{par.dataPag}">
                                         <f:convertDateTime/>
@@ -293,15 +304,15 @@
                                 </p:column>
 
                             </p:dataTable>
-                            
+
                             <p:spacer height="5"/>
-                            
+
                         </h:panelGroup>
                     </ui:repeat>
                     <br/>
 
                 </h:panelGroup>
-                
+
             </h:form>
 
             <h:form id="formPag">

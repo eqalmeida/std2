@@ -4,7 +4,7 @@ body {
 
 .painel1 {
     vertical-align: top;
-    
+
 }
 
 .painel2{
@@ -13,7 +13,7 @@ body {
 }
 
 .ui-widget, .ui-widget .ui-widget {
-font-size: 90% !important;
+    font-size: 90% !important;
 }
 
 .ui-state-hover{
@@ -26,7 +26,7 @@ font-size: 90% !important;
 }
 
 .field {
-    
+
 }
 
 .red{
@@ -34,26 +34,56 @@ font-size: 90% !important;
 }
 
 tr.verde{
-       background-image: none;
+    background-image: none;
 
-   background-color: #060;
-   color: #fff;
+    background-color: #060;
+    color: #fff;
 }
 
 tr.vermelho{
-       background-image: none;
+    background-image: none;
 
-   background-color: #C00;
-   color: #fff;
+    background-color: #C00;
+    color: #fff;
 }
 
 tr.laranja{
-       background-image: none;
+    background-image: none;
 
-   background-color: #C60;
-   color: #fff;
+    background-color: #C60;
+    color: #fff;
 }
 
 a:hover {
     font-weight: normal;
+}
+
+
+table.boleto{
+    font-family: Tahoma, Geneva, sans-serif;
+    font-size: 12px;
+    border-collapse:collapse;
+    width: 100%;
+}
+table.boleto td, table.boleto th{
+    border:1px solid #ddd;
+    padding: 5px;
+}
+
+table.no-border td, table.no-border th{
+    border:0px;
+    padding: 5px;
+}
+
+@media print{
+    body{ background-color:#FFFFFF; background-image:none; color:#000000 }
+    .ui-widget, .ui-widget .ui-widget .ui-datatable {
+        border: 0;
+        margin: 0;
+        padding: 0;
+        background: none;
+        color: black;
+    }
+
+
 }

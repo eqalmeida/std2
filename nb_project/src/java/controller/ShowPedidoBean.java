@@ -148,6 +148,23 @@ public class ShowPedidoBean extends ControllerBase {
 
     }
 
+    public void printBoletos() {
+        
+        if(pedidoPagSelected == null){
+            addErrorMessage("Identificação inválida!");
+            return;
+        }
+
+        String red = "PrintBoleto.jsf?id=" + pedidoPagSelected.getId();
+        pedidoPagSelected = null;
+        try {
+            FacesContext.getCurrentInstance().getExternalContext().redirect(red);
+        } catch (IOException ex) {
+            addErrorMessage(ex.getMessage());
+        }
+
+    }
+
     public PagtoRecebido getPagamento() {
         return pagamento;
     }

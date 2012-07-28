@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./WEB-INF/templates/templatePrincipal.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+
+
+    <ui:define name="top">
+
+        <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
+
+    </ui:define>
+
+    <ui:define name="left">
+        <h:form>
+            <p:commandButton value="Imprimir" ajax="false" icon="ui-icon-print">
+                <p:printer target=":lbol"/>
+            </p:commandButton>
+        </h:form>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <f:metadata>
+            <f:viewParam name="id" value="#{printBoletoMB.pagId}"/>
+        </f:metadata>
+
+        <p:growl autoUpdate="true" id="message"/>
+
+        <h:outputScript name="locales_prime.js" library="js" /> 
+
+        <!--
+                        Verifica se a informação é válida
+        -->
+        <h:panelGroup rendered="#{printBoletoMB.pedidoPag eq null}">
+            <p:panel header="Atenção">
+                A forma de pagamento não foi selecionada!
+            </p:panel>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{printBoletoMB.pedidoPag != null}">
+            <h:form id="lbol">
+
+                    <ui:param name="bolVar" value="#{app.config.boletosPorPag}"/>
+                    
+                    <ui:repeat value="#{printBoletoMB.pedidoPag.parcelas}" var="it" >
+                    <div style="margin-left: 50px">
+
+                        <table class="boleto">
+                            <tr>
+                                <th colspan="2" align="center">
+                                        <h:outputText value="Rogerinho MOTOS - Boleto - Financiamento"/>
+                                </th>
+                                <td align="right">
+                                        <h:graphicImage value="/resources/img/logo_rogerinho_pq.jpeg"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td rowspan="4" valign="top" width="90%">
+                                    Observações:
+                                    <h:panelGroup rendered="#{it.pedidoPag.jurosDiario > 0.0}">
+                                        Multa por atraso: #{it.pedidoPag.multaAtraso} % <br/>
+                                        Juros: #{it.pedidoPag.jurosDiario} % ao dia.
+                                    </h:panelGroup>
+
+                                </td>
+
+                                <td nowrap="nowrap">Valor da Parcela:</td>
+                                <td nowrap="nowrap" style="font-weight: bold" align="center"><h:outputText value="#{it.valor}"><f:convertNumber type="currency"/></h:outputText></td>
+                            </tr>
+                            <tr>
+                                <td nowrap="nowrap">Vencimento:</td>
+                                <td nowrap="nowrap" style="font-weight: bold" align="center"><h:outputText value="#{it.vencimento}"><f:convertDateTime/></h:outputText></td>
+                            </tr>
+                            <tr>
+                                <td nowrap="nowrap">Parcela:</td>
+                                <td nowrap="nowrap" align="center">
+                                    <h:outputText value="#{it.numParcela}"/>/<h:outputText value="#{it.pedidoPag.numParcelas}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td nowrap="nowrap">Nro. Pedido</td>
+                                <td nowrap="nowrap" align="center">
+                                    <h:outputText value="#{it.pedidoPag.pedido.id}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" align="center" style="font-size: 10px">
+                                    Av. Marechal Tito, xxx - São Miguel Paulista São Paulo <br/>
+                                    rogerinho@rogerinhomotos.com.br<br/>
+                                    tel.: 9999-999
+                                </td>
+                            </tr>
+                        </table>
+                        
+                    </div>
+
+                        <h:panelGroup rendered="#{(it.numParcela mod bolVar) eq 0}">
+                            <p style="page-break-before: always"></p>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{!((it.numParcela mod bolVar) eq 0)}">
+                            <hr style="border: dashed 1px #999" />
+                        </h:panelGroup>
+
+                    </ui:repeat>
+                
+            </h:form>
+        </h:panelGroup>
+    </ui:define>
+
+</ui:composition>
