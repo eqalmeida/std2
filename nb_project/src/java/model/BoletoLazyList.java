@@ -21,20 +21,26 @@ public class BoletoLazyList extends LazyDataModel<Boleto> {
     private Date dateTo = null;
     private Date dateFrom = null;
 
+    public BoletoLazyList(BoletoJpaController service) {
+        this.service = service;
+    }
+    
+    
+
     @Override
     public List<Boleto> load(int startingAt, int maxPerPage, String sortField, SortOrder sortOrder, Map<String, String> filters) {
 /*
-        getService().setFilterNome(null);
+        service.setFilterNome(null);
 
         for(String filterP : filters.keySet()){
             if(filterP.equalsIgnoreCase("nome")){
-                getService().setFilterNome(filters.get(filterP));
+                service.setFilterNome(filters.get(filterP));
                 break;
             }
         }
 */     
         
-        getService().setDatas(dateTo, dateFrom);
+        service.setDatas(dateTo, dateFrom);
         
         if (sortField != null && sortOrder != SortOrder.UNSORTED) {
             String ord = "";
@@ -45,13 +51,13 @@ public class BoletoLazyList extends LazyDataModel<Boleto> {
                 ord = "DESC";
             }
 
-            getService().setSortedField(sortField, ord);
+            service.setSortedField(sortField, ord);
         }
 
 
-        List<Boleto> lista = getService().findBoletoEntities(maxPerPage, startingAt);
+        List<Boleto> lista = service.findBoletoEntities(maxPerPage, startingAt);
 
-        setRowCount(getService().getBoletoCount());
+        setRowCount(service.getBoletoCount());
 
         setPageSize(maxPerPage);
 
@@ -70,18 +76,11 @@ public class BoletoLazyList extends LazyDataModel<Boleto> {
         try {
             Integer id = Integer.valueOf(Id);
 
-            b = getService().findBoleto(id);
+            b = service.findBoleto(id);
             
         } catch (Exception ex) {
         }
         return b;
-    }
-
-    public BoletoJpaController getService() {
-        if(service == null){
-            service = new BoletoJpaController();
-        }
-        return service;
     }
 
     public void setDateTo(Date dateTo) {

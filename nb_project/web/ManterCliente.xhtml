@@ -12,38 +12,37 @@
     </ui:define>
 
     <ui:define name="left">
-        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml" />
+        <h:form id="fmenu">
+
+            <p:menu>
+                
+                <p:submenu label="Opcões">
+                    <p:menuitem value="Novo" actionListener="#{clienteMB.novo}" update=":formDialog @form :formTable" oncomplete="cliForm.show()"/>
+                </p:submenu>
+                
+                <p:submenu label="Selecionado">
+                    <p:menuitem disabled="#{clienteMB.selected.id eq null}" value="Editar" update=":formDialog" actionListener="#{clienteMB.editar}" icon="ui-icon-pencil" oncomplete="cliForm.show()"/>  
+                    <p:menuitem disabled="#{clienteMB.selected.id eq null}" value="Excluir" update=":formTable" icon="ui-icon-trash" actionListener="#{clienteMB.excluir}"/>  
+                    <p:menuitem disabled="#{clienteMB.selected.id eq null}" value="Adicionar ao Pedido" icon="ui-icon-plus" actionListener="#{clienteMB.addToPedido}"/>
+                </p:submenu>
+            </p:menu>
+
+        </h:form>    
     </ui:define>
 
     <ui:define name="content">
         <p:growl autoUpdate="true" id="message"/>
 
-
-        <h:form id="form">
-
-            <p:menubar>
-                <p:menuitem value="Novo" actionListener="#{clienteMB.novo}" update=":formDialog" oncomplete="cliForm.show()"/>
-            </p:menubar>
-
-            <p:spacer height="5" />
-
-
-        </h:form>
-
         <h:form id="formTable">
-
-            <p:contextMenu for="tbl">  
-                <p:menuitem value="Editar" update=":formDialog" actionListener="#{clienteMB.editar}" icon="ui-icon-pencil" oncomplete="cliForm.show()"/>  
-                <p:menuitem value="Excluir" update="tbl" icon="ui-icon-trash" actionListener="#{clienteMB.excluir}"/>  
-                <p:menuitem value="Adicionar ao Pedido" update="tbl" icon="ui-icon-plus" actionListener="#{clienteMB.addToPedido}"/>
-            </p:contextMenu>  
-
 
             <p:dataTable lazy="true" var="it" id="tbl"
                          selectionMode="single" selection="#{clienteMB.selected}"
                          value="#{clienteMB.lazyList}" rows="10"
                          paginatorAlwaysVisible="false"
                          paginator="true">
+                
+                <p:ajax event="rowSelect" update=":fmenu" />
+                <p:ajax event="rowUnselect" update=":fmenu" />
 
                 <p:column headerText="ID" sortBy="#{it.id}">#{it.id}</p:column>
 

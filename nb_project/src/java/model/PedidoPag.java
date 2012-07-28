@@ -57,6 +57,15 @@ public class PedidoPag implements Serializable {
     @Basic(optional = false)
     @Column(name = "frequencia")
     private short frequencia;
+    
+
+    @Column(name="multa_percent")
+    private Double multaAtraso;
+
+    @Column(name="juros_diario_percent")
+    private Double jurosDiario;
+    
+    
     @JoinColumn(name = "tabela_financ_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private TabelaFinanc tabelaFinanc;
@@ -172,6 +181,22 @@ public class PedidoPag implements Serializable {
 
     public void setPagamentos(Collection<PagtoRecebido> pagamentos) {
         this.pagamentos = pagamentos;
+    }
+
+    public Double getMultaAtraso() {
+        return multaAtraso;
+    }
+
+    public void setMultaAtraso(Double multaAtraso) {
+        this.multaAtraso = multaAtraso;
+    }
+
+    public Double getJurosDiario() {
+        return jurosDiario;
+    }
+
+    public void setJurosDiario(Double jurosDiario) {
+        this.jurosDiario = jurosDiario;
     }
     
     public BigDecimal getValorDevidoAtual(Date d){

@@ -18,7 +18,24 @@
             </ui:define>
 
             <ui:define name="left">
-                <ui:include src="./WEB-INF/inc/menu_lateral.xhtml" />
+                <h:form id="fmenu">
+                    <p:menu>
+                        <p:submenu label="Opções">
+
+
+                            <p:menuitem 
+                                value="Novo"
+                                icon="ui-icon-plus" 
+                                actionListener="#{tipoPagtoBean.novo}" 
+                                update=":formIns"
+                                immediate="true" 
+                                oncomplete="insDlg.show()"/>
+
+
+                        </p:submenu>
+
+                    </p:menu>
+                </h:form>
             </ui:define>
 
             <ui:define name="content">
@@ -26,22 +43,6 @@
                 <h:form id="form">
 
                     <p:growl autoUpdate="true" id="message"/>
-
-                    <p:menubar>
-
-
-                        <p:menuitem 
-                            value="Novo"
-                            icon="ui-icon-plus" 
-                            actionListener="#{tipoPagtoBean.novo}" 
-                            update=":formIns"
-                            immediate="true" 
-                            oncomplete="insDlg.show()"/>
-
-
-                    </p:menubar>
-
-                    <p:spacer height="5" width="100" />
 
                     <p:contextMenu for="tbl">  
                         <p:menuitem value="Editar" update=":formEdit" icon="ui-icon-pencil" oncomplete="editDlg.show()"/>  
@@ -68,6 +69,14 @@
                         <p:column headerText="Gera Boleto?">
                             <h:outputText value="Sim" rendered="#{it.geraBoleto == true}" />
                             <h:outputText value="Não" rendered="#{it.geraBoleto == false}" />
+                        </p:column>
+                        
+                        <p:column headerText="Multa Por Atraso">
+                            <h:outputText value="#{it.multaAtraso} %" />
+                        </p:column>
+
+                        <p:column headerText="Juros Diário">
+                            <h:outputText value="#{it.jurosDiario} %" />
                         </p:column>
 
                     </p:dataTable>
@@ -123,6 +132,12 @@
 
                             <h:outputText value="Gera Boleto:" />
                             <p:selectBooleanButton value="#{tipoPagtoBean.selected.geraBoleto}" offLabel="Não" onLabel="Sim"/>
+                            
+                            <h:outputText value="Multa por Atraso (%):" />
+                            <p:inputText value="#{tipoPagtoBean.selected.multaAtraso}" label="Multa por atraso" required="true" />
+
+                            <h:outputText value="Juros diário (%):" />
+                            <p:inputText value="#{tipoPagtoBean.selected.jurosDiario}" label="Juros diário" required="true" />
 
                             <f:facet name="footer">
                                 <p:commandButton value="Gravar" 
@@ -153,7 +168,7 @@
                         <h:inputHidden value="#{tipoPagtoBean.selected.id}"/>
 
                         <p:panelGrid columns="2">
-                            
+
                             <f:facet name="header">Editar Tipo de Pagamento</f:facet>
 
                             <h:outputText value="Descrição:" />
@@ -161,6 +176,13 @@
 
                             <h:outputText value="Gera Boleto:" />
                             <p:selectBooleanButton value="#{tipoPagtoBean.selected.geraBoleto}" offLabel="Não" onLabel="Sim"/>
+                            
+                            <h:outputText value="Multa por Atraso (%):" />
+                            <p:inputText value="#{tipoPagtoBean.selected.multaAtraso}" label="Multa por atraso" required="true" />
+
+                            <h:outputText value="Juros diário (%):" />
+                            <p:inputText value="#{tipoPagtoBean.selected.jurosDiario}" label="Juros diário" required="true" />
+
 
                             <f:facet name="footer">
                                 <p:commandButton value="Gravar" 

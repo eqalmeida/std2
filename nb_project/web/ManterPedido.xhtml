@@ -13,7 +13,15 @@
     </ui:define>
 
     <ui:define name="left">
-        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml" />
+        <h:form id="fmenu">
+            <p:menu>
+                <p:submenu label="Opções">
+                    <p:menuitem value="Adicionar Pagamento" actionListener="#{pedidoMB.novoPag}" update=":formPagDialog"/>
+                    
+                    <p:menuitem actionListener="#{pedidoMB.gravaPedido}" value="Gravar Pedido" update=":formPagDialog, :formItem, :form"/>
+                </p:submenu>
+            </p:menu>
+        </h:form>
     </ui:define>
 
     <ui:define name="content">
@@ -177,10 +185,6 @@
                     #{it.numParcelas}
                 </p:column>
 
-                <f:facet name="footer">
-                    <p:commandButton value="Adicionar" actionListener="#{pedidoMB.novoPag}" update=":formPagDialog"/>
-                </f:facet>
-
             </p:dataTable>
 
         </h:form>
@@ -255,9 +259,6 @@
 
         </h:form>
         
-        <h:form>
-            <p:commandButton actionListener="#{pedidoMB.gravaPedido}" value="Gravar Pedido" update=":formPagDialog, :formItem, :form"/>
-        </h:form>
 
     </ui:define>
 

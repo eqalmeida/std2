@@ -35,13 +35,14 @@
                 <p:menubar>
 
                     <p:submenu label="Cadastros" icon="ui-icon-note">  
-                        <p:menuitem value="Clientes" action="ManterCliente" icon="ui-icon-disk" update=":corpoId"/>  
-                        <p:menuitem value="Produtos" action="ManterProduto" icon="ui-icon-disk" update=":corpoId"/>  
+                        <p:menuitem value="Clientes" action="ManterCliente" icon="ui-icon-disk" ajax="false"/>  
+                        <p:menuitem value="Produtos" action="ManterProduto" icon="ui-icon-disk" ajax="false"/>  
+                        <p:menuitem value="Novo Pedido" action="ManterPedido" icon="ui-icon-disk" ajax="false"/>  
                     </p:submenu>  
+                    
                     <p:submenu label="Configurações" icon="ui-icon-wrench">  
-                        <p:menuitem value="Tab. Financ." action="ManterTabelaFinanc" icon="ui-icon-disk" update=":corpoId"/>  
-                        <p:menuitem value="Tipo Pagamento" action="ManterTipoPagto" icon="ui-icon-disk" update=":corpoId"/>  
-                        <p:menuitem value="Pedido" action="ManterPedido" icon="ui-icon-disk" ajax="false" update=":corpoId"/>  
+                        <p:menuitem value="Tab. Financ." action="ManterTabelaFinanc" ajax="false"/>  
+                        <p:menuitem value="Tipo Pagamento" action="ManterTipoPagto" ajax="false"/>  
                     </p:submenu>  
                     <p:submenu label="Consultas" icon="ui-icon-document">
                         <p:menuitem value="Pedidos" action="ShowPedido" icon="ui-icon-disk" update=":corpoId" ajax="false"/>  

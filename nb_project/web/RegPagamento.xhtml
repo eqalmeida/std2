@@ -47,7 +47,25 @@
         </h:panelGroup>
 
         <h:panelGroup rendered="#{pagMB.pedidoPag != null}">
+            
+            <p:panelGrid columns="4" style="width:100%">
+                
+                <f:facet name="header">Dados da Forma de Pagamento</f:facet>
+                
+                <h:outputText value="Cliente:"/>
+                <h:outputText value="#{pagMB.pedidoPag.pedido.cliente}"/>
 
+                <h:outputText value="Tipo de Pagto:"/>
+                <h:outputText value="#{pagMB.pedidoPag.tipoPagto}"/>
+
+                <h:outputText value="Multa por atraso (%):"/>
+                <h:outputText value="#{pagMB.pedidoPag.multaAtraso}"/>
+
+                <h:outputText value="Juros diário (%):"/>
+                <h:outputText value="#{pagMB.pedidoPag.jurosDiario}"/>
+            </p:panelGrid>
+            <br/>
+            
             <h:form id="form">
                 
                 <p:dataTable value="#{pagMB.pedidoPag.parcelas}" var="it" 

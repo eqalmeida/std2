@@ -22,12 +22,12 @@
                     Mês:
                     <p:selectOneListbox value="#{boletoMB.filtMes}" valueChangeListener="#{boletoMB.mesChanged}">
                         <f:selectItems value="#{app.meses}"/>
-                        <f:ajax render=":formTable:tbl" />
+                        <f:ajax render=":formTable" />
                     </p:selectOneListbox>
 
                     Ano:
                     <p:spinner min="1990" maxlength="5" size="5" value="#{boletoMB.filtAno}" valueChangeListener="#{boletoMB.anoChanged}">
-                        <f:ajax render=":formTable:tbl" />
+                        <f:ajax render=":formTable" />
                     </p:spinner>
                 </h:panelGrid>
 

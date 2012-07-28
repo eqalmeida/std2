@@ -23,7 +23,7 @@ import repo.exceptions.NonexistentEntityException;
  * @author eqalmeida
  */
 public class ProdutoJpaController implements Serializable {
-    
+
     private String sortedField = null;
     private String order = null;
 
@@ -31,8 +31,6 @@ public class ProdutoJpaController implements Serializable {
         this.sortedField = sortedField;
         this.order = order;
     }
-    
-    
 
     public ProdutoJpaController() {
         this.emf = ControllerBase.getEmf();
@@ -172,13 +170,13 @@ public class ProdutoJpaController implements Serializable {
     }
 
     public List<Produto> findProdutoEntities(int maxResults, int firstResult) {
-        
+
         String query = "SELECT p FROM Produto p";
-        
-        if(sortedField != null){
+
+        if (sortedField != null) {
             query += (" ORDER BY p." + sortedField + " " + order);
         }
-        
+
         EntityManager em = getEntityManager();
         try {
 
@@ -195,7 +193,15 @@ public class ProdutoJpaController implements Serializable {
         EntityManager em = getEntityManager();
         try {
 
-            Query q = em.createQuery("SELECT p FROM Produto p WHERE p.tipo = :tipo").setParameter("tipo", tipo);
+            String query = "SELECT p FROM Produto p WHERE p.tipo = :tipo";
+
+            if (sortedField != null) {
+                query += (" ORDER BY p." + sortedField + " " + order);
+            }
+
+
+
+            Query q = em.createQuery(query).setParameter("tipo", tipo);
             if (!all) {
                 q.setMaxResults(maxResults);
                 q.setFirstResult(firstResult);

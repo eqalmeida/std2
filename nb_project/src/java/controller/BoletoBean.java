@@ -9,13 +9,13 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import model.Boleto;
 import model.BoletoLazyList;
-import model.PedidoLazyList;
 import org.primefaces.model.LazyDataModel;
 import repo.BoletoJpaController;
 
@@ -31,6 +31,7 @@ public class BoletoBean extends ControllerBase{
     private Boleto selected = null;
     private Short filtMes = null;
     private Integer filtAno = null;
+    private BoletoJpaController service = null;
 
     /**
      * Creates a new instance of BoletoBean
@@ -39,6 +40,11 @@ public class BoletoBean extends ControllerBase{
         Calendar data = GregorianCalendar.getInstance();
         filtAno = data.get(Calendar.YEAR);
         filtMes = (short) ( data.get(Calendar.MONTH));
+    }
+    
+    @PostConstruct
+    private void init(){
+        service = new BoletoJpaController();
     }
     
     public void verPedido(){
@@ -76,7 +82,7 @@ public class BoletoBean extends ControllerBase{
 
     public LazyDataModel<Boleto> getLazyList() {
         if (lazyList == null) {
-            lazyList = new BoletoLazyList();
+            lazyList = new BoletoLazyList(this.service);
 
             updateDatas();
         }
@@ -84,8 +90,6 @@ public class BoletoBean extends ControllerBase{
     }
 
     public BigDecimal getTotalMes() {
-        BoletoLazyList boletoLazy = (BoletoLazyList) getLazyList();
-        BoletoJpaController service = boletoLazy.getService();
         return (service.getValorTotal());
     }
 

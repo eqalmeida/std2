@@ -12,34 +12,32 @@
     </ui:define>
 
     <ui:define name="left">
-        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml" />
+        <h:form id="fmenu">
+            <p:menu>  
+                
+                <p:submenu label="Visualizar">
+                    <p:menuitem value="Veiculos" actionListener="#{produtoBean.setTipoProduto(1)}" update=":formTable @form" disabled="#{produtoBean.tipoProduto eq 1 }"/>
+                    <p:menuitem value="Outros" actionListener="#{produtoBean.setTipoProduto(0)}" update=":formTable @form" disabled="#{produtoBean.tipoProduto eq 0 }"/>
+                </p:submenu>
+                
+                <p:submenu icon="ui-icon-plus" label="Novo" >
+                    <p:menuitem value="Veículo" actionListener="#{produtoBean.novoVeiculo}" update=":formNewCar" oncomplete="dialogNewCar.show()"/>
+                    <p:menuitem value="Outro" actionListener="#{produtoBean.novoProduto}" update=":formNewCar" oncomplete="dialogNewCar.show()"/>
+                </p:submenu>
+
+                <p:submenu label="Selecionado" >
+                <p:menuitem disabled="#{produtoBean.selected.id eq null}" value="Editar" update=":formNewCar" actionListener="#{produtoBean.editar}" icon="ui-icon-pencil"/>  
+                <p:menuitem  disabled="#{produtoBean.selected.id eq null}" value="Excluir" update=":formTable" icon="ui-icon-trash" actionListener="#{produtoBean.excluir}"/>  
+                <p:menuitem  disabled="#{produtoBean.selected.id eq null}" value="Adicionar ao Pedido" update=":formTable" icon="ui-icon-plus" actionListener="#{produtoBean.addToPedido}"/>
+                </p:submenu>
+            </p:menu>
+        </h:form>
     </ui:define>
 
     <ui:define name="content">
         <p:growl autoUpdate="true" id="message"/>
 
-
-        <h:form id="form">
-
-            <p:menubar>
-                <p:submenu icon="ui-icon-plus" label="Novo" >
-                    <p:menuitem value="Veículo" actionListener="#{produtoBean.novoVeiculo}" update=":formNewCar" oncomplete="dialogNewCar.show()"/>
-                    <p:menuitem value="Outro" actionListener="#{produtoBean.novoProduto}" update=":formNewCar" oncomplete="dialogNewCar.show()"/>
-                </p:submenu>
-            </p:menubar>
-
-            <p:spacer height="5" />
-
-
-        </h:form>
-
         <h:form id="formTable">
-
-            <p:contextMenu for="tbl">  
-                <p:menuitem value="Editar" update=":formNewCar" actionListener="#{produtoBean.editar}" icon="ui-icon-pencil"/>  
-                <p:menuitem value="Excluir" update="tbl" icon="ui-icon-trash" actionListener="#{produtoBean.excluir}"/>  
-                <p:menuitem value="Adicionar ao Pedido" update="tbl" icon="ui-icon-plus" actionListener="#{produtoBean.addToPedido}"/>
-            </p:contextMenu>  
 
             <p:dataTable lazy="true" var="it" id="tbl"
                          selectionMode="single" selection="#{produtoBean.selected}"
@@ -47,28 +45,29 @@
                          paginatorAlwaysVisible="false"
                          paginator="true">
 
-                <p:column headerText="Tipo" sortBy="#{it.tipo}">
-                    <h:outputText value="Veículo" rendered="#{it.tipo == 1}"/>
-                    <h:outputText value="Outros" rendered="#{it.tipo == 0}"/>
-                </p:column>
+                <p:ajax event="rowSelect"
+                        update=":fmenu"/>  
 
-                <p:column headerText="Descrição">
+                <p:ajax event="rowUnselect"
+                        update=":fmenu"/>  
+
+                <p:column headerText="Descrição" rendered="#{produtoBean.tipoProduto eq 0}">
                     #{it.descricaoGeral}
                 </p:column>
 
-                <p:column headerText="Placa" sortBy="#{it.placa}">
+                <p:column headerText="Placa" sortBy="#{it.placa}" rendered="#{produtoBean.tipoProduto eq 1}">
                     #{it.placa}
                 </p:column>
 
-                <p:column headerText="Fabricante" sortBy="#{it.fabricante}">
+                <p:column headerText="Fabricante" sortBy="#{it.fabricante}" rendered="#{produtoBean.tipoProduto eq 1}">
                     #{it.fabricante}
                 </p:column>
 
-                <p:column headerText="Modelo" sortBy="#{it.modelo}">
+                <p:column headerText="Modelo" sortBy="#{it.modelo}" rendered="#{produtoBean.tipoProduto eq 1}">
                     #{it.modelo}
                 </p:column>
 
-                <p:column headerText="Ano" sortBy="#{it.ano}">
+                <p:column headerText="Ano" sortBy="#{it.ano}" rendered="#{produtoBean.tipoProduto eq 1}">
                     #{it.ano}
                 </p:column>
 

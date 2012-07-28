@@ -363,6 +363,12 @@ public class Boleto implements Serializable {
     }
 
     private BigDecimal getJuros(Date data) {
+        
+        Double j = this.getPedidoPag().getJurosDiario();
+        
+        if(j == null || j == 0.0){
+            return (BigDecimal.ZERO);
+        }
 
         long diasDataPag = getDias(data);
 
@@ -373,7 +379,7 @@ public class Boleto implements Serializable {
 
 
             if (atraso > 0) {
-                BigDecimal temp = getValor().multiply(new BigDecimal(atraso)).divide(new BigDecimal(100.0)).setScale(2, RoundingMode.DOWN);
+                BigDecimal temp = getValor().multiply(new BigDecimal(atraso)).multiply(new BigDecimal(j)).divide(new BigDecimal(100.0)).setScale(2, RoundingMode.DOWN);
                 return (temp);
 
             } else {
@@ -394,7 +400,7 @@ public class Boleto implements Serializable {
 
 
             if (atraso > 0) {
-                BigDecimal temp = getValorFaltante().multiply(new BigDecimal(atraso)).divide(new BigDecimal(100.0)).setScale(2, RoundingMode.DOWN);
+                BigDecimal temp = getValorFaltante().multiply(new BigDecimal(atraso)).multiply(new BigDecimal(j)).divide(new BigDecimal(100.0)).setScale(2, RoundingMode.DOWN);
                 return (temp);
             } else {
                 return (BigDecimal.ZERO);
@@ -404,6 +410,12 @@ public class Boleto implements Serializable {
     }
 
     private BigDecimal getMulta(Date data) {
+        
+        Double m = this.getPedidoPag().getMultaAtraso();
+        
+        if(m == null || m == 0.0){
+            return (BigDecimal.ZERO);
+        }
 
         long diasDataPag = getDias(data);
 
@@ -414,7 +426,7 @@ public class Boleto implements Serializable {
 
 
             if (atraso > 0) {
-                BigDecimal temp = getValor().multiply(new BigDecimal(10)).divide(new BigDecimal(100)).setScale(2, RoundingMode.DOWN);
+                BigDecimal temp = getValor().multiply(new BigDecimal(m)).divide(new BigDecimal(100)).setScale(2, RoundingMode.DOWN);
                 return (temp);
 
             } else {

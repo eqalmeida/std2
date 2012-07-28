@@ -5,6 +5,7 @@
 package controller;
 
 import java.io.Serializable;
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import model.Cliente;
@@ -27,9 +28,6 @@ public class ClienteBean extends ControllerBase implements Serializable {
     private LazyDataModel<Cliente> lazyList = null;
 
     public Cliente getSelected() {
-        if(selected == null){
-            selected = new Cliente();
-        }
         return selected;
     }
 
@@ -37,13 +35,17 @@ public class ClienteBean extends ControllerBase implements Serializable {
         this.selected = selected;
     }
 
+    @PostConstruct
+    private void init(){
+            service = new ClienteJpaController();
+    }
 
     public void gravar() {
         try {
             if (selected.getId() > 0) {
-                getService().edit(selected);
+                service.edit(selected);
             } else {
-                getService().create(selected);
+                service.create(selected);
             }
             
             RequestContext.getCurrentInstance().execute("cliForm.hide()");
@@ -56,7 +58,7 @@ public class ClienteBean extends ControllerBase implements Serializable {
 
     public void onRowSelect(SelectEvent event) {
     
-        selected = getService().findCliente(((Cliente) event.getObject()).getId()); 
+        selected = service.findCliente(((Cliente) event.getObject()).getId()); 
     }
 
     public void novo() {
@@ -68,7 +70,7 @@ public class ClienteBean extends ControllerBase implements Serializable {
     
     public void excluir() {
         try {
-            getService().destroy(this.selected.getId());
+            service.destroy(this.selected.getId());
             this.selected = new Cliente();
         } catch (Exception ex) {
             addMessage("Não foi possível excluir este cliente!");
@@ -76,18 +78,12 @@ public class ClienteBean extends ControllerBase implements Serializable {
     }
     
     public void editar(){
-        selected = getService().findCliente(selected.getId());
+        selected = service.findCliente(selected.getId());
     }
 
     public ClienteBean() {
     }
 
-    public ClienteJpaController getService() {
-        if(service == null){
-            service = new ClienteJpaController();
-        }
-        return service;
-    }
 
     /*
      * Adiciona cliente ao pedido na session

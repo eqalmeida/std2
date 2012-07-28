@@ -87,6 +87,14 @@ public class PagamentoBean extends ControllerBase implements Serializable {
     }
 
     public void novoPagamento() {
+        
+        Usuario user = getUsuarioLogado();
+        
+        if(user == null){
+            addErrorMessage("Falha de Login!");
+            return;
+        }
+
 
         data = new Date();
         valorDevido = pedidoPag.getValorDevidoAtual(data);
@@ -96,6 +104,13 @@ public class PagamentoBean extends ControllerBase implements Serializable {
     }
 
     public void registrar() {
+
+        Usuario user = getUsuarioLogado();
+        
+        if(user == null){
+            addErrorMessage("Falha de Login!");
+            return;
+        }
 
         EntityManager em = ControllerBase.getEmf().createEntityManager();
 
