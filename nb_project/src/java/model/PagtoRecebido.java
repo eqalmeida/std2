@@ -6,10 +6,7 @@ package model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,7 +20,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import util.Util;
 
 /**
  *
@@ -51,21 +47,13 @@ public class PagtoRecebido implements Serializable {
     @Basic(optional = false)
     @Column(name = "valor")
     private BigDecimal valor;
-    @Column(name = "valor_devido")
-    private BigDecimal valorDevido;
-    @Column(name = "multa")
-    private BigDecimal multa;
-    @Column(name = "juros")
-    private BigDecimal juros;
-    @Basic(optional = false)
-    @Column(name = "status")
-    private short status;
     @JoinColumn(name = "receb_usuario_id", referencedColumnName = "id")
-    @ManyToOne
-    private Usuario recebUsuario;
-    @JoinColumn(name = "boleto_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Boleto boleto;
+    private Usuario recebUsuario;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "pedido_pag_id", referencedColumnName = "id")
+    private PedidoPag pedidoPag;
     
     public PagtoRecebido() {
     }
@@ -73,13 +61,7 @@ public class PagtoRecebido implements Serializable {
     public PagtoRecebido(Integer id) {
         this.id = id;
     }
-    
-    public PagtoRecebido(Integer id, BigDecimal valor, short status) {
-        this.id = id;
-        this.valor = valor;
-        this.status = status;
-    }
-    
+        
     public Integer getId() {
         return id;
     }
@@ -104,14 +86,6 @@ public class PagtoRecebido implements Serializable {
         this.valor = valor;
     }
     
-    public short getStatus() {
-        return status;
-    }
-    
-    public void setStatus(short status) {
-        this.status = status;
-    }
-    
     public Usuario getRecebUsuario() {
         return recebUsuario;
     }
@@ -120,14 +94,14 @@ public class PagtoRecebido implements Serializable {
         this.recebUsuario = recebUsuario;
     }
 
-    public Boleto getBoleto() {
-        return boleto;
+    public PedidoPag getPedidoPag() {
+        return pedidoPag;
     }
 
-    public void setBoleto(Boleto boleto) {
-        this.boleto = boleto;
+    public void setPedidoPag(PedidoPag pedidoPag) {
+        this.pedidoPag = pedidoPag;
     }
-    
+
     
     public Date getDataInformada() {
         return dataInformada;
@@ -135,48 +109,6 @@ public class PagtoRecebido implements Serializable {
     
     public void setDataInformada(Date dataInformada) {
         this.dataInformada = dataInformada;
-    }
-    
-    public BigDecimal getValorDevido() {
-        return valorDevido;
-    }
-    
-    public void setValorDevido(BigDecimal valorDevido) {
-        this.valorDevido = valorDevido;
-    }
-    
-    public BigDecimal getMulta() {
-        return multa;
-    }
-    
-    public void setMulta(BigDecimal multa) {
-        this.multa = multa;
-    }
-    
-    public BigDecimal getJuros() {
-        return juros;
-    }
-    
-    public void setJuros(BigDecimal juros) {
-        this.juros = juros;
-    }
-    
-    public BigDecimal getValorTotal() {
-        if (valorDevido == null) {
-            return BigDecimal.ZERO;
-        }
-        
-        BigDecimal val = valorDevido;
-        
-        if (juros != null) {
-            val = val.add(juros);
-        }
-        
-        if (multa != null) {
-            val = val.add(multa);
-        }
-        
-        return val;
     }
     
     public void calculaValorDevido() {

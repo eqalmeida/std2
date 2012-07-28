@@ -30,7 +30,7 @@
     <ui:define name="content">
 
         <f:metadata>
-            <f:viewParam name="id" value="#{pagMB.id}"/>
+            <f:viewParam name="id" value="#{pagMB.pagId}"/>
         </f:metadata>
 
         <p:growl autoUpdate="true" id="message"/>
@@ -49,8 +49,9 @@
         <h:panelGroup rendered="#{pagMB.pedidoPag != null}">
 
             <h:form id="form">
-
-                <p:dataTable value="#{pagMB.pedidoPag.parcelas}" var="it">
+                
+                <p:dataTable value="#{pagMB.pedidoPag.parcelas}" var="it" 
+                             rowStyleClass="#{it.status == 1 ? 'verde' : it.atrasado ? it.status == 2 ? 'laranja' : 'vermelho' : null }">
 
                     <f:facet name="header">
                         Parcelas
@@ -101,6 +102,32 @@
                     </p:column>
 
                 </p:dataTable>
+                <br/>
+                <p:dataTable value="#{pagMB.pedidoPag.pagamentos}" var="it" rendered="#{pagMB.pedidoPag.pagamentos.size() > 0 }">
+                    
+                    <f:facet name="header">Pagamentos</f:facet>
+                    
+                    <p:column headerText="Data Informada">
+                        <h:outputText value="#{it.dataInformada}">
+                            <f:convertDateTime timeZone="#{app.timeZone}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Data de Registro">
+                        <h:outputText value="#{it.data}">
+                            <f:convertDateTime timeZone="#{app.timeZone}" type="both"/>
+                        </h:outputText>
+                    </p:column>
+                    
+                    <p:column headerText="Valor">
+                        <h:outputText value="#{it.valor}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
+                    
+                    <p:column headerText="Usuario">
+                        <h:outputText value="#{it.recebUsuario}"/>
+                    </p:column>
+                </p:dataTable>
 
             </h:form>            
             <br/>
@@ -117,21 +144,12 @@
                             <f:ajax render="vdev" />
                         </p:inputText>
 
-                        <h:outputText value="Num.:"/>
-                        <h:outputText value="#{pagMB.boletoSel.numParcela}"/>
-
-                        <h:outputText value="Vencimento:"/>
-                        <h:outputText value="#{pagMB.boletoSel.vencimento}">
-                            <f:convertDateTime timeZone="#{app.timeZone}" />
-                        </h:outputText>
-
-
-                        <h:outputText value="Valor devido:" />
+                        <h:outputText value="Valor devido nessa Data:" />
                         <h:outputText value="#{pagMB.valorDevido}" id="vdev">
                             <f:convertNumber type="currency"/>
                         </h:outputText>
 
-                        <h:outputText value="Valor:"/>
+                        <h:outputText value="Valor Recebido:"/>
                         <p:inputText value="#{pagMB.valorRecebido}" label="Valor" styleClass="valor" required="true">
                             <f:convertNumber  pattern="#,##0.00"/>
                         </p:inputText>

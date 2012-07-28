@@ -33,6 +33,27 @@ font-size: 90% !important;
     color: red; 
 }
 
+tr.verde{
+       background-image: none;
+
+   background-color: #060;
+   color: #fff;
+}
+
+tr.vermelho{
+       background-image: none;
+
+   background-color: #C00;
+   color: #fff;
+}
+
+tr.laranja{
+       background-image: none;
+
+   background-color: #C60;
+   color: #fff;
+}
+
 a:hover {
     font-weight: normal;
 }

@@ -7,12 +7,9 @@ package model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,7 +19,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -79,9 +75,6 @@ public class Boleto implements Serializable {
     private Date dataPag;
     @javax.persistence.Transient
     private Short situacao = null;
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "boleto_id")
-    private Collection<PagtoRecebido> pagamentos;
 
     public Boleto() {
     }
@@ -108,14 +101,6 @@ public class Boleto implements Serializable {
 
     public void setMulta(BigDecimal multa) {
         this.multa = multa;
-    }
-
-    public Collection<PagtoRecebido> getPagamentos() {
-        return pagamentos;
-    }
-
-    public void setPagamentos(Collection<PagtoRecebido> pagamentos) {
-        this.pagamentos = pagamentos;
     }
 
     public BigDecimal getValorFaltante() {
@@ -229,20 +214,32 @@ public class Boleto implements Serializable {
         return d;
     }
 
+    public boolean isAtrasado() {
+        return (this.isAtrasado(new Date()));
+    }
+    
     public boolean isAtrasado(Date data) {
 
         if (status == Boleto.CANCELADO || status == Boleto.PAGO) {
             return false;
         }
 
-        if (status == PAGO_PARCIAL) {
-            return true;
-        }
-
         long diasDataPag = getDias(data);
         long diasVencimento = getDias(vencimento);
-        long atraso = diasDataPag - diasVencimento;
-
+        
+        long atraso;
+        if(status == ATIVO){
+            atraso = diasDataPag - diasVencimento;
+        }else{
+            long atual = getDias(getDataPag());
+            
+            if(atual > diasVencimento){
+                atraso = diasDataPag - atual;
+            }else{
+                atraso = diasDataPag - diasVencimento;
+            }
+        }
+        
         if (atraso >= 0) {
             return true;
         }
@@ -251,35 +248,23 @@ public class Boleto implements Serializable {
 
     }
 
-    public boolean regPagamento(BigDecimal valorRecebido, Date dataInf, Usuario usuario) throws Exception {
+    public BigDecimal regPagamento(BigDecimal valorRecebido, Date dataInf) throws Exception {
 
-        BigDecimal val = getValorDevido(dataInf);
+        BigDecimal valorAtualComTaxas = getValorAtualComTaxas(dataInf);
+        BigDecimal sobra;
+        BigDecimal valParcela;
 
-        long diasHoje = getDias(new Date());
-        long diasPag = getDias(dataInf);
-
-        if (diasPag > diasHoje) {
-            throw new Exception("Data de Pagamento Inválida");
+        /*
+         * Calcula o valor de sobra
+         */
+        if (valorRecebido.doubleValue() > valorAtualComTaxas.doubleValue()) {
+            sobra = valorRecebido.subtract(valorAtualComTaxas);
+            valParcela = valorAtualComTaxas;
         }
-
-        if (valorRecebido.compareTo(val) > 0) {
-            throw new Exception("Valor de Pagamento inválido");
+        else{
+            sobra = BigDecimal.ZERO;
+            valParcela = valorRecebido;
         }
-
-        for (PagtoRecebido pr : this.getPagamentos()) {
-            long dp = getDias(pr.getDataInformada());
-            if (dp > diasPag) {
-                throw new Exception("Este boleto já possui um pagamento com data posterior a esta!");
-            }
-        }
-
-        PagtoRecebido pag = new PagtoRecebido();
-        pag.setBoleto(this);
-        pag.setData(new Date());
-        pag.setDataInformada(dataInf);
-        pag.setValorDevido(val);
-        pag.setValor(valorRecebido);
-        pag.setRecebUsuario(usuario);
 
         BigDecimal temp = getJuros();
 
@@ -303,19 +288,14 @@ public class Boleto implements Serializable {
 
         if (this.status == ATIVO) {
 
-            BigDecimal valorDevidoAtual = this.getValor().add(jurosAtual).add(multaAtual);
+            this.setValorPago(valParcela);
 
-            this.setValorPago(valorRecebido);
-
-            this.setValorFaltante(valorDevidoAtual.subtract(valorRecebido));
+            this.setValorFaltante(valorAtualComTaxas.subtract(valParcela));
 
         } else if (this.status == PAGO_PARCIAL) {
 
-            // Calcula o Valor total devido
-            BigDecimal valorDevidoAtual = this.getValorFaltante().add(jurosAtual).add(multaAtual);
-
             // Salva o novo valor faltante
-            setValorFaltante(valorDevidoAtual.subtract(valorRecebido));
+            setValorFaltante(valorAtualComTaxas.subtract(valParcela));
 
             temp = this.getValorPago();
 
@@ -326,7 +306,7 @@ public class Boleto implements Serializable {
             /**
              * O Valor Pago é somado ao valor anterior
              */
-            this.setValorPago(valorRecebido.add(temp));
+            this.setValorPago(valParcela.add(temp));
 
         }
 
@@ -339,13 +319,32 @@ public class Boleto implements Serializable {
 
         setDataPag(dataInf);
 
-        if (getPagamentos() == null) {
-            setPagamentos(new ArrayList<PagtoRecebido>());
+        return (sobra);
+    }
+    
+    public BigDecimal getValorAtual(){
+        if(this.getStatus() == ATIVO){
+            return (getValor());
         }
-
-        this.getPagamentos().add(pag);
-
-        return true;
+        else if(this.getStatus() == PAGO_PARCIAL){
+            return (getValorFaltante());
+        }
+        else{
+            return (BigDecimal.ZERO);
+        }
+    }
+    
+    /**
+     * Retorna o valor devido na Data informada
+     * @param dataInf Data informada
+     * @return Valor
+     */
+    public BigDecimal getValorAtualComTaxas(Date dataInf){
+        
+        BigDecimal jurosAtual = getJuros(dataInf);
+        BigDecimal multaAtual = getMulta(dataInf);
+        
+        return(getValorAtual().add(jurosAtual).add(multaAtual));
     }
 
     public BigDecimal getValorDevido(Date data) {

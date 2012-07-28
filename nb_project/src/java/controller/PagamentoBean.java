@@ -4,7 +4,9 @@
  */
 package controller;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -12,10 +14,12 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 import model.Boleto;
+import model.PagtoRecebido;
 import model.PedidoPag;
 import model.Usuario;
 import org.primefaces.context.RequestContext;
 import repo.PedidoPagJpaController;
+import util.Util;
 
 /**
  *
@@ -23,12 +27,11 @@ import repo.PedidoPagJpaController;
  */
 @ManagedBean(name = "pagMB")
 @ViewScoped
-public class PagamentoBean extends ControllerBase {
+public class PagamentoBean extends ControllerBase implements Serializable {
 
     private PedidoPag pedidoPag = null;
-    private Integer id = null;
+    private Integer pagId = null;
     private PedidoPagJpaController pagService = null;
-    private Boleto boletoSel = null;
     private BigDecimal valorDevido = null;
     private Date data = null;
     private BigDecimal valorRecebido = null;
@@ -53,9 +56,13 @@ public class PagamentoBean extends ControllerBase {
     }
 
     public PedidoPag getPedidoPag() {
-        try {
-            pedidoPag = pagService.findPedidoPag(id);
-        } catch (Exception ex) {
+
+        if (pedidoPag == null) {
+
+            try {
+                pedidoPag = pagService.findPedidoPag(pagId);
+            } catch (Exception ex) {
+            }
         }
         return pedidoPag;
     }
@@ -64,76 +71,114 @@ public class PagamentoBean extends ControllerBase {
         this.pedidoPag = pedidoPag;
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getPagId() {
+        return pagId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setPagId(Integer pagId) {
+        this.pagId = pagId;
     }
 
     public void dataChanged(ValueChangeEvent ev) {
 
         data = (Date) ev.getNewValue();
 
-        if (boletoSel != null) {
-            valorDevido = boletoSel.getValorDevido(data);
-        }
-
-    }
-
-    public Boleto getBoletoSel() {
-        return boletoSel;
-    }
-
-    public void setBoletoSel(Boleto boletoSel) {
-        this.boletoSel = boletoSel;
+        valorDevido = pedidoPag.getValorDevidoAtual(data);
     }
 
     public void novoPagamento() {
 
-        boletoSel = null;
+        data = new Date();
+        valorDevido = pedidoPag.getValorDevidoAtual(data);
+        valorRecebido = null;
+        RequestContext.getCurrentInstance().execute("pagDialog.show()");
 
-        for (Boleto b : pedidoPag.getParcelas()) {
-            if (b.getStatus() == Boleto.ATIVO || b.getStatus() == Boleto.PAGO_PARCIAL) {
-                boletoSel = b;
-                break;
-            }
-        }
-        if (boletoSel != null) {
-            data = new Date();
-            valorDevido = boletoSel.getValorDevido(data);
-            valorRecebido = null;
-            RequestContext.getCurrentInstance().execute("pagDialog.show()");
-
-        } else {
-            addMessage("Nenhum boleto a ser pago!");
-        }
     }
 
     public void registrar() {
-        if (boletoSel != null) {
 
-            EntityManager em = ControllerBase.getEmf().createEntityManager();
+        EntityManager em = ControllerBase.getEmf().createEntityManager();
 
-            try {
-                Usuario usuario = getUsuarioLogado();
-                boletoSel.regPagamento(valorRecebido, data, usuario);
+        try {
 
-                em.getTransaction().begin();
-                em.merge(boletoSel);
-                em.getTransaction().commit();
-
-                pedidoPag = null;
-
-                RequestContext.getCurrentInstance().execute("pagDialog.hide()");
-                addMessage("Pagamento Registrado");
-            } catch (Exception ex) {
-                addErrorMessage(ex.getMessage());
-            } finally {
-                em.close();
+            /*
+             * Soma as Parcelas não Pagas
+             */
+            BigDecimal soma = BigDecimal.ZERO;
+            for (Boleto b : pedidoPag.getParcelas()) {
+                soma = soma.add(b.getValorAtualComTaxas(data));
             }
+
+            if (valorRecebido.doubleValue() > soma.doubleValue()) {
+                throw new Exception("O valor informado é superior ao devido!");
+            }
+
+            /*
+             * Verifica se não existe pagamento anterior
+             */
+            long dataInfL = Util.dateToLong(data);
+            long hoje = Util.dateToLong(new Date());
+
+            if (dataInfL > hoje) {
+                throw new Exception("Data inválida (futura)!");
+            }
+
+            for (PagtoRecebido pr : pedidoPag.getPagamentos()) {
+                long dataL = Util.dateToLong(pr.getDataInformada());
+                if (dataL > dataInfL) {
+                    throw new Exception("Já existe um pagamento registrado em data posterior!");
+                }
+            }
+
+            em.getTransaction().begin();
+
+            Usuario usuario = getUsuarioLogado();
+
+            /*
+             * Registra os pagamentos por Boleto
+             */
+            BigDecimal sobra = valorRecebido;
+            for (Boleto b : pedidoPag.getParcelas()) {
+                sobra = b.regPagamento(sobra, data);
+                em.merge(b);
+
+                if (sobra.doubleValue() <= 0.00) {
+                    break;
+                }
+            }
+
+            PagtoRecebido pagamento = new PagtoRecebido();
+            pagamento.setData(new Date());
+            pagamento.setDataInformada(data);
+            pagamento.setPedidoPag(pedidoPag);
+            pagamento.setRecebUsuario(usuario);
+            pagamento.setValor(valorRecebido);
+
+            em.persist(pagamento);
+
+            if (pedidoPag.getPagamentos() == null) {
+                pedidoPag.setPagamentos(new ArrayList<PagtoRecebido>());
+            }
+
+            pedidoPag.getPagamentos().add(pagamento);
+
+            em.merge(pedidoPag);
+
+            em.getTransaction().commit();
+
+            RequestContext.getCurrentInstance().execute("pagDialog.hide()");
+
+            addMessage("Pagamento Registrado");
+        } catch (Exception ex) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            addErrorMessage(ex.getMessage());
+        } finally {
+            pedidoPag = null;
+            em.close();
         }
+
     }
 
     public Date getData() {

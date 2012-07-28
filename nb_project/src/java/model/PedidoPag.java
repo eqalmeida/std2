@@ -71,6 +71,11 @@ public class PedidoPag implements Serializable {
     @JoinColumn(name = "pedido_pag_id")
     @OrderBy(value="vencimento")
     private Collection<Boleto> parcelas;
+    
+    @OneToMany
+    @JoinColumn(name="pedido_pag_id")
+    @OrderBy(value="dataInformada")
+    private Collection<PagtoRecebido> pagamentos;
 
     public Collection<Boleto> getParcelas() {
         return parcelas;
@@ -159,6 +164,24 @@ public class PedidoPag implements Serializable {
 
     public void setTipoPagto(TipoPagto tipoPagto) {
         this.tipoPagto = tipoPagto;
+    }
+
+    public Collection<PagtoRecebido> getPagamentos() {
+        return pagamentos;
+    }
+
+    public void setPagamentos(Collection<PagtoRecebido> pagamentos) {
+        this.pagamentos = pagamentos;
+    }
+    
+    public BigDecimal getValorDevidoAtual(Date d){
+        BigDecimal valorDevido = BigDecimal.ZERO;
+        for(Boleto b : this.getParcelas()){
+            if(b.isAtrasado(d)){
+                valorDevido = valorDevido.add( b.getValorAtualComTaxas(d) );
+            }
+        }
+        return(valorDevido);
     }
 
     @Override
