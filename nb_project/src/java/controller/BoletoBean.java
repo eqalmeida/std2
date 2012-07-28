@@ -12,8 +12,10 @@ import java.util.GregorianCalendar;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 import model.Boleto;
 import model.BoletoLazyList;
+import model.PedidoLazyList;
 import org.primefaces.model.LazyDataModel;
 import repo.BoletoJpaController;
 
@@ -36,7 +38,7 @@ public class BoletoBean extends ControllerBase{
     public BoletoBean() {
         Calendar data = GregorianCalendar.getInstance();
         filtAno = data.get(Calendar.YEAR);
-        filtMes = (short) ( data.get(Calendar.MONTH) + 1);
+        filtMes = (short) ( data.get(Calendar.MONTH));
     }
     
     public void verPedido(){
@@ -53,7 +55,7 @@ public class BoletoBean extends ControllerBase{
     public void updateDatas() {
         Calendar data = GregorianCalendar.getInstance();
         data.set(Calendar.YEAR, filtAno);
-        data.set(Calendar.MONTH, filtMes - 1);
+        data.set(Calendar.MONTH, filtMes);
         data.set(Calendar.DATE, 1);
 
         Date dateFrom, dateTo;
@@ -117,4 +119,16 @@ public class BoletoBean extends ControllerBase{
     public void setFiltAno(Integer filtAno) {
         this.filtAno = filtAno;
     }
+    
+    public void mesChanged(ValueChangeEvent ev) {
+        filtMes = (Short) ev.getNewValue();
+        updateDatas();
+    }
+
+    public void anoChanged(ValueChangeEvent ev) {
+        filtAno = (Integer) ev.getNewValue();
+        updateDatas();
+    }
+
+    
 }

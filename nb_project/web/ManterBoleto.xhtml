@@ -13,30 +13,35 @@
     </ui:define>
 
     <ui:define name="left">
-        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml" />
+        <h:form>
+            <p:panel styleClass="ui-shadow">
+
+                <f:facet name="header">Filtros</f:facet>
+
+                <h:panelGrid columns="2">
+                    Mês:
+                    <p:selectOneListbox value="#{boletoMB.filtMes}" valueChangeListener="#{boletoMB.mesChanged}">
+                        <f:selectItems value="#{app.meses}"/>
+                        <f:ajax render=":formTable:tbl" />
+                    </p:selectOneListbox>
+
+                    Ano:
+                    <p:spinner min="1990" maxlength="5" size="5" value="#{boletoMB.filtAno}" valueChangeListener="#{boletoMB.anoChanged}">
+                        <f:ajax render=":formTable:tbl" />
+                    </p:spinner>
+                </h:panelGrid>
+
+            </p:panel>
+        </h:form>
     </ui:define>
 
     <ui:define name="content">
         <p:growl autoUpdate="true" id="message"/>
 
         <h:outputScript name="locales_prime.js" library="js" /> 
-        <h:form id="form">
-            <p:panelGrid columns="5" style="width: 100%">
-                <h:outputText value="Mês:" />
-                <p:spinner value="#{boletoMB.filtMes}" max="12" min="1" required="true"/>
-
-                <h:outputText value="Ano:" />
-                <p:spinner value="#{boletoMB.filtAno}" required="true" min="1990"/>
-
-                <p:commandButton value="Atualizar" actionListener="#{boletoMB.updateDatas}" update=":formTable, :form" />               
-
-            </p:panelGrid>
-
-        </h:form>
-        <p:spacer height="10"/>
 
         <h:form id="formTable">
-            
+
             <p:contextMenu for="tbl">  
                 <p:menuitem value="Ver Pedido" actionListener="#{boletoMB.verPedido}" icon="ui-icon-pencil"/>  
             </p:contextMenu>  
@@ -46,8 +51,7 @@
                          selection="#{boletoMB.selected}" selectionMode="single" rowKey="#{it.id}"
                          value="#{boletoMB.lazyList}" rows="20"
                          paginatorAlwaysVisible="false" 
-                         rowStyleClass="#{it.situacao eq 1 ? 'red' : null}"
-                         paginator="true">
+                         rowStyleClass="#{it.status == 1 ? 'verde' : it.atrasado ? it.status == 2 ? 'laranja' : 'vermelho' : null }"                         paginator="true">
 
                 <p:column headerText="Vencimento" sortBy="#{it.vencimento}"  style="text-align: center">
                     <h:outputText value="#{it.vencimento}" >
@@ -70,7 +74,7 @@
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="Cliente" sortBy="#{it.cliente.nome}" styleClass="#{it.situacao eq 1 ? 'red':null}">
+                <p:column headerText="Cliente" sortBy="#{it.cliente.nome}">
                     #{it.cliente.nome}
                 </p:column>
 
@@ -79,9 +83,9 @@
                 </p:column>
 
             </p:dataTable>
-            
+
             <p:spacer height="10" />
-            
+
             <p:panelGrid columns="2">
                 <h:outputText value="Valor total (mês):"/>
                 <h:outputText value="#{boletoMB.totalMes}" style="font-weight: bold">
