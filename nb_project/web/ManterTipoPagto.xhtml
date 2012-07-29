@@ -71,14 +71,6 @@
                             <h:outputText value="Não" rendered="#{it.geraBoleto == false}" />
                         </p:column>
                         
-                        <p:column headerText="Multa Por Atraso">
-                            <h:outputText value="#{it.multaAtraso} %" />
-                        </p:column>
-
-                        <p:column headerText="Juros Diário">
-                            <h:outputText value="#{it.jurosDiario} %" />
-                        </p:column>
-
                     </p:dataTable>
 
                 </h:form>
@@ -133,12 +125,6 @@
                             <h:outputText value="Gera Boleto:" />
                             <p:selectBooleanButton value="#{tipoPagtoBean.selected.geraBoleto}" offLabel="Não" onLabel="Sim"/>
                             
-                            <h:outputText value="Multa por Atraso (%):" />
-                            <p:inputText value="#{tipoPagtoBean.selected.multaAtraso}" label="Multa por atraso" required="true" />
-
-                            <h:outputText value="Juros diário (%):" />
-                            <p:inputText value="#{tipoPagtoBean.selected.jurosDiario}" label="Juros diário" required="true" />
-
                             <f:facet name="footer">
                                 <p:commandButton value="Gravar" 
                                                  actionListener="#{tipoPagtoBean.inserir}" 
@@ -176,13 +162,6 @@
 
                             <h:outputText value="Gera Boleto:" />
                             <p:selectBooleanButton value="#{tipoPagtoBean.selected.geraBoleto}" offLabel="Não" onLabel="Sim"/>
-                            
-                            <h:outputText value="Multa por Atraso (%):" />
-                            <p:inputText value="#{tipoPagtoBean.selected.multaAtraso}" label="Multa por atraso" required="true" />
-
-                            <h:outputText value="Juros diário (%):" />
-                            <p:inputText value="#{tipoPagtoBean.selected.jurosDiario}" label="Juros diário" required="true" />
-
 
                             <f:facet name="footer">
                                 <p:commandButton value="Gravar" 

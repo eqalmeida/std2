@@ -6,12 +6,14 @@ package controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.persistence.EntityManager;
 import model.Coeficiente;
 import model.CoeficientePK;
 import model.TabelaFinanc;
-import org.primefaces.event.RowEditEvent;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import repo.CoeficienteJpaController;
 import repo.TabelaFinancJpaController;
@@ -27,23 +29,28 @@ public class TabelaFinancBean extends ControllerBase {
     private TabelaFinanc selected = null;
     private Coeficiente subItem = new Coeficiente();
     private List<Coeficiente> subItems = null;
-    private int tabelaPos = 0;
-    
+    private List<TabelaFinanc> tabelas = null;
+    private TabelaFinancJpaController service = null;
+    private CoeficientePK coefIdAnt = null;
 
     /**
      * Creates a new instance of ProdutoBean
      */
     public TabelaFinancBean() {
-        updateTabelaByPos();
     }
 
-    public int getTabelaPos() {
-        return tabelaPos;
+    @PostConstruct
+    private void init() {
+        service = new TabelaFinancJpaController(getEmf());
     }
 
-    private void updateTabelaByPos() {
-        TabelaFinancJpaController ctl = new TabelaFinancJpaController(getEmf());
-        selected = ctl.findTabelaFinancEntities(1, tabelaPos).get(0);
+    public List<TabelaFinanc> getTabelas() {
+        tabelas = service.findTabelaFinancEntities();
+        return tabelas;
+    }
+
+    public void setTabelas(List<TabelaFinanc> tabelas) {
+        this.tabelas = tabelas;
     }
 
     public TabelaFinanc getSelected() {
@@ -62,32 +69,21 @@ public class TabelaFinancBean extends ControllerBase {
         this.subItem = subItem;
     }
 
-    public void inserir() {
-        TabelaFinancJpaController ctl = new TabelaFinancJpaController(getEmf());
+    public void gravar() {
         try {
-            selected.setId(null);
-            ctl.create(selected);
-            tabelaPos = getMaxTabelas() - 1;
-            updateTabelaByPos();
+
+            if (selected.getId() > 0) {
+                service.edit(selected);
+            } else {
+                selected.setId(null);
+                service.create(selected);
+            }
+            RequestContext.getCurrentInstance().execute("tblDlg.hide()");
+            addMessage("Gravado com sucesso!");
+
         } catch (Exception ex) {
-            addMessage(ex.getMessage());
+            addErrorMessage(ex.getMessage());
         }
-    }
-
-    public void salvar() {
-        TabelaFinancJpaController ctl = new TabelaFinancJpaController(getEmf());
-        try {
-            ctl.edit(selected);
-            updateTabelaByPos();
-        } catch (Exception ex) {
-            addMessage(ex.getMessage());
-        }
-    }
-
-    public void onRowSelect(SelectEvent event) {
-
-        TabelaFinancJpaController ctl = new TabelaFinancJpaController(getEmf());
-        selected = ctl.findTabelaFinanc(((TabelaFinanc) event.getObject()).getId());
     }
 
     public void novo() {
@@ -98,9 +94,8 @@ public class TabelaFinancBean extends ControllerBase {
     }
 
     public void excluir() {
-        TabelaFinancJpaController ctl = new TabelaFinancJpaController(getEmf());
         try {
-            ctl.destroy(this.selected.getId());
+            service.destroy(this.selected.getId());
             this.selected = new TabelaFinanc();
         } catch (Exception ex) {
             addMessage("Não foi possível excluir!");
@@ -111,8 +106,7 @@ public class TabelaFinancBean extends ControllerBase {
 
     public void editar() {
         if (this.selected.getId() != null) {
-            TabelaFinancJpaController ctl = new TabelaFinancJpaController(getEmf());
-            selected = ctl.findTabelaFinanc(this.selected.getId());
+            selected = service.findTabelaFinanc(this.selected.getId());
         }
     }
 
@@ -126,53 +120,65 @@ public class TabelaFinancBean extends ControllerBase {
         return subItems;
     }
 
-    public void incPos() {
-        int qtd = getMaxTabelas();
-
-        if (tabelaPos < (qtd - 1)) {
-            tabelaPos++;
-            updateTabelaByPos();
-        }
-    }
-
-    public void decPos() {
-        if (tabelaPos > 0) {
-            tabelaPos--;
-            updateTabelaByPos();
-        }
-    }
-
     public void setSubItems(List<Coeficiente> subItems) {
         this.subItems = subItems;
-    }
-    
-    
-
-    public int getMaxTabelas() {
-        TabelaFinancJpaController ctl = new TabelaFinancJpaController(getEmf());
-        return ctl.getTabelaFinancCount();
-    }
-
-    public void cancela() {
-        updateTabelaByPos();
     }
 
     public void novoCoef() {
         subItem = new Coeficiente();
         subItem.setCoeficientePK(new CoeficientePK());
+        RequestContext.getCurrentInstance().execute("coefDlg.show()");
     }
 
-    public void inserirCoef() {
-        CoeficienteJpaController ctl = new CoeficienteJpaController(getEmf());
+    public void editarCoef() {
+        coefIdAnt = new CoeficientePK();
+        coefIdAnt.setNumParcelas(subItem.getCoeficientePK().getNumParcelas());
+        coefIdAnt.setTabelaFinanc(subItem.getCoeficientePK().getTabelaFinanc());
+        RequestContext.getCurrentInstance().execute("coefDlg.show()");
+    }
+
+    public void gravarCoef() {
+        EntityManager em = getEmf().createEntityManager();
         try {
             verificaCoeficiente(subItem);
-            subItem.setTabelaFinanc(selected);
-            ctl.create(subItem);
+
+            em.getTransaction().begin();
+
+            if (!(subItem.getCoeficientePK().getTabelaFinanc() > 0)) {
+                // Novo
+                subItem.setTabelaFinanc(selected);
+                subItem.getCoeficientePK().setTabelaFinanc(selected.getId());
+                em.persist(subItem);
+
+            } else {
+                /**
+                 * Se é uma edição, apaga o coeficiente anterior
+                 */
+                System.out.println("Coef id :"+coefIdAnt.getNumParcelas() + " " + coefIdAnt.getTabelaFinanc());
+                Coeficiente coefAnt = em.find(Coeficiente.class, coefIdAnt);
+                em.remove(coefAnt);
+                em.flush();
+                
+                em.persist(subItem);
+            }
+
+            em.getTransaction().commit();
+
+            coefIdAnt = null;
+
+            RequestContext.getCurrentInstance().execute("coefDlg.hide()");
+            addMessage("Gravado com sucesso!");
+
         } catch (Exception ex) {
-            addMessage(ex.getMessage());
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            addErrorMessage(ex.getMessage());
+        } finally {
+            em.close();
         }
     }
-    
+
     public void excluirCoef() {
         CoeficienteJpaController ctl = new CoeficienteJpaController(getEmf());
         try {
@@ -183,24 +189,12 @@ public class TabelaFinancBean extends ControllerBase {
         }
 
     }
-    
-    public void salvarCoef() {
-        CoeficienteJpaController ctl = new CoeficienteJpaController(getEmf());
-        try {
-            verificaCoeficiente(subItem);
-            ctl.edit(subItem);
-        } catch (Exception ex) {
-            addMessage(ex.getMessage());
-        }
-    }
-    
-    void verificaCoeficiente(Coeficiente co) throws Exception{
+
+    void verificaCoeficiente(Coeficiente co) throws Exception {
         double min;
-        min = (1.000/(double)co.getCoeficientePK().getNumParcelas());
-        if(min > co.getCoeficiente()){
+        min = (1.000 / (double) co.getCoeficientePK().getNumParcelas());
+        if (min > co.getCoeficiente()) {
             throw new Exception("Erro!\nEste Coeficiente está abaixo do valor mínimo!");
         }
     }
-
-    
 }

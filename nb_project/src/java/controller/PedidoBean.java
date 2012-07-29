@@ -600,8 +600,9 @@ public class PedidoBean extends ControllerBase {
                     pag.setTabelaFinanc(tabela);
                 }
                 
-                pag.setMultaAtraso(tipoPagto.getMultaAtraso());
-                pag.setJurosDiario(tipoPagto.getJurosDiario());
+                pag.setMultaPercent(pag.getTabelaFinanc().getMultaPercent());
+                pag.setMultaVal(pag.getTabelaFinanc().getMultaVal());
+                pag.setJurosDiario(pag.getTabelaFinanc().getJurosDiario());
 
                 pag.setPedido(pedido);
                 pag.setId(null);

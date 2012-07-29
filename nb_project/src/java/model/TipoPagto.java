@@ -45,12 +45,6 @@ public class TipoPagto implements Serializable {
     @Basic(optional = false)
     @Column(name = "gera_boleto")
     private boolean geraBoleto;
-
-    @Column(name="multa_percent")
-    private Double multaAtraso;
-
-    @Column(name="juros_diario_percent")
-    private Double jurosDiario;
     
     public TipoPagto() {
         this.geraBoleto = true;
@@ -65,24 +59,6 @@ public class TipoPagto implements Serializable {
         this.descricao = descricao;
         this.geraBoleto = geraBoleto;
     }
-
-    public Double getMultaAtraso() {
-        return multaAtraso;
-    }
-
-    public void setMultaAtraso(Double multaAtraso) {
-        this.multaAtraso = multaAtraso;
-    }
-
-    public Double getJurosDiario() {
-        return jurosDiario;
-    }
-
-    public void setJurosDiario(Double jurosDiario) {
-        this.jurosDiario = jurosDiario;
-    }
-    
-    
 
     public Short getId() {
         return id;

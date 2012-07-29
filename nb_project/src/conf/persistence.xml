@@ -12,6 +12,7 @@
     <class>model.Pedido</class>
     <class>model.Config</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/std_loja"/>
       <property name="javax.persistence.jdbc.password" value="root"/>

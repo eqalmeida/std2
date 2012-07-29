@@ -5,18 +5,15 @@
 package model;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.math.BigDecimal;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -36,6 +33,17 @@ public class TabelaFinanc implements Serializable {
     private Short id;
     @Column(name = "descricao")
     private String descricao;
+    
+
+    @Column(name="multa_percent")
+    private Double multaPercent;
+
+    @Column(name="multa_val")
+    private BigDecimal multaVal;
+
+    @Column(name="juros_diario")
+    private Double jurosDiario;
+    
 
     public TabelaFinanc() {
     }
@@ -58,6 +66,30 @@ public class TabelaFinanc implements Serializable {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public Double getMultaPercent() {
+        return multaPercent;
+    }
+
+    public void setMultaPercent(Double multaPercent) {
+        this.multaPercent = multaPercent;
+    }
+
+    public BigDecimal getMultaVal() {
+        return multaVal;
+    }
+
+    public void setMultaVal(BigDecimal multaVal) {
+        this.multaVal = multaVal;
+    }
+
+    public Double getJurosDiario() {
+        return jurosDiario;
+    }
+
+    public void setJurosDiario(Double jurosDiario) {
+        this.jurosDiario = jurosDiario;
     }
 
     @Override

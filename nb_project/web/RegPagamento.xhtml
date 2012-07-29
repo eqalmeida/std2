@@ -47,27 +47,56 @@
         </h:panelGroup>
 
         <h:panelGroup rendered="#{pagMB.pedidoPag != null}">
-            
-            <p:panelGrid columns="4" style="width:100%">
-                
+
+            <p:panelGrid style="width:100%">
+
                 <f:facet name="header">Dados da Forma de Pagamento</f:facet>
-                
-                <h:outputText value="Cliente:"/>
-                <h:outputText value="#{pagMB.pedidoPag.pedido.cliente}"/>
+                <p:row>
+                    <p:column>
+                        <h:outputText value="Cliente:"/>
+                    </p:column>
+                    <p:column colspan="3">
+                        <h:outputText value="#{pagMB.pedidoPag.pedido.cliente}"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <h:outputText value="Tipo de Pagto:"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{pagMB.pedidoPag.tipoPagto}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="Multa por atraso (%):"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{pagMB.pedidoPag.multaPercent}"/>
+                    </p:column>
+                </p:row>
 
-                <h:outputText value="Tipo de Pagto:"/>
-                <h:outputText value="#{pagMB.pedidoPag.tipoPagto}"/>
+                <p:row>
+                    <p:column>
+                        <h:outputText value="Multa em valor:"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{pagMB.pedidoPag.multaVal}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="Juros diário (%):"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{pagMB.pedidoPag.jurosDiario}"/>
+                    </p:column>
+                </p:row>
 
-                <h:outputText value="Multa por atraso (%):"/>
-                <h:outputText value="#{pagMB.pedidoPag.multaAtraso}"/>
 
-                <h:outputText value="Juros diário (%):"/>
-                <h:outputText value="#{pagMB.pedidoPag.jurosDiario}"/>
             </p:panelGrid>
             <br/>
-            
+
             <h:form id="form">
-                
+
                 <p:dataTable value="#{pagMB.pedidoPag.parcelas}" var="it" 
                              rowStyleClass="#{it.status == 1 ? 'verde' : it.atrasado ? it.status == 2 ? 'laranja' : 'vermelho' : null }">
 
@@ -122,9 +151,9 @@
                 </p:dataTable>
                 <br/>
                 <p:dataTable value="#{pagMB.pedidoPag.pagamentos}" var="it" rendered="#{pagMB.pedidoPag.pagamentos.size() > 0 }">
-                    
+
                     <f:facet name="header">Pagamentos</f:facet>
-                    
+
                     <p:column headerText="Data Informada">
                         <h:outputText value="#{it.dataInformada}">
                             <f:convertDateTime timeZone="#{app.timeZone}"/>
@@ -135,13 +164,13 @@
                             <f:convertDateTime timeZone="#{app.timeZone}" type="both"/>
                         </h:outputText>
                     </p:column>
-                    
+
                     <p:column headerText="Valor">
                         <h:outputText value="#{it.valor}">
                             <f:convertNumber type="currency"/>
                         </h:outputText>
                     </p:column>
-                    
+
                     <p:column headerText="Usuario">
                         <h:outputText value="#{it.recebUsuario}"/>
                     </p:column>

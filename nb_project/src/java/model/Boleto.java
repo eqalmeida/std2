@@ -411,9 +411,18 @@ public class Boleto implements Serializable {
 
     private BigDecimal getMulta(Date data) {
         
-        Double m = this.getPedidoPag().getMultaAtraso();
+        Double m = this.getPedidoPag().getMultaPercent();
+        BigDecimal mVal = this.getPedidoPag().getMultaVal();
         
-        if(m == null || m == 0.0){
+        if(m == null){
+            m = 0.0;
+        }
+        
+        if(mVal == null){
+            mVal = BigDecimal.ZERO;
+        }
+        
+        if(m == 0.0 && mVal.doubleValue() == 0.0){
             return (BigDecimal.ZERO);
         }
 
@@ -427,6 +436,7 @@ public class Boleto implements Serializable {
 
             if (atraso > 0) {
                 BigDecimal temp = getValor().multiply(new BigDecimal(m)).divide(new BigDecimal(100)).setScale(2, RoundingMode.DOWN);
+                temp = temp.add(mVal);
                 return (temp);
 
             } else {

@@ -57,13 +57,13 @@ public class PagamentoBean extends ControllerBase implements Serializable {
 
     public PedidoPag getPedidoPag() {
 
-        if (pedidoPag == null) {
+//        if (pedidoPag == null) {
 
             try {
                 pedidoPag = pagService.findPedidoPag(pagId);
             } catch (Exception ex) {
             }
-        }
+//        }
         return pedidoPag;
     }
 

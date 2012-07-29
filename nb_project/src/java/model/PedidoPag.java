@@ -58,13 +58,6 @@ public class PedidoPag implements Serializable {
     @Column(name = "frequencia")
     private short frequencia;
     
-
-    @Column(name="multa_percent")
-    private Double multaAtraso;
-
-    @Column(name="juros_diario_percent")
-    private Double jurosDiario;
-    
     
     @JoinColumn(name = "tabela_financ_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
@@ -80,6 +73,17 @@ public class PedidoPag implements Serializable {
     @JoinColumn(name = "pedido_pag_id")
     @OrderBy(value="vencimento")
     private Collection<Boleto> parcelas;
+
+    @Column(name="multa_percent")
+    private Double multaPercent;
+
+    @Column(name="multa_val")
+    private BigDecimal multaVal;
+
+    @Column(name="juros_diario")
+    private Double jurosDiario;
+    
+
     
     @OneToMany
     @JoinColumn(name="pedido_pag_id")
@@ -183,12 +187,20 @@ public class PedidoPag implements Serializable {
         this.pagamentos = pagamentos;
     }
 
-    public Double getMultaAtraso() {
-        return multaAtraso;
+    public Double getMultaPercent() {
+        return multaPercent;
     }
 
-    public void setMultaAtraso(Double multaAtraso) {
-        this.multaAtraso = multaAtraso;
+    public void setMultaPercent(Double multaPercent) {
+        this.multaPercent = multaPercent;
+    }
+
+    public BigDecimal getMultaVal() {
+        return multaVal;
+    }
+
+    public void setMultaVal(BigDecimal multaVal) {
+        this.multaVal = multaVal;
     }
 
     public Double getJurosDiario() {
@@ -198,7 +210,7 @@ public class PedidoPag implements Serializable {
     public void setJurosDiario(Double jurosDiario) {
         this.jurosDiario = jurosDiario;
     }
-    
+
     public BigDecimal getValorDevidoAtual(Date d){
         BigDecimal valorDevido = BigDecimal.ZERO;
         for(Boleto b : this.getParcelas()){
