@@ -4,19 +4,11 @@
  */
 package controller;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.faces.application.ViewHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import model.Usuario;
-import org.primefaces.context.RequestContext;
 
 /**
  *
@@ -26,7 +18,7 @@ import org.primefaces.context.RequestContext;
 @SessionScoped
 public class LoginBean extends ControllerBase {
 
-    private Usuario usuario = null;
+    private Short usuarioId = null;
     private String login;
     private String senha;
     private String url;
@@ -38,8 +30,24 @@ public class LoginBean extends ControllerBase {
     }
 
     public Usuario getUsuario() {
+        if (usuarioId == null || usuarioId == 0) {
+            return null;
+        }
 
-        return usuario;
+        EntityManager em = ControllerBase.getEmf().createEntityManager();
+
+        try {
+            Usuario u = em.find(Usuario.class, usuarioId);
+            if (u != null) {
+                if (u.getAtivo() == false) {
+                    return null;
+                }
+            }
+            return u;
+        } finally {
+            em.close();
+        }
+
     }
 
     public String getLogin() {
@@ -76,7 +84,11 @@ public class LoginBean extends ControllerBase {
             Usuario u = (Usuario) query.getResultList().get(0);
 
             if (u.getSenha().equals(senha)) {
-                usuario = u;
+                if (u.getAtivo()) {
+                    usuarioId = u.getId();
+                } else {
+                    addErrorMessage("Usuário desativado");
+                }
             } else {
                 addErrorMessage("Senha inválida!");
             }
@@ -89,7 +101,7 @@ public class LoginBean extends ControllerBase {
     }
 
     public void logoff() {
-        usuario = null;
+        usuarioId = null;
         login = "";
     }
 

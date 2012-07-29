@@ -40,9 +40,10 @@
                         <p:menuitem value="Novo Pedido" action="ManterPedido" icon="ui-icon-disk" ajax="false"/>  
                     </p:submenu>  
                     
-                    <p:submenu label="Configurações" icon="ui-icon-wrench">  
+                    <p:submenu label="Configurações" icon="ui-icon-wrench" rendered="#{loginMB.usuario.admin eq true}">  
                         <p:menuitem value="Tab. Financ." action="ManterTabelaFinanc" ajax="false"/>  
                         <p:menuitem value="Tipo Pagamento" action="ManterTipoPagto" ajax="false"/>  
+                        <p:menuitem value="Usuários" action="ManterUsuario" ajax="false"/>  
                     </p:submenu>  
                     <p:submenu label="Consultas" icon="ui-icon-document">
                         <p:menuitem value="Pedidos" action="ShowPedido" icon="ui-icon-disk" update=":corpoId" ajax="false"/>  

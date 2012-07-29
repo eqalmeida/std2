@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./WEB-INF/templates/templatePrincipal.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+    <ui:define name="top">
+
+        <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
+
+    </ui:define>
+
+    <ui:define name="left">
+        <h:form id="fmenu">
+
+            <p:menu>
+                
+                <p:submenu label="Opcões">
+                    <p:menuitem value="Novo" actionListener="#{usuarioMB.novo}" update=":formDialog @form :formTable"/>
+                </p:submenu>
+                
+                <p:submenu label="Selecionado">
+                    <p:menuitem disabled="#{usuarioMB.selected.id eq null}" value="Editar" update=":formDialog" actionListener="#{usuarioMB.editar}" icon="ui-icon-pencil"/>  
+                    <p:menuitem disabled="#{usuarioMB.selected.id eq null}" value="Excluir" update=":formTable" icon="ui-icon-trash" actionListener="#{usuarioMB.excluir}"/>  
+                </p:submenu>
+            </p:menu>
+
+        </h:form>    
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl autoUpdate="true" id="message"/>
+
+        <h:form id="formTable">
+
+            <p:dataTable var="it" id="tbl" rowKey="#{it.id}"
+                         selectionMode="single" selection="#{usuarioMB.selected}"
+                         value="#{usuarioMB.lista}">
+                
+                <p:ajax event="rowSelect" update=":fmenu" />
+                <p:ajax event="rowUnselect" update=":fmenu" />
+
+                <p:column headerText="ID" sortBy="#{it.id}">#{it.id}</p:column>
+
+                <p:column headerText="Nome" sortBy="#{it.nome}">
+                    #{it.nome}
+                </p:column>
+
+                <p:column headerText="Login" sortBy="#{it.login}">
+                    #{it.login}
+                </p:column>
+
+                <p:column headerText="Ativo?" sortBy="#{it.ativo}">
+                    #{it.ativo}
+                </p:column>
+
+                <p:column headerText="Admin?" sortBy="#{it.ativo}">
+                    #{it.admin}
+                </p:column>
+
+            </p:dataTable>
+
+        </h:form>
+
+        <h:form id="formDialog">
+
+            <p:dialog widgetVar="uDlg" modal="true" resizable="false">
+
+                <h:inputHidden value="#{usuarioMB.selected.id}" />
+
+                <p:panelGrid columns="2" columnClasses="label,field,label,field" id="frm">
+
+                    <h:outputText value="Nome" />
+                    <p:inputText value="#{usuarioMB.selected.nome}" label="Nome" required="true"/>
+
+                    <h:outputText value="Login" />
+                    <p:inputText value="#{usuarioMB.selected.login}" label="Login" required="true"/>
+
+                    <h:outputText value="Ativo" />
+                    <p:selectOneButton value="#{usuarioMB.selected.ativo}">
+                        <f:selectItem itemLabel="Sim" itemValue="true"/>
+                        <f:selectItem itemLabel="Não" itemValue="false"/>
+                    </p:selectOneButton>
+
+                    <h:outputText value="Admin" />
+                    <p:selectOneButton value="#{usuarioMB.selected.admin}">
+                        <f:selectItem itemLabel="Sim" itemValue="true"/>
+                        <f:selectItem itemLabel="Não" itemValue="false"/>
+                    </p:selectOneButton>
+
+                </p:panelGrid>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Gravar" actionListener="#{usuarioMB.gravar}" update=":formTable, frm"/>
+                </f:facet>
+
+            </p:dialog>
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>

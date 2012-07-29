@@ -42,6 +42,9 @@ public class Usuario implements Serializable {
     @Basic(optional = false)
     @Column(name = "ativo")
     private boolean ativo;
+    @Basic(optional = false)
+    @Column(name = "admin")
+    private boolean admin;
 
     public Usuario() {
     }
@@ -96,6 +99,14 @@ public class Usuario implements Serializable {
 
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 
     @Override
