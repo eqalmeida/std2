@@ -63,6 +63,15 @@ public class UsuarioBean extends ControllerBase implements Serializable {
         selected = new Usuario();
         RequestContext.getCurrentInstance().execute("uDlg.show()");
     }
+    
+    public void excluir(){
+        try{
+            service.destroy(selected.getId());
+            addMessage("Usuário excluído com sucesso");
+        }catch(Exception ex){
+            addErrorMessage("Não foi possível excluir!");
+        }
+    }
 
     public void gravar() {
 

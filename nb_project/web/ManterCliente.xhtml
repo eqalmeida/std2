@@ -22,7 +22,7 @@
                 
                 <p:submenu label="Selecionado">
                     <p:menuitem disabled="#{clienteMB.selected.id eq null}" value="Editar" update=":formDialog" actionListener="#{clienteMB.editar}" icon="ui-icon-pencil" oncomplete="cliForm.show()"/>  
-                    <p:menuitem disabled="#{clienteMB.selected.id eq null}" value="Excluir" update=":formTable" icon="ui-icon-trash" actionListener="#{clienteMB.excluir}"/>  
+                    <p:menuitem disabled="#{clienteMB.selected.id eq null}" value="Excluir" update=":formTable" icon="ui-icon-trash" actionListener="#{clienteMB.excluir}" onstart="return confirm('Confirma?')" />  
                     <p:menuitem disabled="#{clienteMB.selected.id eq null}" value="Adicionar ao Pedido" icon="ui-icon-plus" actionListener="#{clienteMB.addToPedido}"/>
                 </p:submenu>
             </p:menu>

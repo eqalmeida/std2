@@ -22,7 +22,7 @@
                 
                 <p:submenu label="Selecionado">
                     <p:menuitem disabled="#{usuarioMB.selected.id eq null}" value="Editar" update=":formDialog" actionListener="#{usuarioMB.editar}" icon="ui-icon-pencil"/>  
-                    <p:menuitem disabled="#{usuarioMB.selected.id eq null}" value="Excluir" update=":formTable" icon="ui-icon-trash" actionListener="#{usuarioMB.excluir}"/>  
+                    <p:menuitem disabled="#{usuarioMB.selected.id eq null}" value="Excluir" update=":formTable, :message" icon="ui-icon-trash" actionListener="#{usuarioMB.excluir}" onstart="return confirm('Tem certeza?')"/>  
                 </p:submenu>
             </p:menu>
 
@@ -35,6 +35,7 @@
         <h:form id="formTable">
 
             <p:dataTable var="it" id="tbl" rowKey="#{it.id}"
+                         tableStyle="width: auto"
                          selectionMode="single" selection="#{usuarioMB.selected}"
                          value="#{usuarioMB.lista}">
                 
