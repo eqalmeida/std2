@@ -67,8 +67,9 @@
                     <ui:insert name="left">Left</ui:insert>
                 </td>
                 <td style="vertical-align: top; width: 100%">
+                    <h:panelGroup rendered="#{not(loginMB.usuario eq null)}">
                     <ui:insert name="content">Content</ui:insert>    
-
+                    </h:panelGroup>
 
                     <h:form id="loginForm">
 

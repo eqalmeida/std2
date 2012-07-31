@@ -23,6 +23,7 @@
                 <p:submenu label="Selecionado">
                     <p:menuitem disabled="#{usuarioMB.selected.id eq null}" value="Editar" update=":formDialog" actionListener="#{usuarioMB.editar}" icon="ui-icon-pencil"/>  
                     <p:menuitem disabled="#{usuarioMB.selected.id eq null}" value="Excluir" update=":formTable, :message" icon="ui-icon-trash" actionListener="#{usuarioMB.excluir}" onstart="return confirm('Tem certeza?')"/>  
+                    <p:menuitem disabled="#{usuarioMB.selected.id eq null}" value="Alterar Senha" update=":fsenha" icon="ui-icon-key" actionListener="#{usuarioMB.editarSenha}"/>  
                 </p:submenu>
             </p:menu>
 
@@ -42,31 +43,55 @@
                 <p:ajax event="rowSelect" update=":fmenu" />
                 <p:ajax event="rowUnselect" update=":fmenu" />
 
-                <p:column headerText="ID" sortBy="#{it.id}">#{it.id}</p:column>
+                <p:column headerText="ID">#{it.id}</p:column>
 
-                <p:column headerText="Nome" sortBy="#{it.nome}">
+                <p:column headerText="Nome">
                     #{it.nome}
                 </p:column>
 
-                <p:column headerText="Login" sortBy="#{it.login}">
+                <p:column headerText="Login">
                     #{it.login}
                 </p:column>
 
-                <p:column headerText="Ativo?" sortBy="#{it.ativo}">
-                    #{it.ativo}
+                <p:column headerText="Ativo?">
+                    <h:outputText value="#{it.ativo?'Sim':'Não'}" />
                 </p:column>
 
-                <p:column headerText="Admin?" sortBy="#{it.ativo}">
-                    #{it.admin}
+                <p:column headerText="Admin?">
+                    <h:outputText value="#{it.admin?'Sim':'Não'}" />
                 </p:column>
 
             </p:dataTable>
 
         </h:form>
+        
+        <h:form id="fsenha">
+            <p:dialog header="Alterando Senha"
+                widgetVar="usDlg" modal="true" resizable="false">
+
+                <h:inputHidden value="#{usuarioMB.selected.id}" />
+                
+                <p:panelGrid columns="2" columnClasses="label,field" id="frmp">
+                    <h:outputText value="Senha:"/>
+                    <p:password value="#{usuarioMB.selected.senha}" label="Senha" required="true" id="pw1" match="pw2"/>
+                    
+                    <h:outputText value="Confirmação da Senha:"/>
+                    <p:password value="#{usuarioMB.selected.senha}" label="Senha" required="true" id="pw2"/>
+                    
+                </p:panelGrid>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Gravar" actionListener="#{usuarioMB.gravar}" update=":formTable, frmp"/>
+                </f:facet>
+
+                
+            </p:dialog>
+        </h:form>
 
         <h:form id="formDialog">
 
-            <p:dialog widgetVar="uDlg" modal="true" resizable="false">
+            <p:dialog header="#{usuarioMB.selected.id > 0?'Editando':'Inserindo'} Usuário"
+                widgetVar="uDlg" modal="true" resizable="false">
 
                 <h:inputHidden value="#{usuarioMB.selected.id}" />
 

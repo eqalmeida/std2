@@ -30,20 +30,35 @@ public class UsuarioJpaController implements Serializable {
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
-    
-    private void verificaAdmin(Usuario usuario) throws Exception{
-        if(usuario.isAdmin() && usuario.getAtivo()){
+
+    private void verificaAdmin(Usuario usuario) throws Exception {
+        if (usuario.isAdmin() && usuario.getAtivo()) {
             return;
         }
-        
+
         List<Usuario> lista = findUsuarioEntities();
-        
-        for(Usuario u : lista){
-            if(u.isAdmin() && u.getAtivo() && (!u.getId().equals(usuario.getId()))){
+
+        for (Usuario u : lista) {
+            if (u.isAdmin() && u.getAtivo() && (!u.getId().equals(usuario.getId()))) {
                 return;
             }
         }
+
+        throw new Exception("É necessário manter pelo menos um usuário como ADMIN");
+    }
+
+    private void verificaExcluir(short usuarioId) throws Exception {
+
+        Usuario usuario = findUsuario(usuarioId);
         
+        List<Usuario> lista = findUsuarioEntities();
+
+        for (Usuario u : lista) {
+            if (u.isAdmin() && u.getAtivo() && (!u.getId().equals(usuario.getId()))) {
+                return;
+            }
+        }
+
         throw new Exception("É necessário manter pelo menos um usuário como ADMIN");
     }
 
@@ -85,10 +100,14 @@ public class UsuarioJpaController implements Serializable {
         }
     }
 
-    public void destroy(Short id) throws NonexistentEntityException {
+    public void destroy(Short id) throws NonexistentEntityException, Exception {
+
+                verificaExcluir(id);
+        
         EntityManager em = null;
         try {
             em = getEntityManager();
+
             em.getTransaction().begin();
             Usuario usuario;
             try {
@@ -151,5 +170,4 @@ public class UsuarioJpaController implements Serializable {
             em.close();
         }
     }
-    
 }

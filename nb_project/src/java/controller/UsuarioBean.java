@@ -64,6 +64,10 @@ public class UsuarioBean extends ControllerBase implements Serializable {
         RequestContext.getCurrentInstance().execute("uDlg.show()");
     }
     
+    public void editarSenha(){
+        RequestContext.getCurrentInstance().execute("usDlg.show()");
+    }
+    
     public void excluir(){
         try{
             service.destroy(selected.getId());
@@ -86,6 +90,9 @@ public class UsuarioBean extends ControllerBase implements Serializable {
             }
 
             RequestContext.getCurrentInstance().execute("uDlg.hide()");
+            RequestContext.getCurrentInstance().execute("usDlg.hide()");
+            
+            addMessage("Gravado com sucesso");
 
 
         } catch (Exception ex) {
