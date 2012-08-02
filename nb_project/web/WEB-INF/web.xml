@@ -13,6 +13,8 @@
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>*.jsf</url-pattern>
     </servlet-mapping>
+    
+
     <session-config>
         <session-timeout>
             30
@@ -29,12 +31,13 @@
             Defines the amount (default = 20) of the latest views are stored in session.  
         </description>  
     </context-param>    
-
+<!--
     <context-param>  
         <param-name>primefaces.THEME</param-name>  
-<!--        <param-value>pepper-grinder</param-value>  -->
+        <param-value>pepper-grinder</param-value>  
         <param-value>cupertino</param-value>  
     </context-param>   
+    -->
 
     <context-param> 
         <param-name>com.sun.faces.enableRestoreView11Compatibility</param-name> 

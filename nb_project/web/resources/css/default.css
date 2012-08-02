@@ -16,11 +16,19 @@ body {
     font-size: 90% !important;
 }
 
-.ui-state-hover{
+.ui-widget a, .ui-widget .ui-widget a {
+/*    font-size: 90% !important; */
     font-weight: normal;
-    text-decoration: none;
+}
+/*
+.ui-datatable .ui-datatable-header{
+    background-image: none;
 }
 
+.ui-datatable .ui-state-default{
+    background-image: none;
+}
+*/
 .label {
     text-align: right;
 }
@@ -68,6 +76,10 @@ table.boleto{
 table.boleto td, table.boleto th{
     border:1px solid #ddd;
     padding: 5px;
+}
+
+.ui-datatable-header {
+   text-align: left;
 }
 
 table.no-border td, table.no-border th{
