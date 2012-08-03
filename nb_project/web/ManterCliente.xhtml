@@ -61,15 +61,11 @@
 
         <h:form id="formDialog">
 
-            <p:dialog id="cliFormId" widgetVar="cliForm" modal="true" resizable="false">
+            <p:dialog id="cliFormId" 
+                      header="${clienteMB.selected.id gt 0?'Editando':'Inserindo'} Cliente"
+                      widgetVar="cliForm" modal="true" resizable="false">
 
                 <h:inputHidden value="#{clienteMB.selected.id}" />
-
-                <f:facet name="header">
-                    <h:outputText value="Editar "  rendered="#{clienteMB.selected.id > 0}"/>
-                    <h:outputText value="Novo "  rendered="#{clienteMB.selected.id == null}"/>
-                    <h:outputText value="Cliente"/>
-                </f:facet>
 
                 <p:panelGrid columnClasses="label,field,label,field" id="frm">
 
@@ -85,7 +81,9 @@
                     <p:row>
                         <p:column styleClass="label">CPF:</p:column>
                         <p:column>
-                            <p:inputText value="#{clienteMB.selected.cpf}" label="CPF"/>
+                            <p:inputText value="#{clienteMB.selected.cpf}" label="CPF">
+                                <f:validateLength minimum="11" />
+                            </p:inputText>
                         </p:column>
                         <p:column styleClass="label">RG:</p:column>
                         <p:column>
@@ -100,14 +98,18 @@
                         </p:column>
                         <p:column styleClass="label">Tel. Cel.:</p:column>
                         <p:column>
-                            <p:inputText value="#{clienteMB.selected.telCel}" label="Tel. Cel."/>
+                            <p:inputText value="#{clienteMB.selected.telCel}" label="Tel. Cel.">
+                                <f:validateLength minimum="8"/>
+                            </p:inputText>
                         </p:column>
                     </p:row>
 
                     <p:row>
                         <p:column styleClass="label">Tel. COM.:</p:column>
                         <p:column colspan="3">
-                            <p:inputText value="#{clienteMB.selected.telCom}" label="Tel. COM."/>
+                            <p:inputText value="#{clienteMB.selected.telCom}" label="Tel. COM.">
+                                <f:validateLength minimum="8" />
+                            </p:inputText>
                         </p:column>
                     </p:row>
 
@@ -115,7 +117,9 @@
                     <p:row>
                         <p:column styleClass="label">Endereço:</p:column>
                         <p:column colspan="3">
-                            <p:inputText value="#{clienteMB.selected.endRua}" label="Endereço" size="50"/>
+                            <p:inputText value="#{clienteMB.selected.endRua}" label="Endereço" size="50">
+                                <f:validateLength minimum="3" />
+                            </p:inputText>
                         </p:column>
                     </p:row>
 
@@ -146,7 +150,6 @@
 
                 <f:facet name="footer">
                     <p:commandButton value="Gravar" actionListener="#{clienteMB.gravar}" update=":formTable, frm"/>
-                    <p:commandButton value="Cancela" oncomplete="cliForm.hide()" immediate="true"/>
                 </f:facet>
 
             </p:dialog>
