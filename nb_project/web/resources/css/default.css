@@ -1,10 +1,20 @@
-body {
-    margin: 10px;
+html, body {
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+    font-family: Tahoma, Geneva, sans-serif;
+    font-size: 11px;
+    border-collapse: collapse;
+    background-color: #666;
 }
-
+#corpo{
+    background-color: #fff;
+    width: 960px;
+    padding: 10px;
+    margin: 0 auto;
+}
 .painel1 {
     vertical-align: top;
-
 }
 
 .painel2{
@@ -12,8 +22,16 @@ body {
     vertical-align: top;
 }
 
+.topbar{
+    padding: 10px;
+    background-color: #006;
+    color: #eee;
+    width: 100%;
+    border-bottom: solid 2px #003;
+    
+}
 .ui-widget, .ui-widget .ui-widget {
-    font-size: 90% !important;
+/*    font-size: 90% !important; */
 }
 
 .ui-widget a, .ui-widget .ui-widget a {
