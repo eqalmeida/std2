@@ -239,11 +239,12 @@
                         </p:column>
 
                         <p:column>
-                            <p:commandLink value="Registrar Pagamento" action="#{showPedidoMB.regPag}">
+                            <p:commandLink disabled="#{not(it.parcelas.size() gt 0)}"
+                                value="Registrar Pagamento" action="#{showPedidoMB.regPag}">
                                 <f:setPropertyActionListener target="#{showPedidoMB.pedidoPagSelected}" value="#{it}" />
                             </p:commandLink>
                             <p:spacer width="5"/>
-                            <p:commandLink value="Imprimir Boletos" action="#{showPedidoMB.printBoletos}">
+                            <p:commandLink  disabled="#{not(it.parcelas.size() gt 0)}" value="Imprimir Boletos" action="#{showPedidoMB.printBoletos}">
                                 <f:setPropertyActionListener target="#{showPedidoMB.pedidoPagSelected}" value="#{it}" />
                             </p:commandLink>
                             

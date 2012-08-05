@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="./WEB-INF/templates/templatePrincipal.xhtml"
                 xmlns:h="http://java.sun.com/jsf/html"
@@ -14,23 +14,20 @@
     <ui:define name="left">
         <h:form id="fmenu">
             <p:menu>  
-                
-                <p:submenu label="Visualizar">
-                    <p:menuitem value="Veiculos" actionListener="#{produtoBean.setTipoProduto(1)}" update=":formTable @form" disabled="#{produtoBean.tipoProduto eq 1 }"/>
-                    <p:menuitem value="Outros" actionListener="#{produtoBean.setTipoProduto(0)}" update=":formTable @form" disabled="#{produtoBean.tipoProduto eq 0 }"/>
-                </p:submenu>
-                
+
                 <p:submenu icon="ui-icon-plus" label="Novo" >
-                    <p:menuitem value="Veículo" actionListener="#{produtoBean.novoVeiculo}" update=":formNewCar" oncomplete="dialogNewCar.show()"/>
-                    <p:menuitem value="Outro" actionListener="#{produtoBean.novoProduto}" update=":formNewCar" oncomplete="dialogNewCar.show()"/>
+                    <p:menuitem value="Veículo" actionListener="#{produtoBean.novoProduto(1)}" update=":formNewCar"/>
+                    <p:menuitem value="Outro" actionListener="#{produtoBean.novoProduto(0)}" update=":formNewCar"/>
                 </p:submenu>
 
                 <p:submenu label="Selecionado" >
-                <p:menuitem disabled="#{produtoBean.selected.id eq null}" value="Editar" update=":formNewCar" actionListener="#{produtoBean.editar}" icon="ui-icon-pencil"/>  
-                <p:menuitem  disabled="#{produtoBean.selected.id eq null}" value="Excluir" update=":formTable" icon="ui-icon-trash" actionListener="#{produtoBean.excluir}"/>  
-                <p:menuitem  disabled="#{produtoBean.selected.id eq null}" value="Adicionar ao Pedido" update=":formTable" icon="ui-icon-plus" actionListener="#{produtoBean.addToPedido}"/>
+                    <p:menuitem disabled="#{produtoBean.selected.id eq null}" value="Editar" update=":formNewCar" actionListener="#{produtoBean.editar}" icon="ui-icon-pencil"/>  
+                    <p:menuitem  disabled="#{produtoBean.selected.id eq null}" value="Excluir" update=":formTable" icon="ui-icon-trash" actionListener="#{produtoBean.excluir}" onstart="return confirm('Confirma?')"/>  
+                    <p:menuitem  disabled="#{produtoBean.selected.id eq null}" value="Adicionar ao Pedido" update=":formTable" icon="ui-icon-plus" actionListener="#{produtoBean.addToPedido}"/>
                 </p:submenu>
+
             </p:menu>
+
         </h:form>
     </ui:define>
 
@@ -38,8 +35,25 @@
         <p:growl autoUpdate="true" id="message"/>
 
         <h:form id="formTable">
+            <p:panelGrid columns="2" style="width:100%">
 
-            <p:dataTable lazy="true" var="it" id="tbl"
+                            <p:selectOneButton value="#{produtoBean.tipoProduto}">
+                                <f:selectItem itemValue="0" itemLabel="Outros" />
+                                <f:selectItem itemValue="1" itemLabel="Veículos" />
+                                <p:ajax update="tbl" listener="#{produtoBean.emEstoqueChanged}" />  
+                            </p:selectOneButton>
+
+                <h:panelGroup>
+                            
+                            <p:selectBooleanCheckbox value="#{produtoBean.emEstoque}">  
+                                <p:ajax update="tbl" listener="#{produtoBean.emEstoqueChanged}" />  
+                            </p:selectBooleanCheckbox>  
+                            <h:outputText value="Não mostrar itens fora de estoque"/>
+                </h:panelGroup>
+            </p:panelGrid>
+            <p:spacer height="2"/>
+
+            <p:dataTable lazy="true" var="it" id="tbl" 
                          selectionMode="single" selection="#{produtoBean.selected}"
                          value="#{produtoBean.lazyList}" rows="10"
                          paginatorAlwaysVisible="false"
@@ -77,8 +91,7 @@
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="Estoque" sortBy="#{it.qtdEstoque}" 
-                          filterBy="#{it.qtdEstoque}" filterOptions="#{produtoBean.optFilterEstoque}">
+                <p:column headerText="Estoque" sortBy="#{it.qtdEstoque}"> 
                     <h:outputText value="#{it.qtdEstoque}" rendered="#{it.qtdEstoque >= 0}" />
                 </p:column>
 
@@ -89,16 +102,10 @@
 
         <h:form id="formNewCar">
 
-            <p:dialog id="dlgNewCar" widgetVar="dialogNewCar" modal="true" resizable="false">
+            <p:dialog header="#{produtoBean.selected.id gt 0?'Editando':'Inserindo'} #{produtoBean.selected.tipo eq 0?'Produto':'Veículo'}"
+                id="dlgNewCar" widgetVar="dialogNewCar" modal="true" resizable="false">
 
                 <h:inputHidden value="#{produtoBean.selected.id}" />
-
-                <f:facet name="header">
-                    <h:outputText value="Editar "  rendered="#{produtoBean.selected.id > 0}"/>
-                    <h:outputText value="Novo "  rendered="#{produtoBean.selected.id == null}"/>
-                    <h:outputText value="Veículo"  rendered="#{produtoBean.selected.tipo == 1}"/>
-                    <h:outputText value="Produto"  rendered="#{produtoBean.selected.tipo == 0}"/>
-                </f:facet>
 
                 <p:panelGrid columns="#{2*(produtoBean.selected.tipo + 1)}" columnClasses="label,field,label,field" id="frm">
 

@@ -26,7 +26,19 @@ public class ProdutoJpaController implements Serializable {
 
     private String sortedField = null;
     private String order = null;
+    private Integer fTipo = null;
+    private Integer fEstoque = null;
 
+    public void setfTipo(Integer fTipo) {
+        this.fTipo = fTipo;
+    }
+
+    public void setfEstoque(Integer fEstoque) {
+        this.fEstoque = fEstoque;
+    }
+
+
+    
     public void setSortedField(String sortedField, String order) {
         this.sortedField = sortedField;
         this.order = order;
@@ -169,9 +181,32 @@ public class ProdutoJpaController implements Serializable {
         return findProdutoEntities(false, maxResults, firstResult, tipo);
     }
 
+    private String getWhere(){
+        
+        String where = "";
+        
+        if(fEstoque == null && fTipo == null){
+            return where;
+        }
+        
+        where = " WHERE 1=1";
+        
+        if(fTipo != null){
+            where += (" and p.tipo = " + fTipo);
+        }
+        
+        if(fEstoque != null){
+            where += (" and p.qtdEstoque != 0");
+        }
+        
+        return where;
+    }
+    
     public List<Produto> findProdutoEntities(int maxResults, int firstResult) {
 
         String query = "SELECT p FROM Produto p";
+        
+        query += getWhere();
 
         if (sortedField != null) {
             query += (" ORDER BY p." + sortedField + " " + order);
@@ -235,8 +270,9 @@ public class ProdutoJpaController implements Serializable {
     public int getProdutoCount() {
         EntityManager em = getEntityManager();
         try {
-
-            Query q = em.createQuery("SELECT COUNT(p) FROM Produto p");
+            String query = "SELECT COUNT(p) FROM Produto p";
+            query += getWhere();
+            Query q = em.createQuery(query);
             return ((Long) q.getSingleResult()).intValue();
         } finally {
             em.close();

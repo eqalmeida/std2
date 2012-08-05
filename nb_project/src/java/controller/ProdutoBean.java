@@ -4,6 +4,7 @@
  */
 package controller;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -14,6 +15,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 import model.Produto;
 import model.ProdutoLazyList;
+import org.primefaces.component.datatable.DataTable;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
@@ -25,8 +27,9 @@ import repo.ProdutoJpaController;
  */
 @ManagedBean
 @ViewScoped
-public class ProdutoBean extends ControllerBase {
+public class ProdutoBean extends ControllerBase implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     public static final short VEICULO = 1;
     public static final short OUTROS = 0;
     private final String CLASS_NAME = "Produto";
@@ -35,9 +38,9 @@ public class ProdutoBean extends ControllerBase {
     private static List<SelectItem> tipoCombustivel = null;
     private List<Produto> todosProdutos;
     private int tipoProduto = 1;
+    private boolean emEstoque = true;
     private LazyDataModel<Produto> lazyList = null;
     ProdutoJpaController ctl = null;
-    private List<SelectItem> optFilterEstoque = null;
 
     /**
      * Creates a new instance of ProdutoBean
@@ -49,21 +52,22 @@ public class ProdutoBean extends ControllerBase {
     private void init() {
         ctl = new ProdutoJpaController();
 
-        SelectItem it;
-
-        optFilterEstoque = new ArrayList<SelectItem>();
-
-        it = new SelectItem(0, "Todos");
-        optFilterEstoque.add(it);
-
-        it = new SelectItem(1, "Em estoque");
-        optFilterEstoque.add(it);
-        
         tipoProduto = 1;
 
         lazyList = new ProdutoLazyList(ctl);
-        
-        ((ProdutoLazyList) lazyList).setTipo(tipoProduto);
+
+        ProdutoLazyList pLazy = (ProdutoLazyList) lazyList;
+
+        pLazy.getCtl().setfTipo(tipoProduto);
+        pLazy.getCtl().setfEstoque(1);
+    }
+
+    public boolean getEmEstoque() {
+        return emEstoque;
+    }
+
+    public void setEmEstoque(boolean emEstoque) {
+        this.emEstoque = emEstoque;
     }
 
     public LazyDataModel<Produto> getLazyList() {
@@ -132,24 +136,15 @@ public class ProdutoBean extends ControllerBase {
         selected = ctl.findProduto(((Produto) event.getObject()).getId());
     }
 
-    public void novoVeiculo() {
+    public void novoProduto(Short tipo) {
         if (!verificaLogin("")) {
             addErrorMessage("Falha de Login");
             return;
         }
 
         selected = new Produto();
-        selected.setTipo(VEICULO);
-    }
-
-    public void novoProduto() {
-        if (!verificaLogin("")) {
-            addErrorMessage("Falha de Login");
-            return;
-        }
-
-        selected = new Produto();
-        selected.setTipo(OUTROS);
+        selected.setTipo(tipo);
+            RequestContext.getCurrentInstance().execute("dialogNewCar.show()");
     }
 
     public void exibir() {
@@ -227,13 +222,30 @@ public class ProdutoBean extends ControllerBase {
     public int getTipoProduto() {
         return tipoProduto;
     }
-    
+
+    public void emEstoqueChanged() {
+
+        DataTable dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent(":formTable:tbl");
+        dataTable.setFirst(0);
+
+        if (emEstoque) {
+            ((ProdutoLazyList) lazyList).getCtl().setfEstoque(1);
+        } else {
+            ((ProdutoLazyList) lazyList).getCtl().setfEstoque(null);
+        }
+        ((ProdutoLazyList) lazyList).getCtl().setfTipo(tipoProduto);
+    }
+
+    public void tipoChanged(ValueChangeEvent ev) {
+        tipoProduto = (Integer) ev.getNewValue();
+        ((ProdutoLazyList) lazyList).getCtl().setfTipo(tipoProduto);
+    }
 
     public void setTipoProduto(int tipoProduto) {
-        
+
         ProdutoLazyList l = (ProdutoLazyList) getLazyList();
-        l.setTipo(tipoProduto);
-        
+        l.getCtl().setfTipo(tipoProduto);
+
         selected = null;
         this.tipoProduto = tipoProduto;
     }
@@ -262,11 +274,7 @@ public class ProdutoBean extends ControllerBase {
 
             addMessage("Produto adicionado!");
         } catch (Exception ex) {
-            addMessage("Não foi possível adicionar!\n" + ex.getMessage());
+            addErrorMessage("Não foi possível adicionar!\n" + ex.getMessage());
         }
-    }
-
-    public List<SelectItem> getOptFilterEstoque() {
-        return optFilterEstoque;
     }
 }

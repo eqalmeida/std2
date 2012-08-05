@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./WEB-INF/templates/templatePrincipal.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+    <ui:define name="top">
+
+        <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
+
+    </ui:define>
+
+    <ui:define name="left">
+        <h:form id="fmenu">
+
+            <p:menu>
+                
+                <p:submenu label="Opcões">
+                </p:submenu>
+            </p:menu>
+
+        </h:form>    
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl autoUpdate="true" id="message"/>
+
+        <h:form id="form">
+            <p:panelGrid columns="3">
+            <h:outputText value="Num. Pedido:"/>
+            <p:inputText value="#{printAutoMB.pedidoId}" label="Num. pedido" required="true">
+                <f:convertNumber />
+            </p:inputText>
+            <p:commandButton value="Mostrar" update="@form, :form2" />
+            </p:panelGrid>
+            
+            
+            <h:panelGroup rendered="#{not(printAutoMB.pedido eq null)}">
+                
+                
+            </h:panelGroup>
+        </h:form>
+        <h:form id="form2">
+            <p:editor value="#{printAutoMB.texto}" width="800"/>
+                <p:commandButton value="Mostrar" action="#{printAutoMB.mostrarTexto}" />
+            
+        </h:form>        
+    </ui:define>
+
+</ui:composition>

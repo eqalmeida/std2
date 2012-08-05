@@ -9,7 +9,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.persistence.EntityManager;
+import model.Produto;
 import model.Usuario;
 import org.primefaces.context.RequestContext;
 import repo.UsuarioJpaController;
@@ -61,6 +61,8 @@ public class UsuarioBean extends ControllerBase implements Serializable {
 
     public void novo() {
         selected = new Usuario();
+        selected.setAdmin(false);
+        selected.setAtivo(true);
         RequestContext.getCurrentInstance().execute("uDlg.show()");
     }
     
@@ -86,6 +88,9 @@ public class UsuarioBean extends ControllerBase implements Serializable {
                 service.edit(selected);
             } else {
                 //Inserindo
+                if(selected.getSenha() == null){
+                    selected.setSenha("123456");
+                }
                 service.create(selected);
             }
 

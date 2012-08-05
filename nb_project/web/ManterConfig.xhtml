@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./WEB-INF/templates/templatePrincipal.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+    <ui:define name="top">
+
+        <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
+
+    </ui:define>
+
+    <ui:define name="left">
+        <h:form id="fmenu">
+
+            <p:menu>
+
+                <p:submenu label="Opcões">
+                </p:submenu>
+            </p:menu>
+
+        </h:form>    
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl autoUpdate="true" id="message"/>
+
+
+        <p:tabView dynamic="true">
+            <p:tab title="Básico" >
+                <h:form id="form1">
+                    <h:inputHidden value="#{configMB.config.id}" />
+                    
+                    <p:fieldset legend="Dados da empresa:">
+                    
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Nome:" />
+                        <p:inputText value="#{configMB.config.empresaNome}" size="50"/>
+
+                        <h:outputText value="Endereço:" />
+                        <p:inputText value="#{configMB.config.empresaEndereco}" size="50"/>
+
+                        <h:outputText value="Telefones:" />
+                        <p:inputText value="#{configMB.config.empresaTelefones}" size="50"/>
+
+                        <h:outputText value="Email:" />
+                        <p:inputText value="#{configMB.config.empresaEmail}" size="50"/>
+
+                        <h:outputText value="Homepage:" />
+                        <p:inputText value="#{configMB.config.empresaHomepage}" size="50"/>
+
+
+                    </h:panelGrid>
+                    </p:fieldset>
+                    
+                    <p:spacer height="5"/>
+                    
+                    <p:fieldset legend="Miscelânea">
+                        <h:panelGrid columns="2">
+                            <h:outputText value="Boletos por página:" />
+                            <p:inputText value="#{configMB.config.boletosPorPag}"/>
+
+                        </h:panelGrid>    
+                    </p:fieldset>
+                    
+                    <p:commandButton value="Gravar" actionListener="#{configMB.gravar}" update="@form"/>
+                </h:form>            
+            </p:tab>
+            <p:tab title="Carta Autorização">
+                <h:form id="form2">
+                    <h:inputHidden value="#{configMB.config.id}" />
+                    <p:editor value="#{configMB.config.cartaAutoriz}" width="600"/>
+                    <p:commandButton value="Gravar" actionListener="#{configMB.gravar}" update="@form"/>
+                </h:form>
+            </p:tab>
+        </p:tabView>
+
+    </ui:define>
+
+</ui:composition>

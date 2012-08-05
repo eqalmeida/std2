@@ -17,22 +17,15 @@ import repo.ProdutoJpaController;
 public class ProdutoLazyList extends LazyDataModel<Produto> {
     
     private ProdutoJpaController ctl = null;
-    private int tipo = 0;
 
     public ProdutoLazyList(ProdutoJpaController ctl) {
         this.ctl = ctl;
     }
 
-    public int getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(int tipo) {
-        this.tipo = tipo;
+    public ProdutoJpaController getCtl() {
+        return ctl;
     }
     
-    
-
     @Override
     public List<Produto> load(int startingAt, int maxPerPage, String sortField, SortOrder sortOrder, Map<String, String> filters) {
 
@@ -49,9 +42,9 @@ public class ProdutoLazyList extends LazyDataModel<Produto> {
         }
 
 
-        List<Produto> lista = ctl.findProdutoEntities(maxPerPage, startingAt, tipo);
+        List<Produto> lista = ctl.findProdutoEntities(maxPerPage, startingAt);
 
-        setRowCount(ctl.getProdutoCount(tipo));
+        setRowCount(ctl.getProdutoCount());
 
         setPageSize(maxPerPage);
 

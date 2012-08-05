@@ -38,12 +38,22 @@ public class Config implements Serializable {
     @Column(name = "boletos_por_pag")
     private Short boletosPorPag;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Short id;
+    
+    @Column(name="carta_autoriz")
+    private String cartaAutoriz;
 
     public Config() {
+    }
+
+    public String getCartaAutoriz() {
+        return cartaAutoriz;
+    }
+
+    public void setCartaAutoriz(String cartaAutoriz) {
+        this.cartaAutoriz = cartaAutoriz;
     }
 
     public Config(Short id) {
