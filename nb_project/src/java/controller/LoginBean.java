@@ -18,7 +18,7 @@ import model.Usuario;
 @SessionScoped
 public class LoginBean extends ControllerBase {
 
-    private Short usuarioId = null;
+    private Long usuarioId = null;
     private String login;
     private String senha;
     private String url;

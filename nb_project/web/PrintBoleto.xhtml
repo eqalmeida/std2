@@ -43,13 +43,13 @@
             </p:panel>
         </h:panelGroup>
 
-        <h:panelGroup rendered="#{printBoletoMB.pedidoPag != null}">
+        <h:panelGroup rendered="#{printBoletoMB.pedidoPag != null}" style="background: #fff">
             <h:form id="lbol">
 
                     <ui:param name="bolVar" value="#{app.config.boletosPorPag}"/>
                     
                     <ui:repeat value="#{printBoletoMB.pedidoPag.parcelas}" var="it" >
-                    <div style="margin-left: 50px">
+                    <div style="margin-left: 50px; background-color: #fff">
 
                         <table class="boleto">
                             <tr>

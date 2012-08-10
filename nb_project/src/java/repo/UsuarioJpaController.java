@@ -47,7 +47,7 @@ public class UsuarioJpaController implements Serializable {
         throw new Exception("É necessário manter pelo menos um usuário como ADMIN");
     }
 
-    private void verificaExcluir(short usuarioId) throws Exception {
+    private void verificaExcluir(Long usuarioId) throws Exception {
 
         Usuario usuario = findUsuario(usuarioId);
         
@@ -87,7 +87,7 @@ public class UsuarioJpaController implements Serializable {
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                Short id = usuario.getId();
+                Long id = usuario.getId();
                 if (findUsuario(id) == null) {
                     throw new NonexistentEntityException("The usuario with id " + id + " no longer exists.");
                 }
@@ -100,7 +100,7 @@ public class UsuarioJpaController implements Serializable {
         }
     }
 
-    public void destroy(Short id) throws NonexistentEntityException, Exception {
+    public void destroy(Long id) throws NonexistentEntityException, Exception {
 
                 verificaExcluir(id);
         
@@ -149,7 +149,7 @@ public class UsuarioJpaController implements Serializable {
         }
     }
 
-    public Usuario findUsuario(Short id) {
+    public Usuario findUsuario(Long id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(Usuario.class, id);

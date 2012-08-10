@@ -4,7 +4,6 @@
  */
 package model;
 
-import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,13 +22,13 @@ import javax.persistence.Table;
 @Table(name = "usuario")
 @NamedQueries({
     @NamedQuery(name = "Usuario.findAll", query = "SELECT u FROM Usuario u")})
-public class Usuario implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Usuario extends model.Entity {
+//    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
-    private Short id;
+    private Long id;
     @Basic(optional = false)
     @Column(name = "nome")
     private String nome;
@@ -49,23 +48,16 @@ public class Usuario implements Serializable {
     public Usuario() {
     }
 
-    public Usuario(Short id) {
+    public Usuario(Long id) {
         this.id = id;
     }
 
-    public Usuario(Short id, String nome, String login, String senha, boolean ativo) {
-        this.id = id;
-        this.nome = nome;
-        this.login = login;
-        this.senha = senha;
-        this.ativo = ativo;
-    }
-
-    public Short getId() {
+    @Override
+    public Long getId() {
         return id;
     }
 
-    public void setId(Short id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -109,6 +101,7 @@ public class Usuario implements Serializable {
         this.admin = admin;
     }
 
+    /*
     @Override
     public int hashCode() {
         int hash = 0;
@@ -128,7 +121,7 @@ public class Usuario implements Serializable {
         }
         return true;
     }
-
+*/
     @Override
     public String toString() {
         return nome;
