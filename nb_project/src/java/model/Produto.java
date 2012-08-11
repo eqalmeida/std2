@@ -7,6 +7,10 @@ package model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.SortedMap;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -29,6 +33,7 @@ import javax.persistence.Table;
 @NamedQueries({
     @NamedQuery(name = "Produto.findAll", query = "SELECT p FROM Produto p")})
 public class Produto implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,6 +71,29 @@ public class Produto implements Serializable {
     private String obs;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "produto")
     private Collection<PedidoProduto> pedidoProdutoCollection;
+    private static Map<Short, String> combustivelList = null;
+
+    public static Map<Short, String> getCombustivelList() {
+
+        if (combustivelList == null) {
+            combustivelList = new LinkedHashMap<Short, String>();
+            combustivelList.put((short) 1, "Gasolina");
+            combustivelList.put((short) 2, "Álcool");
+            combustivelList.put((short) 3, "Diesel");
+            combustivelList.put((short) 4, "Flex");
+            combustivelList.put((short) 5, "Gás");
+            combustivelList.put((short) 6, "Outro");
+        }
+
+        return combustivelList;
+    }
+
+    public String getCombustivelStr() {
+        if (getCombustivelList().containsKey(this.combustivel)) {
+            return (getCombustivelList().get(this.combustivel));
+        }
+        return null;
+    }
 
     public Produto() {
         this.qtdEstoque = 1;
@@ -91,14 +119,13 @@ public class Produto implements Serializable {
     public String getDescricao() {
         return descricao;
     }
-    
-    public String getDescricaoGeral(){
+
+    public String getDescricaoGeral() {
         String str = "";
-        if(this.tipo == 1){
-            
-            return (this.fabricante+" "+this.modelo+" - "+this.ano+" ("+this.placa+")");
-        }
-        else{
+        if (this.tipo == 1) {
+
+            return (this.fabricante + " " + this.modelo + " - " + this.ano + " (" + this.placa + ")");
+        } else {
             return this.descricao;
         }
     }
@@ -168,7 +195,7 @@ public class Produto implements Serializable {
     }
 
     public void setPlaca(String placa) {
-        if(!placa.isEmpty()){
+        if (!placa.isEmpty()) {
             placa = placa.toUpperCase();
         }
         this.placa = placa;
@@ -179,8 +206,8 @@ public class Produto implements Serializable {
     }
 
     public void setChassi(String chassi) {
-        if(chassi != null ){
-            if(chassi.length() == 0){
+        if (chassi != null) {
+            if (chassi.length() == 0) {
                 chassi = null;
             }
         }
@@ -218,8 +245,6 @@ public class Produto implements Serializable {
     public void setQtdEstoque(Integer qtdEstoque) {
         this.qtdEstoque = qtdEstoque;
     }
-    
-    
 
     @Override
     public int hashCode() {
@@ -245,5 +270,4 @@ public class Produto implements Serializable {
     public String toString() {
         return getDescricaoGeral();
     }
-    
 }

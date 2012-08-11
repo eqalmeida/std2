@@ -16,7 +16,7 @@
         <h:form id="fmenu">
 
             <p:menu>
-                
+
                 <p:submenu label="Opcões">
                 </p:submenu>
             </p:menu>
@@ -29,23 +29,22 @@
 
         <h:form id="form">
             <p:panelGrid columns="3">
-            <h:outputText value="Num. Pedido:"/>
-            <p:inputText value="#{printAutoMB.pedidoId}" label="Num. pedido" required="true">
-                <f:convertNumber />
-            </p:inputText>
-            <p:commandButton value="Mostrar" update="@form, :form2" />
+                <h:outputText value="Num. Pedido:"/>
+                <p:inputText value="#{printAutoMB.pedidoId}" label="Num. pedido" required="true">
+                    <f:convertNumber />
+                </p:inputText>
+                <p:commandButton value="Mostrar" update="@form, :form2"  action="#{printAutoMB.mostrarTexto}" />
             </p:panelGrid>
-            
-            
+
+
             <h:panelGroup rendered="#{not(printAutoMB.pedido eq null)}">
-                
-                
+
+
             </h:panelGroup>
         </h:form>
         <h:form id="form2">
-            <p:editor value="#{printAutoMB.texto}" width="800"/>
-                <p:commandButton value="Mostrar" action="#{printAutoMB.mostrarTexto}" />
-            
+            <p:editor value="#{printAutoMB.texto}"/>
+
         </h:form>        
     </ui:define>
 

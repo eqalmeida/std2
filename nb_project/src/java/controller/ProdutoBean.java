@@ -6,7 +6,9 @@ package controller;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -144,7 +146,7 @@ public class ProdutoBean extends ControllerBase implements Serializable {
 
         selected = new Produto();
         selected.setTipo(tipo);
-            RequestContext.getCurrentInstance().execute("dialogNewCar.show()");
+        RequestContext.getCurrentInstance().execute("dialogNewCar.show()");
     }
 
     public void exibir() {
@@ -197,24 +199,13 @@ public class ProdutoBean extends ControllerBase implements Serializable {
 
             SelectItem it;
 
-            it = new SelectItem(0, "Outro");
-            tipoCombustivel.add(it);
+            Map<Short, String> lista = Produto.getCombustivelList();
 
-            it = new SelectItem(1, "Gasolina");
-            tipoCombustivel.add(it);
+            for (Short i : lista.keySet()) {
+                it = new SelectItem(i, lista.get(i));
+                tipoCombustivel.add(it);
 
-            it = new SelectItem(2, "Alcool");
-            tipoCombustivel.add(it);
-
-            it = new SelectItem(3, "Diesel");
-            tipoCombustivel.add(it);
-
-            it = new SelectItem(4, "Flex");
-            tipoCombustivel.add(it);
-
-            it = new SelectItem(5, "Gás");
-            tipoCombustivel.add(it);
-
+            }
         }
         return tipoCombustivel;
     }

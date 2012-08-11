@@ -14,9 +14,89 @@ import model.Boleto;
  */
 public class PagtoService implements IPagtoService {
 
+    private Boleto boleto = null;
+    
+    
     @Override
-    public void regPagto(Boleto boleto, BigDecimal valorRecebido, Date dataInf) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public BigDecimal regPagto(BigDecimal valorRecebido, Date dataInf) {
+
+    
+        BigDecimal valorAtualComTaxas = boleto.getValorAtualComTaxas(dataInf);
+        BigDecimal sobra;
+        BigDecimal valParcela;
+
+        /*
+         * Calcula o valor de sobra
+         */
+        if (valorRecebido.doubleValue() > valorAtualComTaxas.doubleValue()) {
+            sobra = valorRecebido.subtract(valorAtualComTaxas);
+            valParcela = valorAtualComTaxas;
+        }
+        else{
+            sobra = BigDecimal.ZERO;
+            valParcela = valorRecebido;
+        }
+
+        BigDecimal temp = boleto.getJuros();
+
+        if (temp == null) {
+            temp = BigDecimal.ZERO;
+        }
+
+        BigDecimal jurosAtual = boleto.getJuros(dataInf);
+
+        boleto.setJuros(temp.add(jurosAtual));
+
+        temp = boleto.getMulta();
+
+        if (temp == null) {
+            temp = BigDecimal.ZERO;
+        }
+
+        BigDecimal multaAtual = boleto.getMulta(dataInf);
+
+        boleto.setMulta(temp.add(multaAtual));
+
+        if (boleto.getStatus() == Boleto.ATIVO) {
+
+            boleto.setValorPago(valParcela);
+
+            boleto.setValorFaltante(valorAtualComTaxas.subtract(valParcela));
+
+        } else if (boleto.getStatus() == Boleto.PAGO_PARCIAL) {
+
+            // Salva o novo valor faltante
+            boleto.setValorFaltante(valorAtualComTaxas.subtract(valParcela));
+
+            temp = boleto.getValorPago();
+
+            if (temp == null) {
+                temp = BigDecimal.ZERO;
+            }
+
+            /**
+             * O Valor Pago é somado ao valor anterior
+             */
+            boleto.setValorPago(valParcela.add(temp));
+
+        }
+
+        // Atualiza o Status
+        if (boleto.getValorFaltante().doubleValue() > 0.0) {
+            boleto.setStatus(Boleto.PAGO_PARCIAL);
+        } else {
+            boleto.setStatus(Boleto.PAGO);
+        }
+
+        boleto.setDataPag(dataInf);
+
+        return (sobra);
+        
+    }
+
+    @Override
+    public void setBoleto(Boleto boleto) {
+        this.boleto = boleto;
     }
     
 }

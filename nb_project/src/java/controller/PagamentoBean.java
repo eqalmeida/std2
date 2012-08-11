@@ -19,6 +19,8 @@ import model.PedidoPag;
 import model.Usuario;
 import org.primefaces.context.RequestContext;
 import repo.PedidoPagJpaController;
+import util.IPagtoService;
+import util.PagtoServiceFactory;
 import util.Util;
 
 /**
@@ -107,6 +109,8 @@ public class PagamentoBean extends ControllerBase implements Serializable {
 
         Usuario user = getUsuarioLogado();
         
+        IPagtoService pService = PagtoServiceFactory.getPagtoService();
+        
         if(user == null){
             addErrorMessage("Falha de Login!");
             return;
@@ -154,7 +158,9 @@ public class PagamentoBean extends ControllerBase implements Serializable {
              */
             BigDecimal sobra = valorRecebido;
             for (Boleto b : pedidoPag.getParcelas()) {
-                sobra = b.regPagamento(sobra, data);
+                //sobra = b.regPagamento(sobra, data);
+                pService.setBoleto(b);
+                sobra = pService.regPagto(sobra, data);
                 em.merge(b);
 
                 if (sobra.doubleValue() <= 0.00) {

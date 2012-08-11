@@ -5,12 +5,15 @@
 package controller;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 import model.Pedido;
 import model.PedidoProduto;
 import model.Produto;
+import repo.ConfigJpaController;
 import repo.PedidoJpaController;
 
 /**
@@ -19,20 +22,20 @@ import repo.PedidoJpaController;
  */
 @ManagedBean(name = "printAutoMB")
 @RequestScoped
-public class PrintAutorizacaoBean extends ControllerBase implements Serializable{
+public class PrintAutorizacaoBean extends ControllerBase implements Serializable {
 
     private Integer pedidoId;
     private Pedido pedido;
     private String texto;
     private PedidoJpaController service = null;
-    
+
     @PostConstruct
-    private void init(){
+    private void init() {
         service = new PedidoJpaController();
-        
-        
+
+
     }
-    
+
     public PrintAutorizacaoBean() {
     }
 
@@ -45,13 +48,7 @@ public class PrintAutorizacaoBean extends ControllerBase implements Serializable
     }
 
     public Pedido getPedido() {
-        if(pedidoId != null){
-            pedido = service.findPedido(pedidoId);
-            
-            texto = "<img src=\"/std_loja/resources/img/logo_rogerinho_pq.jpeg\" />";
-            texto += "<h1>AUTORIZAÇÃO</h1>";
-            texto += ("Eu, "+pedido.getCliente().getNome() + " RG: <b>" + pedido.getCliente().getCpf()+"</b>");
-            
+        if (pedidoId != null) {
         }
         return pedido;
     }
@@ -63,8 +60,50 @@ public class PrintAutorizacaoBean extends ControllerBase implements Serializable
     public void setPedidoId(Integer pedidoId) {
         this.pedidoId = pedidoId;
     }
+
+    public void mostrarTexto() {
+        pedido = service.findPedido(pedidoId);
+        
+        if(pedido == null){
+            addErrorMessage("Pedido não encontrado");
+            return;
+        }
+
+        if(pedido.getVeiculo() == null){
+            addErrorMessage("Pedido não possui veículo");
+            return;
+        }
+
+        ConfigJpaController configService = new ConfigJpaController();
+
+        texto = configService.findConfig().getCartaAutoriz();
+
+        texto = texto.replaceAll("NomeCliente", pedido.getCliente().getNome());
+
+        texto = texto.replaceAll("RGCliente", pedido.getCliente().getRg());
+
+        texto = texto.replaceAll("CPFCliente", pedido.getCliente().getCpf());
+
+        texto = texto.replaceAll("PlacaVeiculo", pedido.getVeiculo().getProduto().getPlaca());
+
+        texto = texto.replaceAll("CorVeiculo", pedido.getVeiculo().getProduto().getCor());
+
+        texto = texto.replaceAll("CombustivelVeiculo", pedido.getVeiculo().getProduto().getCombustivelStr());
+
+        texto = texto.replaceAll("ChassiVeiculo", pedido.getVeiculo().getProduto().getChassi());
+
+        texto = texto.replaceAll("AnoVeiculo", pedido.getVeiculo().getProduto().getAno());
+
+        
+        texto = texto.replaceAll("DataAtual", getDataAtual());
+
+        texto = texto.replaceAll("ModeloVeiculo", pedido.getVeiculo().getProduto().getFabricante() + " " + pedido.getVeiculo().getProduto().getModelo());
+
+    }
     
-    public void mostrarTexto(){
-        System.out.println(texto);
+    private String getDataAtual(){
+        Date data = new Date();
+        SimpleDateFormat df = new SimpleDateFormat("d 'de' MMMMM 'de' yyyy");
+        return  df.format(data);
     }
 }

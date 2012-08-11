@@ -62,11 +62,14 @@
                             <p:menuitem value="Tab. Financ." action="ManterTabelaFinanc" ajax="false"/>  
                             <p:menuitem value="Tipo Pagamento" action="ManterTipoPagto" ajax="false"/>  
                             <p:menuitem value="Usuários" action="ManterUsuario" ajax="false"/>  
-                            <p:menuitem value="Configurações" action="ManterConfig" ajax="false"/>  
+                            <p:menuitem value="Gerais" action="ManterConfig" ajax="false"/>  
                         </p:submenu>  
                         <p:submenu label="Consultas" icon="ui-icon-document">
                             <p:menuitem value="Pedidos" action="ShowPedido" icon="ui-icon-disk" update=":corpoId" ajax="false"/>  
                             <p:menuitem value="Boletos" action="ManterBoleto" icon="ui-icon-disk" update=":corpoId" ajax="false"/>  
+                        </p:submenu>
+                        <p:submenu label="Relatórios" icon="ui-icon-document">
+                            <p:menuitem value="Carta Autorização" action="PrintAutorizacao" icon="ui-icon-disk" update=":corpoId" ajax="false"/>  
                         </p:submenu>
 
                     </p:menubar>

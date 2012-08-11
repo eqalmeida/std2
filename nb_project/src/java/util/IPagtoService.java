@@ -13,5 +13,6 @@ import model.Boleto;
  * @author eqalmeida
  */
 public interface IPagtoService {
-    public void regPagto(Boleto boleto, BigDecimal valorRecebido, Date dataInf);
+    public BigDecimal regPagto(BigDecimal valorRecebido, Date dataInf);
+    public void setBoleto(Boleto boleto);
 }

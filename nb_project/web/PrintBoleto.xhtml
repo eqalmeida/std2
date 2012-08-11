@@ -91,9 +91,11 @@
                             </tr>
                             <tr>
                                 <td colspan="3" align="center" style="font-size: 10px">
-                                    Av. Marechal Tito, xxx - São Miguel Paulista São Paulo <br/>
-                                    rogerinho@rogerinhomotos.com.br<br/>
-                                    tel.: 9999-999
+                                    <b> #{app.config.empresaNome} </b> <br/>
+                                    #{app.config.empresaEndereco} <br/>
+                                    <h:outputText value="Tel.: #{app.config.empresaTelefones}" rendered="#{app.config.empresaTelefones.length() gt 1}"/>
+                                    <h:outputText value="Email: #{app.config.empresaEmail}" rendered="#{app.config.empresaEmail.length() gt 1}"/><br/>
+                                    <h:outputText value="Email: #{app.config.empresaHomepage}" rendered="#{app.config.empresaHomepage.length() gt 1}"/>
                                 </td>
                             </tr>
                         </table>

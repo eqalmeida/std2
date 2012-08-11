@@ -131,7 +131,8 @@
                     <p:inputText value="#{produtoBean.selected.cor}" required="true" rendered="#{produtoBean.selected.tipo == 1}"/>
 
                     <h:outputText value="Combustível:" rendered="#{produtoBean.selected.tipo == 1}" />
-                    <p:selectOneMenu value="#{produtoBean.selected.combustivel}"  rendered="#{produtoBean.selected.tipo == 1}">
+                    <p:selectOneMenu value="#{produtoBean.selected.combustivel}"  rendered="#{produtoBean.selected.tipo == 1}" label="Combustível" required="true">
+                        <f:selectItem itemValue="" itemLabel="" />
                         <f:selectItems value="#{produtoBean.tipoCombustivel}" />
                     </p:selectOneMenu>
 

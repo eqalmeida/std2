@@ -247,80 +247,6 @@ public class Boleto implements Serializable {
         return false;
 
     }
-
-    public BigDecimal regPagamento(BigDecimal valorRecebido, Date dataInf) throws Exception {
-
-        BigDecimal valorAtualComTaxas = getValorAtualComTaxas(dataInf);
-        BigDecimal sobra;
-        BigDecimal valParcela;
-
-        /*
-         * Calcula o valor de sobra
-         */
-        if (valorRecebido.doubleValue() > valorAtualComTaxas.doubleValue()) {
-            sobra = valorRecebido.subtract(valorAtualComTaxas);
-            valParcela = valorAtualComTaxas;
-        }
-        else{
-            sobra = BigDecimal.ZERO;
-            valParcela = valorRecebido;
-        }
-
-        BigDecimal temp = getJuros();
-
-        if (temp == null) {
-            temp = BigDecimal.ZERO;
-        }
-
-        BigDecimal jurosAtual = getJuros(dataInf);
-
-        this.setJuros(temp.add(jurosAtual));
-
-        temp = this.getMulta();
-
-        if (temp == null) {
-            temp = BigDecimal.ZERO;
-        }
-
-        BigDecimal multaAtual = this.getMulta(dataInf);
-
-        this.setMulta(temp.add(multaAtual));
-
-        if (this.status == ATIVO) {
-
-            this.setValorPago(valParcela);
-
-            this.setValorFaltante(valorAtualComTaxas.subtract(valParcela));
-
-        } else if (this.status == PAGO_PARCIAL) {
-
-            // Salva o novo valor faltante
-            setValorFaltante(valorAtualComTaxas.subtract(valParcela));
-
-            temp = this.getValorPago();
-
-            if (temp == null) {
-                temp = BigDecimal.ZERO;
-            }
-
-            /**
-             * O Valor Pago é somado ao valor anterior
-             */
-            this.setValorPago(valParcela.add(temp));
-
-        }
-
-        // Atualiza o Status
-        if (getValorFaltante().doubleValue() > 0.0) {
-            setStatus(PAGO_PARCIAL);
-        } else {
-            setStatus(PAGO);
-        }
-
-        setDataPag(dataInf);
-
-        return (sobra);
-    }
     
     public BigDecimal getValorAtual(){
         if(this.getStatus() == ATIVO){
@@ -362,7 +288,7 @@ public class Boleto implements Serializable {
         return val;
     }
 
-    private BigDecimal getJuros(Date data) {
+    public BigDecimal getJuros(Date data) {
         
         Double j = this.getPedidoPag().getJurosDiario();
         
@@ -409,7 +335,7 @@ public class Boleto implements Serializable {
         return (BigDecimal.ZERO);
     }
 
-    private BigDecimal getMulta(Date data) {
+    public BigDecimal getMulta(Date data) {
         
         Double m = this.getPedidoPag().getMultaPercent();
         BigDecimal mVal = this.getPedidoPag().getMultaVal();
