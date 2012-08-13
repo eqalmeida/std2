@@ -84,6 +84,10 @@
                         <p:column headerText="Juros diário (%)">
                             <h:outputText value="#{it.jurosDiario}"></h:outputText>
                         </p:column>
+
+                        <p:column headerText="Desconto máximo (%)">
+                            <h:outputText value="#{it.descontoMaximo}"></h:outputText>
+                        </p:column>
                     </p:dataTable>
 
                     <h:panelGroup rendered="#{tabelaFinancBean.selected.id > 0}">
@@ -141,6 +145,9 @@
 
                             <h:outputText value="Juros diário (%):" />
                             <p:inputText value="#{tabelaFinancBean.selected.jurosDiario}" label="Juros diário" required="true" />
+
+                            <h:outputText value="Desconto máximo (%):" />
+                            <p:inputText value="#{tabelaFinancBean.selected.descontoMaximo}" label="Desconto Máximo" required="true" />
 
                         </p:panelGrid>
 

@@ -44,6 +44,9 @@ public class TabelaFinanc implements Serializable {
     @Column(name="juros_diario")
     private Double jurosDiario;
     
+    @Column(name="desconto_maximo")
+    private Double descontoMaximo;
+    
 
     public TabelaFinanc() {
     }
@@ -98,6 +101,16 @@ public class TabelaFinanc implements Serializable {
         hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
+
+    public Double getDescontoMaximo() {
+        return descontoMaximo;
+    }
+
+    public void setDescontoMaximo(Double descontoMaximo) {
+        this.descontoMaximo = descontoMaximo;
+    }
+    
+    
 
     @Override
     public boolean equals(Object object) {

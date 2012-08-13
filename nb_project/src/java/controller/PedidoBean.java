@@ -52,7 +52,8 @@ public class PedidoBean extends ControllerBase {
     private List<TabelaFinanc> tabelaFinancList = null;
     private List<SelectItem> parcelaList = null;
     private Integer tipoPagtoSelected = null;
-    private Integer tabelaId = 0;
+//    private Integer tabelaId = 0;
+    private TabelaFinanc tabela = null;
     private Integer numParcelas;
     private BigDecimal valorParcela;
 
@@ -205,7 +206,8 @@ public class PedidoBean extends ControllerBase {
 
         tipoPagtoSelected = 0;
         tabelaFinancList = null;
-        tabelaId = 0;
+        //tabelaId = 0;
+        tabela = new TabelaFinanc();
         parcelaList = null;
         numParcelas = 0;
 
@@ -225,6 +227,26 @@ public class PedidoBean extends ControllerBase {
             addMessage("Valor total do pedido inválido!");
         }
 
+    }
+
+    /**
+     * Atualiza o valor da parcela
+     */
+    private void updateValParcela(){
+        if (numParcelas != null && numParcelas > 0) {
+
+            Coeficiente coeficiente = new CoeficienteJpaController(ControllerBase.getEmf()).findCoeficiente(new CoeficientePK(getTabela().getId(), numParcelas.shortValue()));
+
+            getPagamento().setValorParcela(pagamento.getValor().multiply(new BigDecimal(coeficiente.getCoeficiente())).setScale(2, RoundingMode.DOWN));
+
+        }else{
+            getPagamento().setValorParcela(null);
+        }
+
+    }
+    
+    public void numParcelasChanged() {
+        updateValParcela();
     }
 
     public BigDecimal getValorFaltante() {
@@ -277,7 +299,7 @@ public class PedidoBean extends ControllerBase {
         }
 
         tipoPagtoSelected = pagamento.getTipoPagto().getId().intValue();
-        tabelaId = pagamento.getTabelaFinanc().getId().intValue();
+        tabela = pagamento.getTabelaFinanc();
         numParcelas = (int) pagamento.getNumParcelas();
     }
 
@@ -300,11 +322,26 @@ public class PedidoBean extends ControllerBase {
 
         TabelaFinancJpaController tfctl = new TabelaFinancJpaController(ControllerBase.getEmf());
 
-        TabelaFinanc tabFinanc = tfctl.findTabelaFinanc(tabelaId.shortValue());
+        tabela = tfctl.findTabelaFinanc(tabela.getId());
 
-        pagamento.setTabelaFinanc(tabFinanc);
+        pagamento.setTabelaFinanc(tabela);
 
-        if (tabFinanc != null) {
+        Coeficiente coeficiente = new CoeficienteJpaController(ControllerBase.getEmf()).findCoeficiente(new CoeficientePK(getTabela().getId(), numParcelas.shortValue()));
+
+        BigDecimal valParcela = pagamento.getValor().multiply(new BigDecimal(coeficiente.getCoeficiente()));
+
+        valParcela = valParcela.setScale(2, RoundingMode.DOWN);
+
+        if (valParcela.doubleValue() > pagamento.getValorParcela().doubleValue()) {
+            double diff = (valParcela.doubleValue() - pagamento.getValorParcela().doubleValue());
+            Double percent = diff / valParcela.doubleValue() * 100.0;
+            if (percent > tabela.getDescontoMaximo()) {
+                addErrorMessage("Valor de Parcela Inválido!");
+                return;
+            }
+        }
+
+        if (tabela != null) {
             pagamento.setNumParcelas(numParcelas.shortValue());
         }
 
@@ -349,6 +386,17 @@ public class PedidoBean extends ControllerBase {
         pagamento = new PedidoPag();
     }
 
+    public TabelaFinanc getTabela() {
+        if (tabela == null) {
+            tabela = new TabelaFinanc();
+        }
+        return tabela;
+    }
+
+    public void setTabela(TabelaFinanc tabela) {
+        this.tabela = tabela;
+    }
+
     public List<TipoPagto> getTipoPagtoList() {
         return tipoPagtoList;
     }
@@ -371,15 +419,13 @@ public class PedidoBean extends ControllerBase {
 
     public List<SelectItem> getParcelaList() {
 
+        if (parcelaList == null) {
+            //populateParcelaList();
+            parcelaList = new ArrayList<SelectItem>();
+
+        }
+
         return parcelaList;
-    }
-
-    public Integer getTabelaId() {
-        return tabelaId;
-    }
-
-    public void setTabelaId(Integer tabelaId) {
-        this.tabelaId = tabelaId;
     }
 
     public Integer getNumParcelas() {
@@ -394,9 +440,9 @@ public class PedidoBean extends ControllerBase {
 
         try {
             TabelaFinancJpaController tfctl = new TabelaFinancJpaController(ControllerBase.getEmf());
-            TabelaFinanc tbf = tfctl.findTabelaFinanc(tabelaId.shortValue());
+            tabela = tfctl.findTabelaFinanc(tabela.getId());
             CoeficienteJpaController cftl = new CoeficienteJpaController(ControllerBase.getEmf());
-            CoeficientePK pk = new CoeficientePK(tabelaId.shortValue(), numParcelas.shortValue());
+            CoeficientePK pk = new CoeficientePK(tabela.getId(), numParcelas.shortValue());
             Coeficiente coef = cftl.findCoeficiente(pk);
             valorParcela = pagamento.getValor().multiply(new BigDecimal(coef.getCoeficiente()));
         } catch (Exception ex) {
@@ -408,6 +454,11 @@ public class PedidoBean extends ControllerBase {
     }
 
     public void valorChanged(ValueChangeEvent ev) {
+
+        if (ev.getNewValue() == null) {
+            return;
+        }
+
         this.pagamento.setValor((BigDecimal) ev.getNewValue());
 
         BigDecimal oldValue = (BigDecimal) ev.getOldValue();
@@ -418,8 +469,7 @@ public class PedidoBean extends ControllerBase {
         }
     }
 
-    public void tipoChanged(ValueChangeEvent ev) {
-        tipoPagtoSelected = (Integer) ev.getNewValue();
+    public void tipoChanged() {
 
         tabelaFinancList = new ArrayList<TabelaFinanc>();
 
@@ -428,22 +478,24 @@ public class PedidoBean extends ControllerBase {
             TipoPagtoJpaController c = new TipoPagtoJpaController();
             TipoPagto tp = c.findTipoPagto(getTipoPagtoSelected().shortValue());
 
-            if (tp.getGeraBoleto()) {
-                if (pagamento.getDataVenc() == null) {
-                    Calendar data = Calendar.getInstance();
-                    data.add(Calendar.MONTH, 1);
-                    pagamento.setDataVenc(data.getTime());
-                }
-            }
-
             if (tp != null) {
 
-                tabelaFinancList = new ArrayList<TabelaFinanc>(tp.getTabelasFinanc());
+                if (tp.getGeraBoleto()) {
+                    if (pagamento.getDataVenc() == null) {
+                        Calendar data = Calendar.getInstance();
+                        data.add(Calendar.MONTH, 1);
+                        pagamento.setDataVenc(data.getTime());
+                    }
+                }
+
+
+                tabelaFinancList = new ArrayList<TabelaFinanc>();
+                tabelaFinancList.addAll(tp.getTabelasFinanc());
 
                 if (tabelaFinancList.size() == 1) {
-                    tabelaId = (int) tabelaFinancList.get(0).getId();
+                    tabela = tabelaFinancList.get(0);
                 } else {
-                    tabelaId = null;
+                    tabela = new TabelaFinanc();
                     numParcelas = null;
                 }
             }
@@ -453,42 +505,61 @@ public class PedidoBean extends ControllerBase {
         populateParcelaList();
     }
 
+    public void descChanged() {
+        populateParcelaList();
+    }
+
     private void populateParcelaList() {
 
-        List<Coeficiente> lista;
-
-        CoeficienteJpaController c = new CoeficienteJpaController(ControllerBase.getEmf());
-
-        lista = c.findCoeficienteEntities(tabelaId.shortValue());
+        List<Coeficiente> lista = null;
 
         parcelaList = new ArrayList<SelectItem>();
 
-        for (Coeficiente co : lista) {
+        try {
+            if (getTabela().getId() > 0) {
 
-            Short nu = co.getCoeficientePK().getNumParcelas();
+                CoeficienteJpaController c = new CoeficienteJpaController(ControllerBase.getEmf());
 
-            BigDecimal vl = pagamento.getValor().multiply(new BigDecimal(co.getCoeficiente()));
+                lista = c.findCoeficienteEntities(tabela.getId());
 
-            NumberFormat nf = NumberFormat.getCurrencyInstance();
 
-            SelectItem it = new SelectItem(nu, nu.toString() + " x " + nf.format(vl));
+                for (Coeficiente co : lista) {
 
-            parcelaList.add(it);
-        }
+                    Short nu = co.getCoeficientePK().getNumParcelas();
 
-        if (parcelaList.size() == 1) {
-            numParcelas = (int) lista.get(0).getCoeficientePK().getNumParcelas();
-        } else {
-            numParcelas = null;
+                    BigDecimal vl = pagamento.getValor().multiply(new BigDecimal(co.getCoeficiente())).setScale(2, RoundingMode.DOWN);
+
+                    NumberFormat nf = NumberFormat.getCurrencyInstance();
+
+                    SelectItem it = new SelectItem(nu, nu.toString() + " x " + nf.format(vl));
+
+                    parcelaList.add(it);
+                }
+
+                if (parcelaList.size() == 1) {
+                    numParcelas = (int) lista.get(0).getCoeficientePK().getNumParcelas();
+                    updateValParcela();
+                } else {
+                    numParcelas = null;
+                }
+
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            System.out.println(ex.getCause());
         }
 
     }
 
-    public void tabelaChanged(ValueChangeEvent ev) {
+    public void tabelaChanged() {
 
-        tabelaId = (Integer) ev.getNewValue();
+        System.out.println("Tabela ID:  " + getTabela().getId());
 
-        populateParcelaList();
+        if (getTabela().getId() > 0) {
+            tabela = new TabelaFinancJpaController(ControllerBase.getEmf()).findTabelaFinanc(tabela.getId());
+
+            populateParcelaList();
+        }
 
     }
 
@@ -506,13 +577,21 @@ public class PedidoBean extends ControllerBase {
             addErrorMessage("O pedido deve possuir formas de pagamento!");
             return;
         }
-        
+
         Usuario user = getUsuarioLogado();
-        
-        if(user == null){
+
+        if (user == null) {
             addErrorMessage("Falha de Login!");
             return;
         }
+
+
+
+
+
+
+
+
 
         PedidoJpaController pedidoService = new PedidoJpaController();
 
@@ -599,10 +678,11 @@ public class PedidoBean extends ControllerBase {
                     tabela = em.getReference(tabela.getClass(), tabela.getId());
                     pag.setTabelaFinanc(tabela);
                 }
-                
+
                 pag.setMultaPercent(pag.getTabelaFinanc().getMultaPercent());
                 pag.setMultaVal(pag.getTabelaFinanc().getMultaVal());
                 pag.setJurosDiario(pag.getTabelaFinanc().getJurosDiario());
+
 
                 pag.setPedido(pedido);
                 pag.setId(null);
@@ -627,8 +707,30 @@ public class PedidoBean extends ControllerBase {
                             throw new Exception("Coeficiente não cadastrado!");
                         }
 
+
+
+
+
+
                         BigDecimal valParcela = pag.getValor().multiply(new BigDecimal(coeficiente.getCoeficiente()));
+
                         valParcela = valParcela.setScale(2, RoundingMode.DOWN);
+
+                        if (valParcela.doubleValue() > pag.getValorParcela().doubleValue()) {
+                            double diff = (valParcela.doubleValue() - pag.getValorParcela().doubleValue());
+                            Double percent = diff / valParcela.doubleValue() * 100.0;
+                            if (percent > pag.getTabelaFinanc().getDescontoMaximo()) {
+                                throw new Exception("Valor de Parcela Inválido!");
+                            }
+                        }
+
+
+
+
+
+
+
+
 
                         for (i = 0; i < pag.getNumParcelas(); i++) {
 
@@ -636,7 +738,7 @@ public class PedidoBean extends ControllerBase {
 
                             boleto.setCliente(pedido.getCliente());
                             boleto.setPedidoPag(pag);
-                            boleto.setValor(valParcela);
+                            boleto.setValor(pag.getValorParcela());
                             boleto.setVencimento(data.getTime());
                             boleto.setNumParcela((short) (i + 1));
 
@@ -644,7 +746,7 @@ public class PedidoBean extends ControllerBase {
 
                             //Flush para atualizar e manter a ordem correta das parcelas
                             em.flush();
-                            
+
                             pag.getParcelas().add(boleto);
 
                             em.persist(pag);

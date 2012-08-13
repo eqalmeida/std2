@@ -83,6 +83,9 @@ public class PedidoPag implements Serializable {
     @Column(name="juros_diario")
     private Double jurosDiario;
     
+    @javax.persistence.Transient
+    private BigDecimal valorParcela;
+    
 
     
     @OneToMany
@@ -209,6 +212,14 @@ public class PedidoPag implements Serializable {
 
     public void setJurosDiario(Double jurosDiario) {
         this.jurosDiario = jurosDiario;
+    }
+
+    public BigDecimal getValorParcela() {
+        return valorParcela;
+    }
+
+    public void setValorParcela(BigDecimal valorParcela) {
+        this.valorParcela = valorParcela;
     }
 
     public BigDecimal getValorDevidoAtual(Date d){

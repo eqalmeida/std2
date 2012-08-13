@@ -17,7 +17,7 @@
             <p:menu>
                 <p:submenu label="Opções">
                     <p:menuitem value="Adicionar Pagamento" actionListener="#{pedidoMB.novoPag}" update=":formPagDialog"/>
-                    
+
                     <p:menuitem actionListener="#{pedidoMB.gravaPedido}" value="Gravar Pedido" update=":formPagDialog, :formItem, :form"/>
                 </p:submenu>
             </p:menu>
@@ -78,11 +78,11 @@
 
                     <h:outputText value="Desconto:"/>
                     <p:inputText value="#{pedidoMB.itemSelected.desconto}" label="Desconto">
-                        
+
                     </p:inputText>
 
                 </p:panelGrid>
-                
+
                 <f:facet name="footer">
                     <p:commandButton value="Gravar" actionListener="#{pedidoMB.gravarItem}" update=":form:itemsTable, frm2"/>
                     <p:commandButton value="Cancela" oncomplete="itForm.hide()" immediate="true"/>
@@ -184,6 +184,12 @@
                 <p:column headerText="Parcelas">
                     #{it.numParcelas}
                 </p:column>
+                
+                <p:column headerText="Valor Parcela">
+                    <h:outputText value="#{it.valorParcela}">
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>
+                </p:column>
 
             </p:dataTable>
 
@@ -196,15 +202,10 @@
             <p:dialog id="pagFormId" 
                       widgetVar="pagForm" 
                       modal="true" 
+                      header="#{pedidoMB.pagamento.id gt 0 ? 'Editando':'Inserindo'} Pagamento"
                       showHeader="true" resizable="false">
 
                 <h:inputHidden value="#{pedidoMB.pagamento.id}" />
-                <f:facet name="header">
-                    <h:outputText value="Editar "  rendered="#{pedidoMB.pagamento.id > 0}"/>
-                    <h:outputText value="Novo "  rendered="#{pedidoMB.pagamento.id == null}"/>
-                    <h:outputText value="Pagamento"/>
-                </f:facet>
-
 
                 <p:panelGrid columns="2" columnClasses="label,field,label,field" id="frm">
 
@@ -212,42 +213,44 @@
                     <p:inputText value="#{pedidoMB.pagamento.valor}" label="Valor" required="true" styleClass="valor" 
                                  valueChangeListener="#{pedidoMB.valorChanged}" >
                         <f:convertNumber  pattern="#,##0.00"/>
-                        <f:ajax render="selTabela selParcelas"/>
+                        <p:ajax update="frm" />
                     </p:inputText>
 
                     <h:outputText value="Forma de Pagto:"/>
                     <p:selectOneMenu value="#{pedidoMB.tipoPagtoSelected}" 
-                                     valueChangeListener="#{pedidoMB.tipoChanged}"
                                      label="Forma de Pagto" required="true">
                         <f:selectItem itemValue="" itemLabel="-- Selecione --" />
                         <f:selectItems var="item" value="#{pedidoMB.tipoPagtoList}" itemValue="#{item.id}" itemLabel="#{item.descricao}"/>
-                        <f:ajax render="selTabela selParcelas selData"/>
+                        <p:ajax update="frm" listener="#{pedidoMB.tipoChanged}"/>
                     </p:selectOneMenu>
 
                     <h:outputText value="Tabela de financiamento:"/>
-                    <p:selectOneMenu value="#{pedidoMB.tabelaId}" 
-                                     valueChangeListener="#{pedidoMB.tabelaChanged}"
+                    <p:selectOneMenu value="#{pedidoMB.tabela.id}" 
                                      id="selTabela" 
                                      disabled="#{!(pedidoMB.tabelaFinancList.size() > 1)}">
-                        
+
                         <f:selectItem itemValue="" itemLabel="-- Selecione --" />
-                        
                         <f:selectItems value="#{pedidoMB.tabelaFinancList}" var="it" itemValue="#{it.id}" itemLabel="#{it.descricao}"/>
-                        <f:ajax render="selParcelas"/>
+
+                        <p:ajax update="frm" listener="#{pedidoMB.tabelaChanged}" />
                     </p:selectOneMenu>
 
                     <h:outputText value="Parcelas:"/>
                     <p:selectOneMenu value="#{pedidoMB.numParcelas}" id="selParcelas" disabled="#{!(pedidoMB.parcelaList.size() > 1)}">
                         <f:selectItem itemValue="" itemLabel="-- Selecione --" />
-                        <f:selectItems value="#{pedidoMB.parcelaList}" 
-                                       var="i" 
-                                       itemValue="#{i.coeficientePK.numParcelas}" 
-                                       itemLabel="#{i.coeficientePK.numParcelas}"/>
+                        <f:selectItems value="#{pedidoMB.parcelaList}" />
+
+                        <p:ajax update="valParc" listener="#{pedidoMB.numParcelasChanged()}"/>
 
                     </p:selectOneMenu>
 
+                    <h:outputText value="Valor Parcela:" rendered="#{pedidoMB.tabela.descontoMaximo gt 0.0}"/>
+                    <p:inputText id="valParc" rendered="#{pedidoMB.tabela.descontoMaximo gt 0.0}" value="#{pedidoMB.pagamento.valorParcela}" label="Valor Parcela" required="true" styleClass="valor">
+                        <f:convertNumber  pattern="#,##0.00"/>
+                    </p:inputText>
+
                     <h:outputText value="Data:"/>
-                    <p:calendar value="#{pedidoMB.pagamento.dataVenc}" id="selData"/>
+                    <p:calendar value="#{pedidoMB.pagamento.dataVenc}" id="selData" required="true" label="Data"/>
 
                 </p:panelGrid>
                 <f:facet name="footer">
@@ -258,7 +261,7 @@
             </p:dialog>
 
         </h:form>
-        
+
 
     </ui:define>
 
