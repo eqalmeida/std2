@@ -14,6 +14,7 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import model.Cliente;
+import model.Pedido;
 import repo.exceptions.NonexistentEntityException;
 
 /**
@@ -125,6 +126,17 @@ public class ClienteJpaController implements Serializable {
             q.setMaxResults(maxResults);
             q.setFirstResult(firstResult);
             return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+    
+    public List<Pedido> findPedidos(Cliente cliente){
+        EntityManager em = getEntityManager();
+        try {
+            Query query = em.createQuery("SELECT p FROM Pedido p WHERE p.cliente.id = :cid");
+            query.setParameter("cid", cliente.getId());
+            return query.getResultList();
         } finally {
             em.close();
         }

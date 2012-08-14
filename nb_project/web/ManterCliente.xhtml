@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="./WEB-INF/templates/templatePrincipal.xhtml"
                 xmlns:h="http://java.sun.com/jsf/html"
@@ -41,7 +42,7 @@
                          paginatorAlwaysVisible="false"
                          paginator="true">
                 
-                <p:ajax event="rowSelect" update=":fmenu" />
+                <p:ajax event="rowSelect" update=":fmenu, :pedidosForm" listener="#{clienteMB.onRowSelect}" />
                 <p:ajax event="rowUnselect" update=":fmenu" />
 
                 <p:column headerText="ID" sortBy="#{it.id}">#{it.id}</p:column>
@@ -155,6 +156,35 @@
             </p:dialog>
 
         </h:form>
+        
+        <h:form id="pedidosForm">
+            <br/>
+            <p:dataTable tableStyleClass="width:auto" value="#{clienteMB.pedidos}" var="it" rendered="#{not empty clienteMB.pedidos}">
+                
+                <f:facet name="header">Pedidos de #{clienteMB.selected.nome}</f:facet>
+                
+                <p:column headerText="N. Pedido">#{it.id}</p:column>
+                
+                <p:column headerText="Data" >
+                    <h:outputText value="#{it.data}">
+                        <f:convertDateTime/>
+                    </h:outputText>
+                </p:column>
+                
+                <p:column headerText="Veículo">
+                    <h:outputText value="#{it.veiculo.produto.descricaoGeral}"></h:outputText>
+                </p:column>
+                
+                <p:column>
+                    <p:commandButton icon="ui-icon-file" actionListener="#{clienteMB.verPedido(it.id)}" ajax="false">
+                    </p:commandButton>
+                </p:column>
+                
+            </p:dataTable>
+        </h:form>
+        <br/>
+        <br/>
+        <br/>
     </ui:define>
 
 </ui:composition>

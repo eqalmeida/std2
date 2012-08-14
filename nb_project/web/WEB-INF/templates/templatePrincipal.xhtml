@@ -21,7 +21,6 @@
             })    
         </script>
 
-
     </h:head>
 
     <h:body>
@@ -99,7 +98,7 @@
                                         <h:outputText value="Senha:" />
                                         <p:password value="#{loginMB.senha}" required="true" label="Senha"/>
                                         <f:facet name="footer">
-                                            <p:commandButton value="Efetuar Login" actionListener="#{loginMB.login}" update=":loginForm, :menuBarForm"/>
+                                            <p:commandButton value="Efetuar Login" actionListener="#{loginMB.login}" update=":loginForm, :menuBarForm" ajax="false"/>
                                         </f:facet>
                                     </p:panelGrid>
 

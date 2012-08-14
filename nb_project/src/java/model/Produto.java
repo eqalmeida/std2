@@ -35,6 +35,10 @@ import javax.persistence.Table;
 public class Produto implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    public static final short OUTRO = 0;
+    public static final short VEICULO = 1;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)

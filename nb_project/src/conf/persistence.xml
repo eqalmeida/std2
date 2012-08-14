@@ -11,6 +11,7 @@
     <class>model.PedidoOld</class>
     <class>model.Pedido</class>
     <class>model.Config</class>
+    <class>model.PedidoStatus</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>

@@ -217,7 +217,7 @@
                     </p:inputText>
 
                     <h:outputText value="Forma de Pagto:"/>
-                    <p:selectOneMenu value="#{pedidoMB.tipoPagtoSelected}" 
+                    <p:selectOneMenu value="#{pedidoMB.tipo.id}" 
                                      label="Forma de Pagto" required="true">
                         <f:selectItem itemValue="" itemLabel="-- Selecione --" />
                         <f:selectItems var="item" value="#{pedidoMB.tipoPagtoList}" itemValue="#{item.id}" itemLabel="#{item.descricao}"/>
@@ -244,8 +244,8 @@
 
                     </p:selectOneMenu>
 
-                    <h:outputText value="Valor Parcela:" rendered="#{pedidoMB.tabela.descontoMaximo gt 0.0}"/>
-                    <p:inputText id="valParc" rendered="#{pedidoMB.tabela.descontoMaximo gt 0.0}" value="#{pedidoMB.pagamento.valorParcela}" label="Valor Parcela" required="true" styleClass="valor">
+                    <h:outputText value="Valor Parcela:" rendered="#{pedidoMB.tabela.descontoMaximo gt 0.0 and pedidoMB.tipo.geraBoleto}"/>
+                    <p:inputText id="valParc" rendered="#{pedidoMB.tabela.descontoMaximo gt 0.0 and pedidoMB.tipo.geraBoleto}" value="#{pedidoMB.pagamento.valorParcela}" label="Valor Parcela" required="true" styleClass="valor">
                         <f:convertNumber  pattern="#,##0.00"/>
                     </p:inputText>
 

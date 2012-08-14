@@ -4,16 +4,21 @@
  */
 package controller;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
+import javax.persistence.EntityManager;
 import model.Cliente;
 import model.ClienteLazyList;
+import model.Pedido;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import repo.ClienteJpaController;
+import repo.PedidoJpaController;
 
 /**
  *
@@ -26,6 +31,7 @@ public class ClienteBean extends ControllerBase implements Serializable {
     private Cliente selected = null;
     private ClienteJpaController service = null;
     private LazyDataModel<Cliente> lazyList = null;
+    private List<Pedido> pedidos = null;
 
     public Cliente getSelected() {
         return selected;
@@ -55,10 +61,30 @@ public class ClienteBean extends ControllerBase implements Serializable {
         }
     }
 
+    public void verPedido(Integer id){
 
-    public void onRowSelect(SelectEvent event) {
+            String red = "ShowPedido.jsf?pedidoId=" +id;
+            try {
+                FacesContext.getCurrentInstance().getExternalContext().redirect(red);
+            } catch (IOException ex) {
+                addErrorMessage(ex.getMessage());
+            }
+
+    }
+
     
-        selected = service.findCliente(((Cliente) event.getObject()).getId()); 
+
+    public void onRowSelect() {
+    
+        pedidos = null;
+        
+        if(selected != null){
+            pedidos = new ClienteJpaController().findPedidos(selected);
+        }
+    }
+
+    public List<Pedido> getPedidos() {
+        return pedidos;
     }
 
     public void novo() {

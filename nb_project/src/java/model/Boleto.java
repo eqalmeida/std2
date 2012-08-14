@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,10 +36,24 @@ import javax.persistence.TemporalType;
 public class Boleto implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    public static Short ATIVO = 0;
-    public static Short PAGO = 1;
-    public static Short PAGO_PARCIAL = 2;
-    public static Short CANCELADO = 3;
+    
+    // Opções de Status
+    public static final Short ATIVO         = 0;
+    public static final Short PAGO          = 1;
+    public static final Short PAGO_PARCIAL  = 2;
+    public static final Short CANCELADO     = 3;
+    public static final Short PARADO        = 4;
+    
+    private static final Map<Short,String> listStatus = new HashMap<Short, String>();
+    static{
+        listStatus.put(ATIVO, "ATIVO");
+        listStatus.put(PAGO, "PAGO");
+        listStatus.put(PAGO_PARCIAL, "PAGO PARCIAL");
+        listStatus.put(CANCELADO, "CANCELADO");
+        listStatus.put(PARADO, "PARADO");
+    }
+    
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -374,12 +390,7 @@ public class Boleto implements Serializable {
     }
 
     public String getStatusStr() {
-        String str[] = {
-            "ATIVO",
-            "PAGO",
-            "PAGO PARCIAL",
-            "CANCELADO",};
-        return str[status];
+        return listStatus.get(this.status);
     }
 
     @Override

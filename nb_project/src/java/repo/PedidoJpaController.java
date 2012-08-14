@@ -16,7 +16,10 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.TemporalType;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import model.Boleto;
 import model.Pedido;
+import model.PedidoPag;
+import model.PedidoStatus;
 import model.Usuario;
 import org.primefaces.model.SortOrder;
 import repo.exceptions.NonexistentEntityException;
@@ -46,14 +49,14 @@ public class PedidoJpaController implements Serializable {
                 usuario = em.getReference(usuario.getClass(), usuario.getId());
                 pedido.setUsuario(usuario);
             }
-/*
-            em.persist(pedido);
-            if (usuario != null) {
-                usuario.getPedidoCollection().add(pedido);
-                usuario = em.merge(usuario);
-            }
-            em.getTransaction().commit();
-            */ 
+            /*
+             em.persist(pedido);
+             if (usuario != null) {
+             usuario.getPedidoCollection().add(pedido);
+             usuario = em.merge(usuario);
+             }
+             em.getTransaction().commit();
+             */
         } finally {
             if (em != null) {
                 em.close();
@@ -113,25 +116,72 @@ public class PedidoJpaController implements Serializable {
         }
     }
 
+    public void changeStatus(Pedido pedido, Short status, Usuario usuario, String just) {
+        EntityManager em = null;
+        try {
+            em = getEntityManager();
+            em.getTransaction().begin();
+            try {
+                pedido = em.getReference(Pedido.class, pedido.getId());
+                pedido.getId();
+
+
+                for (PedidoPag pag : pedido.getPagamentos()) {
+                    for (Boleto b : pag.getParcelas()) {
+                        if (b.getStatus() != Boleto.PAGO) {
+
+                            b = em.getReference(Boleto.class, b.getId());
+
+                            b.setStatus(status);
+
+                            em.merge(b);
+                        }
+                    }
+                }
+
+                usuario = em.getReference(Usuario.class, usuario.getId());
+
+                PedidoStatus st = new PedidoStatus();
+                st.setPedido(pedido);
+                st.setUsuario(usuario);
+                st.setAlteracao("Status alterado para " + status);
+                st.setJustificativa(just);
+                em.persist(st);
+
+                em.getTransaction().commit();
+
+
+            } catch (Exception e) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+            }
+        } finally {
+            if (em != null) {
+                em.close();
+            }
+        }
+
+    }
+
     public List<Pedido> findPedidoEntities() {
         return findPedidoEntities(true, -1, -1);
     }
 
-    public List<Pedido> findPedidoEntities(int maxResults, int firstResults, Calendar data, SortOrder sortOrder, String sortField){
+    public List<Pedido> findPedidoEntities(int maxResults, int firstResults, Calendar data, SortOrder sortOrder, String sortField) {
         EntityManager em = getEntityManager();
-        try{
+        try {
             Date data1, data2;
-            
+
             String query = "SELECT p FROM Pedido p WHERE p.data BETWEEN :data1 AND :data2";
             query += " ORDER BY ";
             query += (" p." + sortField);
-            if(sortOrder == SortOrder.ASCENDING){
+            if (sortOrder == SortOrder.ASCENDING) {
                 query += " ASC";
-            }
-            else if(sortOrder == SortOrder.DESCENDING){
+            } else if (sortOrder == SortOrder.DESCENDING) {
                 query += " DESC";
             }
-            
+
             Query q = em.createQuery(query);
 
             data.set(Calendar.DATE, 1);
@@ -139,19 +189,18 @@ public class PedidoJpaController implements Serializable {
             data.add(Calendar.MONTH, 1);
             data.add(Calendar.DATE, -1);
             data2 = data.getTime();
-            
+
             q.setParameter("data1", data1, TemporalType.DATE);
             q.setParameter("data2", data2, TemporalType.DATE);
-            
+
             q.setMaxResults(maxResults);
             q.setFirstResult(firstResults);
             return q.getResultList();
-        }finally{
+        } finally {
             em.close();
         }
     }
-            
-    
+
     public List<Pedido> findPedidoEntities(int maxResults, int firstResult) {
         return findPedidoEntities(false, maxResults, firstResult);
     }
@@ -193,15 +242,14 @@ public class PedidoJpaController implements Serializable {
             em.close();
         }
     }
-    
 
-    public int getPedidoCount(Calendar data){
+    public int getPedidoCount(Calendar data) {
         EntityManager em = getEntityManager();
-        try{
+        try {
             Date data1, data2;
-            
+
             String query = "SELECT COUNT(p) FROM Pedido p WHERE p.data BETWEEN :data1 AND :data2";
-            
+
             Query q = em.createQuery(query);
 
             data.set(Calendar.DATE, 1);
@@ -209,17 +257,13 @@ public class PedidoJpaController implements Serializable {
             data.add(Calendar.MONTH, 1);
             data.add(Calendar.DATE, -1);
             data2 = data.getTime();
-            
+
             q.setParameter("data1", data1, TemporalType.DATE);
             q.setParameter("data2", data2, TemporalType.DATE);
-            
-            return ((Long)q.getSingleResult()).intValue();
-        }finally{
+
+            return ((Long) q.getSingleResult()).intValue();
+        } finally {
             em.close();
         }
     }
-            
-    
-    
-    
 }

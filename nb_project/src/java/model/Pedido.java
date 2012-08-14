@@ -68,7 +68,7 @@ public class Pedido implements Serializable {
     @ManyToOne(optional = false)
     private Usuario usuario;
     
-    @OneToMany(cascade= CascadeType.ALL)
+    @OneToMany(cascade= CascadeType.ALL, fetch= FetchType.EAGER)
     @JoinColumn(name="pedido_id")
     private Collection<PedidoProduto> itens;
     
@@ -166,7 +166,8 @@ public class Pedido implements Serializable {
     public PedidoProduto getVeiculo(){
 
         for(PedidoProduto it : itens){
-            if(it.getProduto().getTipo() == 1){
+            if(it.getProduto().getTipo() == Produto.VEICULO){
+                
                 return (it);
             }
         }

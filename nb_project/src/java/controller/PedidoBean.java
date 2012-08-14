@@ -51,9 +51,10 @@ public class PedidoBean extends ControllerBase {
     private List<TipoPagto> tipoPagtoList = null;
     private List<TabelaFinanc> tabelaFinancList = null;
     private List<SelectItem> parcelaList = null;
-    private Integer tipoPagtoSelected = null;
+//    private Integer tipoPagtoSelected = null;
 //    private Integer tabelaId = 0;
     private TabelaFinanc tabela = null;
+    private TipoPagto tipo = null;
     private Integer numParcelas;
     private BigDecimal valorParcela;
 
@@ -204,7 +205,8 @@ public class PedidoBean extends ControllerBase {
 
         pagamento = new PedidoPag();
 
-        tipoPagtoSelected = 0;
+//        tipoPagtoSelected = 0;
+        tipo = new TipoPagto();
         tabelaFinancList = null;
         //tabelaId = 0;
         tabela = new TabelaFinanc();
@@ -298,7 +300,8 @@ public class PedidoBean extends ControllerBase {
             }
         }
 
-        tipoPagtoSelected = pagamento.getTipoPagto().getId().intValue();
+//        tipoPagtoSelected = pagamento.getTipoPagto().getId().intValue();
+        tipo = pagamento.getTipoPagto();
         tabela = pagamento.getTabelaFinanc();
         numParcelas = (int) pagamento.getNumParcelas();
     }
@@ -307,10 +310,11 @@ public class PedidoBean extends ControllerBase {
 
         TipoPagtoJpaController tpctl = new TipoPagtoJpaController();
 
-        TipoPagto tipoPagto = tpctl.findTipoPagto(tipoPagtoSelected.shortValue());
+//        TipoPagto tipoPagto = tpctl.findTipoPagto(tipoPagtoSelected.shortValue());
+        tipo = tpctl.findTipoPagto(tipo.getId());
 
-        if (tipoPagto != null) {
-            if (tipoPagto.getGeraBoleto()) {
+        if (tipo != null) {
+            if (tipo.getGeraBoleto()) {
                 if (pagamento.getDataVenc() == null) {
                     addMessage("A data da primeira parcela deve ser definida!!!");
                     return;
@@ -318,7 +322,7 @@ public class PedidoBean extends ControllerBase {
             }
         }
 
-        pagamento.setTipoPagto(tipoPagto);
+        pagamento.setTipoPagto(tipo);
 
         TabelaFinancJpaController tfctl = new TabelaFinancJpaController(ControllerBase.getEmf());
 
@@ -401,15 +405,15 @@ public class PedidoBean extends ControllerBase {
         return tipoPagtoList;
     }
 
-    public Integer getTipoPagtoSelected() {
-        if (tipoPagtoSelected == null) {
-            tipoPagtoSelected = 0;
+    public TipoPagto getTipo() {
+        if(tipo == null){
+            tipo = new TipoPagto();
         }
-        return tipoPagtoSelected;
+        return tipo;
     }
 
-    public void setTipoPagtoSelected(Integer tipoPagtoSelected) {
-        this.tipoPagtoSelected = tipoPagtoSelected;
+    public void setTipo(TipoPagto tipo) {
+        this.tipo = tipo;
     }
 
     public List<TabelaFinanc> getTabelaFinancList() {
@@ -472,15 +476,17 @@ public class PedidoBean extends ControllerBase {
     public void tipoChanged() {
 
         tabelaFinancList = new ArrayList<TabelaFinanc>();
+        
+        Short tipoPagtoSelected = getTipo().getId();
 
         if (tipoPagtoSelected > 0) {
 
             TipoPagtoJpaController c = new TipoPagtoJpaController();
-            TipoPagto tp = c.findTipoPagto(getTipoPagtoSelected().shortValue());
+            tipo = c.findTipoPagto(tipoPagtoSelected);
 
-            if (tp != null) {
+            if (tipo != null) {
 
-                if (tp.getGeraBoleto()) {
+                if (tipo.getGeraBoleto()) {
                     if (pagamento.getDataVenc() == null) {
                         Calendar data = Calendar.getInstance();
                         data.add(Calendar.MONTH, 1);
@@ -490,7 +496,7 @@ public class PedidoBean extends ControllerBase {
 
 
                 tabelaFinancList = new ArrayList<TabelaFinanc>();
-                tabelaFinancList.addAll(tp.getTabelasFinanc());
+                tabelaFinancList.addAll(tipo.getTabelasFinanc());
 
                 if (tabelaFinancList.size() == 1) {
                     tabela = tabelaFinancList.get(0);
