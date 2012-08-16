@@ -72,22 +72,25 @@ html, body {
 tr.verde{
     background-image: none;
 
-    background-color: #060;
-    color: #fff;
+    color: #060;
 }
 
 tr.vermelho{
     background-image: none;
 
-    background-color: #C00;
-    color: #fff;
+    color: #c00;
 }
 
 tr.laranja{
     background-image: none;
 
-    background-color: #C60;
-    color: #fff;
+    color: #c60;
+}
+
+tr.azul{
+    background-image: none;
+
+    color: #00c;
 }
 
 a:hover {

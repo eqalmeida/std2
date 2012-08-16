@@ -44,7 +44,7 @@ public class Boleto implements Serializable {
     public static final Short CANCELADO     = 3;
     public static final Short PARADO        = 4;
     
-    private static final Map<Short,String> listStatus = new HashMap<Short, String>();
+    public static final Map<Short,String> listStatus = new HashMap<Short, String>();
     static{
         listStatus.put(ATIVO, "ATIVO");
         listStatus.put(PAGO, "PAGO");
@@ -244,7 +244,7 @@ public class Boleto implements Serializable {
         long diasVencimento = getDias(vencimento);
         
         long atraso;
-        if(status == ATIVO){
+        if(status == ATIVO || status == Boleto.PARADO){
             atraso = diasDataPag - diasVencimento;
         }else{
             long atual = getDias(getDataPag());

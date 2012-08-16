@@ -116,46 +116,60 @@ public class PedidoJpaController implements Serializable {
         }
     }
 
-    public void changeStatus(Pedido pedido, Short status, Usuario usuario, String just) {
+    public void changeStatus(Pedido pedido, Short status, Usuario usuario, String just) throws IllegalAccessException, Exception {
         EntityManager em = null;
         try {
+            if (status == Boleto.PAGO || status == Boleto.PAGO_PARCIAL) {
+                throw new IllegalAccessException("STATUS INVÁLIDO!");
+            }
             em = getEntityManager();
             em.getTransaction().begin();
-            try {
-                pedido = em.getReference(Pedido.class, pedido.getId());
-                pedido.getId();
+            //try {
+            pedido = em.find(Pedido.class, pedido.getId());
 
+            pedido.setStatus(status);
+            em.merge(pedido);
 
-                for (PedidoPag pag : pedido.getPagamentos()) {
-                    for (Boleto b : pag.getParcelas()) {
-                        if (b.getStatus() != Boleto.PAGO) {
+            for (PedidoPag pag : pedido.getPagamentos()) {
+                for (Boleto b : pag.getParcelas()) {
+                    if (b.getStatus() != Boleto.PAGO) {
 
-                            b = em.getReference(Boleto.class, b.getId());
+                        int boletoId = b.getId();
+                        
+                        b = em.find(Boleto.class, boletoId);
 
+                        if (status == Boleto.ATIVO && b.getValorPago() != null && b.getValorPago().doubleValue() > 0.0) {
+                            b.setStatus(Boleto.PAGO_PARCIAL);
+                        } else {
                             b.setStatus(status);
-
-                            em.merge(b);
                         }
+
+                        em.merge(b);
                     }
                 }
-
-                usuario = em.getReference(Usuario.class, usuario.getId());
-
-                PedidoStatus st = new PedidoStatus();
-                st.setPedido(pedido);
-                st.setUsuario(usuario);
-                st.setAlteracao("Status alterado para " + status);
-                st.setJustificativa(just);
-                em.persist(st);
-
-                em.getTransaction().commit();
-
-
-            } catch (Exception e) {
-                if (em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
             }
+
+            usuario = em.getReference(Usuario.class, usuario.getId());
+
+            PedidoStatus st = new PedidoStatus();
+            st.setPedido(pedido);
+            st.setUsuario(usuario);
+            st.setAlteracao("Status alterado para " + status);
+            st.setJustificativa(just);
+            em.persist(st);
+
+            int pedidoId = pedido.getId();
+            
+            em.getTransaction().commit();
+
+            pedido = em.find(Pedido.class, pedidoId);
+
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw new Exception(e.getMessage());
+
         } finally {
             if (em != null) {
                 em.close();

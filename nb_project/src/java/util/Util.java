@@ -6,12 +6,31 @@ package util;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author eqalmeida
  */
 public class Util {
+    
+    public static final Map<Integer, String> monthNames ;
+    static {
+        monthNames = new HashMap<Integer, String>();
+        monthNames.put(0, "Janeiro");
+        monthNames.put(1, "Fevereiro");
+        monthNames.put(2, "Março");
+        monthNames.put(3, "Abril");
+        monthNames.put(4, "Maio");
+        monthNames.put(5, "Junho");
+        monthNames.put(6, "Julho");
+        monthNames.put(7, "Agosto");
+        monthNames.put(8, "Setembro");
+        monthNames.put(9, "Outubro");
+        monthNames.put(10, "Novembro");
+        monthNames.put(11, "Dezembro");
+    }
 
     public static void debug(String msg) {
         System.out.println(new Date() + ": " + msg);

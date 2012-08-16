@@ -25,7 +25,7 @@ import repo.BoletoJpaController;
  */
 @ManagedBean(name = "boletoMB")
 @ViewScoped
-public class BoletoBean extends ControllerBase{
+public class BoletoBean extends ControllerBase {
 
     private LazyDataModel<Boleto> lazyList = null;
     private Boleto selected = null;
@@ -39,22 +39,20 @@ public class BoletoBean extends ControllerBase{
     public BoletoBean() {
         Calendar data = GregorianCalendar.getInstance();
         filtAno = data.get(Calendar.YEAR);
-        filtMes = (short) ( data.get(Calendar.MONTH));
+        filtMes = (short) (data.get(Calendar.MONTH));
     }
-    
+
     @PostConstruct
-    private void init(){
+    private void init() {
         service = new BoletoJpaController();
     }
-    
-    public void verPedido(){
-        if(selected != null){
-            String red = "ShowPedido.jsf?pedidoId=" + selected.getPedidoPag().getPedido().getId();
-            try {
-                FacesContext.getCurrentInstance().getExternalContext().redirect(red);
-            } catch (IOException ex) {
-                addErrorMessage(ex.getMessage());
-            }
+
+    public void verPedido(int pedidoId) {
+        String red = "ShowPedido.jsf?pedidoId=" + pedidoId;
+        try {
+            FacesContext.getCurrentInstance().getExternalContext().redirect(red);
+        } catch (IOException ex) {
+            addErrorMessage(ex.getMessage());
         }
     }
 
@@ -123,7 +121,7 @@ public class BoletoBean extends ControllerBase{
     public void setFiltAno(Integer filtAno) {
         this.filtAno = filtAno;
     }
-    
+
     public void mesChanged(ValueChangeEvent ev) {
         filtMes = (Short) ev.getNewValue();
         updateDatas();
@@ -133,6 +131,4 @@ public class BoletoBean extends ControllerBase{
         filtAno = (Integer) ev.getNewValue();
         updateDatas();
     }
-
-    
 }

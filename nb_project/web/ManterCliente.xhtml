@@ -163,7 +163,9 @@
                 
                 <f:facet name="header">Pedidos de #{clienteMB.selected.nome}</f:facet>
                 
-                <p:column headerText="N. Pedido">#{it.id}</p:column>
+                <p:column headerText="N. Pedido">
+                    <p:commandLink value="#{it.id}" actionListener="#{clienteMB.verPedido(it.id)}" ajax="false"/>
+                </p:column>
                 
                 <p:column headerText="Data" >
                     <h:outputText value="#{it.data}">
@@ -175,9 +177,8 @@
                     <h:outputText value="#{it.veiculo.produto.descricaoGeral}"></h:outputText>
                 </p:column>
                 
-                <p:column>
-                    <p:commandButton icon="ui-icon-file" actionListener="#{clienteMB.verPedido(it.id)}" ajax="false">
-                    </p:commandButton>
+                <p:column headerText="Status">
+                    <h:outputText value="#{it.statusStr}"/>
                 </p:column>
                 
             </p:dataTable>

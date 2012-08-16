@@ -42,16 +42,10 @@
 
         <h:form id="formTable">
 
-            <p:contextMenu for="tbl">  
-                <p:menuitem value="Ver Pedido" actionListener="#{boletoMB.verPedido}" icon="ui-icon-pencil"/>  
-            </p:contextMenu>  
-
-
             <p:dataTable lazy="true" var="it" id="tbl"
-                         selection="#{boletoMB.selected}" selectionMode="single" rowKey="#{it.id}"
                          value="#{boletoMB.lazyList}" rows="20"
                          paginatorAlwaysVisible="false" 
-                         rowStyleClass="#{it.status == 1 ? 'verde' : it.atrasado ? it.status == 2 ? 'laranja' : 'vermelho' : null }"                         paginator="true">
+                         rowStyleClass="#{it.status eq 1 ? 'verde':it.status eq 4?'azul': it.atrasado ? it.status == 2 ? 'laranja' : 'vermelho' : null }"                         paginator="true">
 
                 <p:column headerText="Vencimento" sortBy="#{it.vencimento}"  style="text-align: center">
                     <h:outputText value="#{it.vencimento}" >
@@ -78,8 +72,12 @@
                     #{it.cliente.nome}
                 </p:column>
 
-                <p:column headerText="Situação" sortBy="#{it.situacao}" style="text-align: center">
-                    #{it.situacao}
+                <p:column headerText="Status" sortBy="#{it.status}">
+                    #{it.statusStr}
+                </p:column>
+
+                <p:column headerText="Pedido" sortBy="#{it.pedidoPag.pedido.id}" style="text-align: center">
+                    <p:commandLink value="#{it.pedidoPag.pedido.id}" actionListener="#{boletoMB.verPedido(it.pedidoPag.pedido.id)}"/>
                 </p:column>
 
             </p:dataTable>

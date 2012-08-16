@@ -142,6 +142,10 @@ public class Pedido implements Serializable {
     public short getStatus() {
         return status;
     }
+    
+    public String getStatusStr(){
+        return Boleto.listStatus.get(this.status);
+    }
 
     public void setStatus(short status) {
         this.status = status;
