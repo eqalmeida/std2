@@ -46,6 +46,77 @@
             </p:panel>
         </h:panelGroup>
 
+        <h:form id="formDialog">
+
+            <p:panelGrid columns="2" id="npag_panel">
+
+                <f:facet name="header">
+                    Novo Pagamento
+                </f:facet>
+
+                <h:outputText value="Data:"/>
+                <p:inputText value="#{pagMB.data}" label="Data" required="true"
+                             valueChangeListener="#{pagMB.dataChanged}">
+                    <f:convertDateTime type="date"  timeZone="#{app.timeZone}"/>
+                    <p:ajax update="@form" />
+                </p:inputText>
+
+                <h:outputText value="Juros:"  />
+                <h:outputText value="#{pagMB.totalJuros}">
+                    <f:convertNumber type="currency" />
+                </h:outputText>
+
+                <h:outputText value="Multa:"  />
+                <h:outputText value="#{pagMB.totalMulta}">
+                    <f:convertNumber type="currency" />
+                </h:outputText>
+
+                <h:outputText value="Total Parcelas:"  />
+                <h:outputText value="#{pagMB.totalParcela}">
+                    <f:convertNumber type="currency" />
+                </h:outputText>
+
+                <h:outputText value="Desconto (%):" rendered="#{pagMB.desconto gt 0.00}"/>
+                <h:outputText value="#{pagMB.desconto}" rendered="#{pagMB.desconto gt 0.00}"/>
+
+                <h:outputText value="Desconto ($):"  rendered="#{pagMB.desconto gt 0.00}"/>
+                <h:outputText value="#{pagMB.descontoVal}" rendered="#{pagMB.desconto gt 0.00}">
+                    <f:convertNumber type="currency"/>
+                </h:outputText>
+
+                <h:outputText value="Total Devido:" />
+                <h:outputText value="#{pagMB.valorDevido}" id="vdev" style="font-weight: bold">
+                    <f:convertNumber type="currency"/>
+                </h:outputText>
+
+                <h:outputText value="Valor Recebido:"/>
+                <p:inputText value="#{pagMB.valorRecebido}" label="Valor" styleClass="valor" required="true">
+                    <f:convertNumber  pattern="#,##0.00"/>
+                    <f:validateDoubleRange minimum="0.01" />
+                </p:inputText>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Registrar" actionListener="#{pagMB.registrar}" update=":form npag_panel" onstart="return confirm('Confirma o pagamento?')"/>
+                    <p:commandButton icon="ui-icon-scissors" actionListener="#{pagMB.editarDesconto()}" update=":fdesconto" immediate="true" rendered="#{loginMB.usuario.admin}"/>
+                </f:facet>
+
+            </p:panelGrid>
+            <br/>
+
+        </h:form>
+
+        <h:form id="fdesconto">
+            <p:dialog modal="true" resizable="false" header="Adicionar Desconto" widgetVar="descDlg">
+                <h:panelGroup id="descD">
+                <h:outputText value="Desconto nos Juros:"/><br/>
+                <p:inputText value="#{pagMB.desconto}" label="Desconto">
+                    <f:validateDoubleRange maximum="100.0" />
+                </p:inputText><br/>
+                </h:panelGroup>
+                <p:commandButton value="Gravar" actionListener="#{pagMB.gravaDesconto()}" update="descD, :formDialog"/>
+            </p:dialog>
+        </h:form>
+
         <h:panelGroup rendered="#{pagMB.pedidoPag != null}">
 
             <p:panelGrid style="width:100%">
@@ -138,6 +209,12 @@
                         </h:outputText>
                     </p:column>
 
+                    <p:column headerText="Valor Pago">
+                        <h:outputText value="#{it.valorPago}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
+
                     <p:column headerText="Valor Faltante">
                         <h:outputText value="#{it.valorFaltante}">
                             <f:convertNumber type="currency"/>
@@ -177,38 +254,6 @@
                 </p:dataTable>
 
             </h:form>            
-            <br/>
-            <h:form id="formDialog">
-
-                <p:dialog widgetVar="pagDialog" header="Registro de Pagamento" modal="true" resizable="false">
-
-                    <p:panelGrid columns="2" id="npag_panel">
-
-                        <h:outputText value="Data:"/>
-                        <p:inputText value="#{pagMB.data}" label="Data" required="true"
-                                     valueChangeListener="#{pagMB.dataChanged}">
-                            <f:convertDateTime type="date"  timeZone="#{app.timeZone}"/>
-                            <f:ajax render="vdev" />
-                        </p:inputText>
-
-                        <h:outputText value="Valor devido nessa Data:" />
-                        <h:outputText value="#{pagMB.valorDevido}" id="vdev">
-                            <f:convertNumber type="currency"/>
-                        </h:outputText>
-
-                        <h:outputText value="Valor Recebido:"/>
-                        <p:inputText value="#{pagMB.valorRecebido}" label="Valor" styleClass="valor" required="true">
-                            <f:convertNumber  pattern="#,##0.00"/>
-                        </p:inputText>
-
-                        <f:facet name="footer">
-                            <p:commandButton value="Registrar" actionListener="#{pagMB.registrar}" update=":form npag_panel" onstart="return confirm('Confirma o pagamento?')"/>
-                        </f:facet>
-
-                    </p:panelGrid>
-
-                </p:dialog>
-            </h:form>
         </h:panelGroup>
     </ui:define>
 

@@ -169,7 +169,7 @@ public class BoletoJpaController implements Serializable {
     public List<Boleto> findBoletoEntities(int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
 
-        String query = ("SELECT b FROM Boleto b WHERE b.vencimento BETWEEN :ini AND :fin");
+        String query = ("SELECT b FROM Boleto b WHERE (b.vencimento BETWEEN :ini AND :fin) and b.status != " + Boleto.CANCELADO);
 
         if (sortedField != null) {
             query += (" ORDER BY b." + sortedField + " " + order);
@@ -182,6 +182,29 @@ public class BoletoJpaController implements Serializable {
             
             q.setMaxResults(maxResults);
             q.setFirstResult(firstResult);
+            return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+
+    public List<Object[]> findBoletoReport() {
+        EntityManager em = getEntityManager();
+
+        String query = (
+                "SELECT b.status AS status, "+
+                "SUM(b.valor) AS total, SUM(b.valorPago) AS valorPago, "+
+                "SUM(b.valorFaltante) AS valorFaltante  "+
+                "FROM Boleto b WHERE (b.vencimento BETWEEN :ini AND :fin) and b.status != :stat"+
+                " GROUP BY b.status");
+
+
+        try {
+            Query q = em.createQuery(query);
+            q.setParameter("ini", dateFrom, TemporalType.DATE);
+            q.setParameter("fin", dateTo, TemporalType.DATE);
+            q.setParameter("stat", Boleto.CANCELADO);
             return q.getResultList();
         } finally {
             em.close();
@@ -238,7 +261,7 @@ public class BoletoJpaController implements Serializable {
         EntityManager em = getEntityManager();
         try {
 
-            String query = ("SELECT SUM(b.valor) FROM Boleto b WHERE b.vencimento BETWEEN :ini AND :fin");
+            String query = ("SELECT SUM(b.valor) FROM Boleto b WHERE (b.vencimento BETWEEN :ini AND :fin) AND b.status != " + Boleto.CANCELADO);
             Query q = em.createQuery(query);
             q.setParameter("ini", dateFrom, TemporalType.DATE);
             q.setParameter("fin", dateTo, TemporalType.DATE);

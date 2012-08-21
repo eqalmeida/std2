@@ -6,6 +6,7 @@ package controller;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.annotation.PostConstruct;
@@ -37,6 +38,12 @@ public class PagamentoBean extends ControllerBase implements Serializable {
     private BigDecimal valorDevido = null;
     private Date data = null;
     private BigDecimal valorRecebido = null;
+    private BigDecimal totalJuros = null;
+    private BigDecimal totalMulta = null;
+    private BigDecimal totalParcela = null;
+    private BigDecimal taxas = null;
+    private BigDecimal descontoVal = null;
+    private double desconto = 0.0;
 
     @PostConstruct
     private void inicializa() {
@@ -59,12 +66,23 @@ public class PagamentoBean extends ControllerBase implements Serializable {
 
     public PedidoPag getPedidoPag() {
 
+        boolean first;
+
+        if (pedidoPag == null) {
+            first = true;
+        } else {
+            first = false;
+        }
 //        if (pedidoPag == null) {
 
-            try {
-                pedidoPag = pagService.findPedidoPag(pagId);
-            } catch (Exception ex) {
+        try {
+            pedidoPag = pagService.findPedidoPag(pagId);
+            if (first) {
+                novoPagamento();
+                updateTotais(data);
             }
+        } catch (Exception ex) {
+        }
 //        }
         return pedidoPag;
     }
@@ -85,33 +103,73 @@ public class PagamentoBean extends ControllerBase implements Serializable {
 
         data = (Date) ev.getNewValue();
 
-        valorDevido = pedidoPag.getValorDevidoAtual(data);
+        updateTotais(data);
+
+    }
+
+    private void updateTotais(Date d) {
+
+        totalJuros = BigDecimal.ZERO;
+        totalMulta = BigDecimal.ZERO;
+        totalParcela = BigDecimal.ZERO;
+
+        for (Boleto b : getPedidoPag().getParcelas()) {
+
+            if (b.isAtrasado(d)) {
+                totalJuros = totalJuros.add(b.getJuros(d));
+                totalMulta = totalMulta.add(b.getMulta(d));
+                totalParcela = totalParcela.add(b.getValor());
+            }
+
+        }
+        
+        if(!getUsuarioLogado().isAdmin()){
+            desconto = 0.0;
+        }
+
+        taxas = totalJuros.add(totalMulta);
+        descontoVal = taxas.multiply(new BigDecimal(desconto)).divide(new BigDecimal(100)).setScale(2, RoundingMode.DOWN);
+        valorDevido = taxas.add(totalParcela).subtract(descontoVal);
+
     }
 
     public void novoPagamento() {
-        
+
         Usuario user = getUsuarioLogado();
-        
-        if(user == null){
+
+        if (user == null) {
             addErrorMessage("Falha de Login!");
             return;
         }
 
 
         data = new Date();
-        valorDevido = pedidoPag.getValorDevidoAtual(data);
+        updateTotais(data);
         valorRecebido = null;
-        RequestContext.getCurrentInstance().execute("pagDialog.show()");
+        desconto = 0.0;
+    }
 
+    public void editarDesconto() {
+        if (getUsuarioLogado().isAdmin()) {
+            RequestContext.getCurrentInstance().execute("descDlg.show()");
+        }
+    }
+
+    public void gravaDesconto() {
+        if (!getUsuarioLogado().isAdmin()) {
+            desconto = 0.0;
+        }
+        updateTotais(data);
+        RequestContext.getCurrentInstance().execute("descDlg.hide()");
     }
 
     public void registrar() {
 
         Usuario user = getUsuarioLogado();
-        
+
         IPagtoService pService = PagtoServiceFactory.getPagtoService();
-        
-        if(user == null){
+
+        if (user == null) {
             addErrorMessage("Falha de Login!");
             return;
         }
@@ -187,7 +245,7 @@ public class PagamentoBean extends ControllerBase implements Serializable {
 
             em.getTransaction().commit();
 
-            RequestContext.getCurrentInstance().execute("pagDialog.hide()");
+            novoPagamento();
 
             addMessage("Pagamento Registrado");
         } catch (Exception ex) {
@@ -213,4 +271,33 @@ public class PagamentoBean extends ControllerBase implements Serializable {
     public BigDecimal getValorDevido() {
         return valorDevido;
     }
+
+    public BigDecimal getTotalJuros() {
+        return totalJuros;
+    }
+
+    public BigDecimal getTotalMulta() {
+        return totalMulta;
+    }
+
+    public BigDecimal getTotalParcela() {
+        return totalParcela;
+    }
+
+    public BigDecimal getTaxas() {
+        return taxas;
+    }
+
+    public double getDesconto() {
+        return desconto;
+    }
+
+    public void setDesconto(double desconto) {
+        this.desconto = desconto;
+    }
+
+    public BigDecimal getDescontoVal() {
+        return descontoVal;
+    }
+
 }

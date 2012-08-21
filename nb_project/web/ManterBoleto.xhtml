@@ -91,6 +91,35 @@
                 </h:outputText>
             </p:panelGrid>
 
+            <br/>
+
+            <p:dataTable value="#{boletoMB.reportList}" var="it">
+                
+                <f:facet name="header">Total Por Status</f:facet>
+
+                <p:column headerText="Status">
+                    <h:outputText value="#{it[0] eq 0?'ATIVO':it[0] eq 1?'PAGO':it[0] eq 2 ? 'PAGO PARCIAL': it[0] eq 3?'CANCELADO':'PARADO' } " style="font-weight: bold"/>
+                </p:column>
+
+                <p:column headerText="Valor Total do Boleto">
+                    <h:outputText value="#{it[1]}">
+                        <f:convertNumber type="currency" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Valor Total Recebido">
+                    <h:outputText value="#{it[2]}">
+                        <f:convertNumber type="currency" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Valor Total Faltante">
+                    <h:outputText value="#{it[3]}">
+                        <f:convertNumber type="currency" />
+                    </h:outputText>
+                </p:column>
+            </p:dataTable>
+
         </h:form>
     </ui:define>
 

@@ -232,6 +232,15 @@ public class PedidoPag implements Serializable {
         return(valorDevido);
     }
 
+    public BigDecimal getTaxasAtual(Date d){
+        BigDecimal val = BigDecimal.ZERO;
+        for(Boleto b : this.getParcelas()){
+            val = val.add(b.getJuros(d));
+            val = val.add(b.getMulta(d));
+        }
+        return(val);
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;

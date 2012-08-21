@@ -9,6 +9,9 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -18,6 +21,7 @@ import model.Boleto;
 import model.BoletoLazyList;
 import org.primefaces.model.LazyDataModel;
 import repo.BoletoJpaController;
+import util.Util;
 
 /**
  *
@@ -44,7 +48,7 @@ public class BoletoBean extends ControllerBase {
 
     @PostConstruct
     private void init() {
-        service = new BoletoJpaController();
+            service = new BoletoJpaController();
     }
 
     public void verPedido(int pedidoId) {
@@ -79,6 +83,13 @@ public class BoletoBean extends ControllerBase {
     }
 
     public LazyDataModel<Boleto> getLazyList() {
+        
+        if(getUsuarioLogado().isAdmin() == false){
+            addErrorMessage("Acesso negado!!!");
+            lazyList = null;
+        }
+        else
+        
         if (lazyList == null) {
             lazyList = new BoletoLazyList(this.service);
 
@@ -130,5 +141,13 @@ public class BoletoBean extends ControllerBase {
     public void anoChanged(ValueChangeEvent ev) {
         filtAno = (Integer) ev.getNewValue();
         updateDatas();
+    }
+    
+    public List<Object[]> getReportList(){
+        return service.findBoletoReport();
+    }
+    
+    public String getStatusToStr(Short num){
+        return Boleto.listStatus.get(num);
     }
 }
