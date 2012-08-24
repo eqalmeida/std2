@@ -779,6 +779,8 @@ public class PedidoBean extends ControllerBase {
             FacesContext.getCurrentInstance().getExternalContext().redirect(red);
 
         } catch (Exception ex) {
+            
+            ex.printStackTrace();
 
             addErrorMessage(ex.getMessage());
 

@@ -218,6 +218,8 @@ public class PagamentoBean extends ControllerBase implements Serializable {
             for (Boleto b : pedidoPag.getParcelas()) {
                 //sobra = b.regPagamento(sobra, data);
                 pService.setBoleto(b);
+                pService.setDesconto(desconto);
+                
                 sobra = pService.regPagto(sobra, data);
                 em.merge(b);
 
@@ -232,6 +234,7 @@ public class PagamentoBean extends ControllerBase implements Serializable {
             pagamento.setPedidoPag(pedidoPag);
             pagamento.setRecebUsuario(usuario);
             pagamento.setValor(valorRecebido);
+            pagamento.setDesconto(desconto);
 
             em.persist(pagamento);
 

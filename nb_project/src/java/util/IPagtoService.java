@@ -15,4 +15,5 @@ import model.Boleto;
 public interface IPagtoService {
     public BigDecimal regPagto(BigDecimal valorRecebido, Date dataInf);
     public void setBoleto(Boleto boleto);
+    public void setDesconto(double desconto);
 }

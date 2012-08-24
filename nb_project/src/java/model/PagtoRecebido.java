@@ -44,9 +44,14 @@ public class PagtoRecebido implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date dataInformada;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    
     @Basic(optional = false)
     @Column(name = "valor")
     private BigDecimal valor;
+    
+    @Column(name = "desconto")
+    private double desconto;
+    
     @JoinColumn(name = "receb_usuario_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Usuario recebUsuario;
@@ -109,6 +114,14 @@ public class PagtoRecebido implements Serializable {
     
     public void setDataInformada(Date dataInformada) {
         this.dataInformada = dataInformada;
+    }
+
+    public double getDesconto() {
+        return desconto;
+    }
+
+    public void setDesconto(double desconto) {
+        this.desconto = desconto;
     }
     
     public void calculaValorDevido() {

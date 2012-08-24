@@ -15,6 +15,8 @@ import model.Boleto;
 public class PagtoService implements IPagtoService {
 
     private Boleto boleto = null;
+    private double desconto = 0.0;
+    
     
     
     @Override
@@ -43,7 +45,11 @@ public class PagtoService implements IPagtoService {
             temp = BigDecimal.ZERO;
         }
 
+        // Calcula Juros
         BigDecimal jurosAtual = boleto.getJuros(dataInf);
+        
+        // Subtrai desconto
+        jurosAtual = valComDesconto(jurosAtual, this.desconto);
 
         boleto.setJuros(temp.add(jurosAtual));
 
@@ -54,6 +60,9 @@ public class PagtoService implements IPagtoService {
         }
 
         BigDecimal multaAtual = boleto.getMulta(dataInf);
+
+        // Subtrai desconto
+        multaAtual = valComDesconto(multaAtual, this.desconto);
 
         boleto.setMulta(temp.add(multaAtual));
 
@@ -89,6 +98,8 @@ public class PagtoService implements IPagtoService {
         }
 
         boleto.setDataPag(dataInf);
+        
+        desconto = 0.0;
 
         return (sobra);
         
@@ -98,5 +109,26 @@ public class PagtoService implements IPagtoService {
     public void setBoleto(Boleto boleto) {
         this.boleto = boleto;
     }
+
+    @Override
+    public void setDesconto(double desconto) {
+        this.desconto = desconto;
+    }
     
+    /**
+     * Calcula o valor com desconto
+     * @param val
+     * @param desc
+     * @return 
+     */
+    private BigDecimal valComDesconto(BigDecimal val, double desc){
+        
+        if(desc == 0.0){
+            return val;
+        }
+        
+        BigDecimal descVal = val.multiply(new BigDecimal(desc)).divide(new BigDecimal(100)); 
+        
+        return(val.subtract(descVal));
+    }
 }
