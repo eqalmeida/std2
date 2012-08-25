@@ -180,6 +180,19 @@ public class ProdutoJpaController implements Serializable {
     public List<Produto> findProdutoEntities(int maxResults, int firstResult, int tipo) {
         return findProdutoEntities(false, maxResults, firstResult, tipo);
     }
+    
+    public List<Produto> findProdutosByQuery(String query){
+        EntityManager em = getEntityManager();
+        try{
+            return em.createQuery(query).getResultList();
+        }finally{
+            em.close();
+        }
+    }
+    
+    public List<Produto> findVeiculosEmEstoque(){
+        return findProdutosByQuery("SELECT p FROM Produto p WHERE p.tipo = 1 and p.qtdEstoque != 0");
+    }
 
     private String getWhere(){
         
