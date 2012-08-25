@@ -24,6 +24,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import util.Util;
 
 /**
@@ -92,9 +93,22 @@ public class Boleto implements Serializable {
     private Date dataPag;
     @javax.persistence.Transient
     private Short situacao = null;
+    
+    @Transient
+    private BigDecimal valorComMulta;
 
     public Boleto() {
     }
+
+    public BigDecimal getValorComMulta() {
+        if(this.pedidoPag != null){
+            double fator = (this.pedidoPag.getMultaPercent()/100.0) + 1.0;
+            valorComMulta = this.valor.multiply(new BigDecimal(fator));
+        }
+        return valorComMulta;
+    }
+    
+    
 
     public BigDecimal getValorPago() {
         return valorPago;

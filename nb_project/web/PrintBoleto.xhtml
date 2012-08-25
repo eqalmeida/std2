@@ -46,71 +46,166 @@
         <h:panelGroup rendered="#{printBoletoMB.pedidoPag != null}" style="background: #fff">
             <h:form id="lbol">
 
-                    <ui:param name="bolVar" value="#{app.config.boletosPorPag}"/>
-                    
-                    <ui:repeat value="#{printBoletoMB.pedidoPag.parcelas}" var="it" >
-                    <div style="margin-left: 50px; background-color: #fff">
+                <ui:param name="bolVar" value="#{app.config.boletosPorPag}"/>
+                <h:panelGroup>
+                    <hr style="border: dashed 1px #999" />
+                </h:panelGroup>
+
+
+                <ui:repeat value="#{printBoletoMB.pedidoPag.parcelas}" var="it" >
+                    <div style="margin: 0 10px 0 20px; background-color: #fff">
+
+
 
                         <table class="boleto">
                             <tr>
-                                <th colspan="2" align="center">
-                                        <h:outputText value="Rogerinho MOTOS - Boleto - Financiamento"/>
-                                </th>
-                                <td align="right">
-                                        <h:graphicImage value="/resources/img/logo_rogerinho_pq.jpeg"/>
+                                <td>
+                                    <div class="cxtop">VALOR COM DESCONTO:</div>
+                                    <div class="cxdentro">
+                                        <h:outputText value="#{it.valor}"><f:convertNumber type="currency"/></h:outputText>
+                                    </div>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td rowspan="4" valign="top" width="90%">
-                                    Observações:
-                                    <h:panelGroup rendered="#{it.pedidoPag.jurosDiario > 0.0}">
-                                        Multa por atraso: #{it.pedidoPag.multaPercent} % <br/>
-                                        Juros: #{it.pedidoPag.jurosDiario} % ao dia.
-                                    </h:panelGroup>
-
+                                <td rowspan="2">
+                                    <h:graphicImage value="/resources/img/logo_rogerinho_pq.jpeg"/>
                                 </td>
-
-                                <td nowrap="nowrap">Valor da Parcela:</td>
-                                <td nowrap="nowrap" style="font-weight: bold" align="center"><h:outputText value="#{it.valor}"><f:convertNumber type="currency"/></h:outputText></td>
-                            </tr>
-                            <tr>
-                                <td nowrap="nowrap">Vencimento:</td>
-                                <td nowrap="nowrap" style="font-weight: bold" align="center"><h:outputText value="#{it.vencimento}"><f:convertDateTime/></h:outputText></td>
-                            </tr>
-                            <tr>
-                                <td nowrap="nowrap">Parcela:</td>
-                                <td nowrap="nowrap" align="center">
-                                    <h:outputText value="#{it.numParcela}"/>/<h:outputText value="#{it.pedidoPag.numParcelas}"/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td nowrap="nowrap">Nro. Pedido</td>
-                                <td nowrap="nowrap" align="center">
-                                    <h:outputText value="#{it.pedidoPag.pedido.id}"/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="3" align="center" style="font-size: 10px">
+                                <td rowspan="2">
+                                    PAGÁVEL SOMENTE NA: 
                                     <b> #{app.config.empresaNome} </b> <br/>
                                     #{app.config.empresaEndereco} <br/>
                                     <h:outputText value="Tel.: #{app.config.empresaTelefones}" rendered="#{app.config.empresaTelefones.length() gt 1}"/>
                                     <h:outputText value="Email: #{app.config.empresaEmail}" rendered="#{app.config.empresaEmail.length() gt 1}"/><br/>
                                     <h:outputText value="Email: #{app.config.empresaHomepage}" rendered="#{app.config.empresaHomepage.length() gt 1}"/>
                                 </td>
+                                <td>
+                                    <div class="cxtop">VALOR COM DESCONTO:</div>
+                                    <div class="cxdentro">
+                                        <h:outputText value="#{it.valor}"><f:convertNumber type="currency"/></h:outputText>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cxtop">VALOR NORMAL</div>
+                                    <div class="cxdentro">
+                                        <h:outputText value="#{it.valorComMulta}"><f:convertNumber type="currency"/></h:outputText>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cxtop">VALOR NORMAL</div>
+                                    <div class="cxdentro">
+                                        <h:outputText value="#{it.valorComMulta}"><f:convertNumber type="currency"/></h:outputText>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cxtop">VENCIMENTO</div>
+                                    <div class="cxdentro">
+                                        <h:outputText value="#{it.vencimento}"><f:convertDateTime /></h:outputText> 
+                                    </div>
+                                </td>
+                                <td colspan="2">
+                                    <div class="cxtop">CLIENTE</div>
+                                    <h:outputText value="#{it.pedidoPag.pedido.cliente}" />
+                                </td>
+                                <td>
+                                    <div class="cxtop">VENCIMENTO</div>
+                                    <div class="cxdentro">
+                                        <h:outputText value="#{it.vencimento}"><f:convertDateTime /></h:outputText> 
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cxtop">JUROS</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                                <td colspan="2" rowspan="2">
+
+                                    Valor até <h:outputText value="#{it.vencimento}"><f:convertDateTime /></h:outputText> 
+                                    = <h:outputText value="#{it.valor}"><f:convertNumber type="currency" /></h:outputText>
+                                    (valor com desconto)<br/>
+                                    Após o vencimento, <h:outputText value="#{it.valorComMulta}"><f:convertNumber type="currency" /></h:outputText> + #{it.pedidoPag.jurosDiario}% ao dia.
+
+                                </td>
+                                <td>
+                                    <div class="cxtop">JUROS</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cxtop">VALOR TOTAL</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                                <td>
+                                    <div class="cxtop">VALOR TOTAL</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cxtop">VALOR DO RECEBIMENTO</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                                <td colspan="2" rowspan="4">
+                                    <div align="center">
+                                        <h2>ATENÇÃO</h2>
+                                    </div>
+                                    <div style="margin: 10px">
+                                        <h2>Evite pagar Juros!<br/>
+                                            Em prestações em atraso é cobrado o valor sem desconto + multa e juros diários conforme a lei.</h2>
+                                    </div>
+                                </td>
+                                <td nowrap="nowrap">
+                                    <div class="cxtop">VALOR DO RECEBIMENTO</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cxtop">DATA DO RECEBIMENTO</div>
+                                    <div class="cxdentro">___/___/___</div>
+                                </td>
+                                <td>
+                                    <div class="cxtop">DATA DO RECEBIMENTO</div>
+                                    <div class="cxdentro">___/___/___</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cxtop">SALDO DA PARCELA</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                                <td>
+                                    <div class="cxtop">SALDO DA PARCELA</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td nowrap="nowrap">
+                                    <div class="cxtop">NRO PEDIDO / NRO PARCELA</div>
+                                    <div class="cxdentroL">#{it.pedidoPag.pedido.id} / #{it.numParcela} de #{it.pedidoPag.numParcelas}</div>
+                                </td>
+                                <td nowrap="nowrap">
+                                    <div class="cxtop">NRO PEDIDO / NRO PARCELA</div>
+                                    <div class="cxdentroL">#{it.pedidoPag.pedido.id} / #{it.numParcela} de #{it.pedidoPag.numParcelas}</div>
+                                </td>
                             </tr>
                         </table>
-                        
+
                     </div>
+                    <h:panelGroup>
+                        <hr style="border: dashed 1px #999" />
+                    </h:panelGroup>
 
-                        <h:panelGroup rendered="#{(it.numParcela mod bolVar) eq 0}">
-                            <p style="page-break-before: always"></p>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{!((it.numParcela mod bolVar) eq 0)}">
-                            <hr style="border: dashed 1px #999" />
-                        </h:panelGroup>
+                    <h:panelGroup rendered="#{(it.numParcela mod bolVar) eq 0}">
+                        <p style="page-break-before: always"></p>
+                        <hr style="border: dashed 1px #999" />
+                    </h:panelGroup>
 
-                    </ui:repeat>
-                
+                </ui:repeat>
+
             </h:form>
         </h:panelGroup>
     </ui:define>
