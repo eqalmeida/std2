@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:stella="http://stella.caelum.com.br/faces2"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="./WEB-INF/templates/templatePrincipal.xhtml"
@@ -39,7 +40,7 @@
             <p:dataTable lazy="true" var="it" id="tbl"
                          selectionMode="single" selection="#{clienteMB.selected}"
                          value="#{clienteMB.lazyList}" rows="10"
-                         paginatorAlwaysVisible="false"
+                         paginatorAlwaysVisible="true"
                          paginator="true">
                 
                 <p:ajax event="rowSelect" update=":fmenu, :pedidosForm" listener="#{clienteMB.onRowSelect}" />
@@ -84,6 +85,7 @@
                         <p:column>
                             <p:inputText value="#{clienteMB.selected.cpf}" label="CPF">
                                 <f:validateLength minimum="11" />
+                                <stella:validateCPF  />
                             </p:inputText>
                         </p:column>
                         <p:column styleClass="label">RG:</p:column>

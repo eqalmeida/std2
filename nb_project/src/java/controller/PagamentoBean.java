@@ -116,14 +116,14 @@ public class PagamentoBean extends ControllerBase implements Serializable {
         for (Boleto b : getPedidoPag().getParcelas()) {
 
             if (b.isAtrasado(d)) {
-                totalJuros = totalJuros.add(b.getJuros(d));
-                totalMulta = totalMulta.add(b.getMulta(d));
-                totalParcela = totalParcela.add(b.getValor());
+                totalJuros = totalJuros.add(b.getJuros(d, 0.0));
+                totalMulta = totalMulta.add(b.getMulta(d, 0.0));
+                totalParcela = totalParcela.add(b.getValorDevido());
             }
 
         }
-        
-        if(!getUsuarioLogado().isAdmin()){
+
+        if (!getUsuarioLogado().isAdmin()) {
             desconto = 0.0;
         }
 
@@ -183,7 +183,7 @@ public class PagamentoBean extends ControllerBase implements Serializable {
              */
             BigDecimal soma = BigDecimal.ZERO;
             for (Boleto b : pedidoPag.getParcelas()) {
-                soma = soma.add(b.getValorAtualComTaxas(data));
+                soma = soma.add(b.getValorAtualComTaxas(data, desconto));
             }
 
             if (valorRecebido.doubleValue() > soma.doubleValue()) {
@@ -216,16 +216,23 @@ public class PagamentoBean extends ControllerBase implements Serializable {
              */
             BigDecimal sobra = valorRecebido;
             for (Boleto b : pedidoPag.getParcelas()) {
-                //sobra = b.regPagamento(sobra, data);
-                pService.setBoleto(b);
-                pService.setDesconto(desconto);
-                
-                sobra = pService.regPagto(sobra, data);
-                em.merge(b);
 
-                if (sobra.doubleValue() <= 0.00) {
-                    break;
+                if (b.getValorDevido().doubleValue() > 0.0) {
+                    //sobra = b.regPagamento(sobra, data);
+                    pService.setBoleto(b);
+                    pService.setDesconto(desconto);
+
+                    sobra = pService.regPagto(sobra, data);
+                    em.merge(b);
+
+                    if (sobra.doubleValue() <= 0.00) {
+                        break;
+                    }
                 }
+            }
+            
+            if(sobra.doubleValue() > 0.0){
+                throw new Exception("O valor informado é maior que o devido!");
             }
 
             PagtoRecebido pagamento = new PagtoRecebido();
@@ -302,5 +309,4 @@ public class PagamentoBean extends ControllerBase implements Serializable {
     public BigDecimal getDescontoVal() {
         return descontoVal;
     }
-
 }

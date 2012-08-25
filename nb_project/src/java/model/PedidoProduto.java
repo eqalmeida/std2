@@ -6,6 +6,7 @@ package model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import javax.persistence.AssociationOverride;
 import javax.persistence.AssociationOverrides;
 import javax.persistence.Basic;
@@ -102,7 +103,7 @@ public class PedidoProduto implements Serializable {
             val = val.subtract(desc);
         }
         
-        return val.setScale(2);
+        return val.setScale(2, RoundingMode.DOWN);
     }
 
     public void setValor(BigDecimal valor) {

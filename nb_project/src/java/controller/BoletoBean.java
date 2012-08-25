@@ -19,6 +19,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import model.Boleto;
 import model.BoletoLazyList;
+import org.primefaces.component.datatable.DataTable;
 import org.primefaces.model.LazyDataModel;
 import repo.BoletoJpaController;
 import util.Util;
@@ -49,6 +50,11 @@ public class BoletoBean extends ControllerBase {
     @PostConstruct
     private void init() {
             service = new BoletoJpaController();
+    }
+    
+    private void resetTable(){
+        DataTable dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent(":formTable:tbl");
+        dataTable.setFirst(0);
     }
 
     public void verPedido(int pedidoId) {
@@ -136,11 +142,13 @@ public class BoletoBean extends ControllerBase {
     public void mesChanged(ValueChangeEvent ev) {
         filtMes = (Short) ev.getNewValue();
         updateDatas();
+        resetTable();
     }
 
     public void anoChanged(ValueChangeEvent ev) {
         filtAno = (Integer) ev.getNewValue();
         updateDatas();
+        resetTable();
     }
     
     public List<Object[]> getReportList(){

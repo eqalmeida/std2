@@ -4,6 +4,7 @@
  */
 package controller;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
@@ -40,19 +41,15 @@ import repo.TipoPagtoJpaController;
  */
 @ManagedBean(name = "pedidoMB")
 @SessionScoped
-public class PedidoBean extends ControllerBase {
+public class PedidoBean extends ControllerBase implements Serializable {
 
     private Pedido pedido = null;
-//    private Produto produto = null;
     private PedidoProduto itemSelected = null;
-    private List<PedidoProduto> items = null;
     private List<PedidoPag> pagamentos = null;
     private PedidoPag pagamento = null;
     private List<TipoPagto> tipoPagtoList = null;
     private List<TabelaFinanc> tabelaFinancList = null;
     private List<SelectItem> parcelaList = null;
-//    private Integer tipoPagtoSelected = null;
-//    private Integer tabelaId = 0;
     private TabelaFinanc tabela = null;
     private TipoPagto tipo = null;
     private Integer numParcelas;
@@ -75,17 +72,21 @@ public class PedidoBean extends ControllerBase {
         this.itemSelected = itemSelected;
     }
 
-    public void gravarItem() {
+    public void gravaItem() {
+        RequestContext.getCurrentInstance().execute("itForm.hide()");
+    }
 
-        for (int i = 0; i < items.size(); i++) {
-            if (items.get(i).equals(itemSelected)) {
-                items.set(i, itemSelected);
-                itemSelected = new PedidoProduto();
-                RequestContext.getCurrentInstance().execute("itForm.hide()");
-                break;
+    public void excluirItem() {
+        if (itemSelected != null) {
+            if (itemSelected.getProduto() != null) {
+                for (PedidoProduto it : pedido.getItens()) {
+                    if (it.getProduto().getId() == itemSelected.getProduto().getId()) {
+                        pedido.getItens().remove(it);
+                        break;
+                    }
+                }
             }
         }
-
     }
 
     /**
@@ -106,22 +107,33 @@ public class PedidoBean extends ControllerBase {
         itemSelected.setQtd((short) 1);
         itemSelected.setValor(p.getValor());
 
-        int id = getItems().indexOf(itemSelected);
+        if (pedido.getItens() == null) {
+            pedido.setItens(new ArrayList<PedidoProduto>());
+        }
 
-        if (id != -1) {
-            itemSelected.setQtd((short) (itemSelected.getQtd() + getItems().get(id).getQtd()));
+        boolean achou = false;
+        for (PedidoProduto it : pedido.getItens()) {
+            if (it.getProduto().getId() == p.getId()) {
+
+                if (p.getQtdEstoque() >= 0 && p.getQtdEstoque() < (it.getQtd() + 1)) {
+                    throw new Exception("Produto não possui estoque");
+                }
+
+                it.setQtd((short) (it.getQtd() + 1));
+                achou = true;
+                break;
+
+            }
+        }
+
+        if (!achou) {
             if (p.getQtdEstoque() != -1 && p.getQtdEstoque() < itemSelected.getQtd()) {
                 throw new Exception("Produto não possui estoque");
             }
-            getItems().remove(itemSelected);
+
+            pedido.getItens().add(itemSelected);
+
         }
-
-        if (p.getQtdEstoque() != -1 && p.getQtdEstoque() < itemSelected.getQtd()) {
-            throw new Exception("Produto não possui estoque");
-        }
-
-
-        getItems().add(itemSelected);
 
         itemSelected = new PedidoProduto();
     }
@@ -141,22 +153,11 @@ public class PedidoBean extends ControllerBase {
         this.getItemSelected().setProduto(produto);
     }
 
-    public List<PedidoProduto> getItems() {
-        if (items == null) {
-            items = new ArrayList<PedidoProduto>();
-        }
-        return items;
-    }
-
-    public void setItems(List<PedidoProduto> items) {
-        this.items = items;
-    }
-
     public BigDecimal getValorTotalPedido() {
 
         BigDecimal valor = BigDecimal.ZERO;
 
-        for (PedidoProduto p : getItems()) {
+        for (PedidoProduto p : pedido.getItens()) {
 
             valor = valor.add(p.getValorTotal());
         }
@@ -196,7 +197,7 @@ public class PedidoBean extends ControllerBase {
 
     public void novoPag() {
 
-        for (PedidoProduto p : items) {
+        for (PedidoProduto p : pedido.getItens()) {
             if (p.getValorTotal().compareTo(new BigDecimal(0.01)) < 0) {
                 addErrorMessage("O produto " + p.getProduto().getDescricaoGeral() + " está com valor zero!");
                 return;
@@ -234,19 +235,19 @@ public class PedidoBean extends ControllerBase {
     /**
      * Atualiza o valor da parcela
      */
-    private void updateValParcela(){
+    private void updateValParcela() {
         if (numParcelas != null && numParcelas > 0) {
 
             Coeficiente coeficiente = new CoeficienteJpaController(ControllerBase.getEmf()).findCoeficiente(new CoeficientePK(getTabela().getId(), numParcelas.shortValue()));
 
             getPagamento().setValorParcela(pagamento.getValor().multiply(new BigDecimal(coeficiente.getCoeficiente())).setScale(2, RoundingMode.DOWN));
 
-        }else{
+        } else {
             getPagamento().setValorParcela(null);
         }
 
     }
-    
+
     public void numParcelasChanged() {
         updateValParcela();
     }
@@ -406,7 +407,7 @@ public class PedidoBean extends ControllerBase {
     }
 
     public TipoPagto getTipo() {
-        if(tipo == null){
+        if (tipo == null) {
             tipo = new TipoPagto();
         }
         return tipo;
@@ -476,7 +477,7 @@ public class PedidoBean extends ControllerBase {
     public void tipoChanged() {
 
         tabelaFinancList = new ArrayList<TabelaFinanc>();
-        
+
         Short tipoPagtoSelected = getTipo().getId();
 
         if (tipoPagtoSelected > 0) {
@@ -568,13 +569,17 @@ public class PedidoBean extends ControllerBase {
         }
 
     }
+    
+    private void addLog(String str){
+        System.out.println(str);
+    }
 
     /**
      * Torna o pedido persistente no banco de dados
      */
     public void gravaPedido() {
 
-        if (items.isEmpty()) {
+        if (pedido.getItens().isEmpty()) {
             addErrorMessage("O pedido não possui produtos!");
             return;
         }
@@ -593,10 +598,7 @@ public class PedidoBean extends ControllerBase {
 
 
 
-
-
-
-
+        List<PedidoProduto> itensCopy = new ArrayList<PedidoProduto>();
 
 
         PedidoJpaController pedidoService = new PedidoJpaController();
@@ -607,12 +609,18 @@ public class PedidoBean extends ControllerBase {
             em = pedidoService.getEntityManager();
             em.getTransaction().begin();
 
-
+            addLog("Instancia EM ok");
 
             pedido.setValorTotal(getValorTotalPedido());
             pedido.setData(Calendar.getInstance().getTime());
 
+            itensCopy.addAll(pedido.getItens());
+            pedido.setItens(null);
+
+
             pedido.setUsuario(user);
+            
+            addLog("Usuario adicionado");
 
             Cliente cliente = pedido.getCliente();
             if (cliente != null) {
@@ -620,8 +628,12 @@ public class PedidoBean extends ControllerBase {
                 pedido.setCliente(cliente);
             }
 
+            addLog("Cliente adicionado");
+            
             em.persist(pedido);
             em.flush();
+            
+            addLog("Pedido persistido");
 
             pedido = em.getReference(pedido.getClass(), pedido.getId());
 
@@ -630,13 +642,13 @@ public class PedidoBean extends ControllerBase {
             /**
              * Grava os ítens do pedido
              */
-            for (PedidoProduto it : items) {
+            for (PedidoProduto it : itensCopy) {
 
                 if (it.getValorTotal() == BigDecimal.ZERO) {
                     throw new Exception("O pedido não pode conter ítem com valor zero.");
                 }
 
-//                it.setPedido(pedido);
+                it.setPedido(pedido);
 
                 Produto produto = it.getProduto();
                 if (produto != null) {
@@ -662,8 +674,6 @@ public class PedidoBean extends ControllerBase {
                 it.setPedidoProdutoPK(pk);
 
                 em.persist(it);
-                pedido.getItens().add(it);
-                em.persist(pedido);
 
             }
 
@@ -679,10 +689,10 @@ public class PedidoBean extends ControllerBase {
                     pag.setTipoPagto(tipoPagto);
                 }
 
-                TabelaFinanc tabela = pag.getTabelaFinanc();
-                if (tabela != null) {
-                    tabela = em.getReference(tabela.getClass(), tabela.getId());
-                    pag.setTabelaFinanc(tabela);
+                TabelaFinanc tab = pag.getTabelaFinanc();
+                if (tab != null) {
+                    tab = em.getReference(tab.getClass(), tab.getId());
+                    pag.setTabelaFinanc(tab);
                 }
 
                 pag.setMultaPercent(pag.getTabelaFinanc().getMultaPercent());
@@ -773,13 +783,12 @@ public class PedidoBean extends ControllerBase {
 //            addMessage("Pedido Gravado com sucesso com num.: " + pedido.getId());
 
             pedido = new Pedido();
-            items = null;
             pagamentos = null;
 
             FacesContext.getCurrentInstance().getExternalContext().redirect(red);
 
         } catch (Exception ex) {
-            
+
             ex.printStackTrace();
 
             addErrorMessage(ex.getMessage());
@@ -793,6 +802,8 @@ public class PedidoBean extends ControllerBase {
                 em.close();
             }
         }
+
+        pedido.setItens(itensCopy);
 
     }
 }

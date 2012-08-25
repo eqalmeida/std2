@@ -28,7 +28,7 @@
         <p:growl autoUpdate="true" id="message"/>
 
 
-        <p:panel header="Atenção" rendered="#{pedidoMB.items.size() == 0 or pedidoMB.pedido.cliente.id == null}">
+        <p:panel header="Atenção" rendered="#{pedidoMB.pedido.itens.size() == 0 or pedidoMB.pedido.cliente.id == null}">
             Este pedido está incompleto. Você deve selecionar um cliente no Cadastro de Clientes 
             e ao menos um produto no Cadastro de Produtos.
         </p:panel>
@@ -76,15 +76,15 @@
                         <f:convertNumber pattern="#,##0.00" />
                     </p:inputText>
 
-                    <h:outputText value="Desconto:"/>
-                    <p:inputText value="#{pedidoMB.itemSelected.desconto}" label="Desconto">
+                    <h:outputText value="Desconto:" rendered="#{loginMB.usuario.admin}"/>
+                    <p:inputText value="#{pedidoMB.itemSelected.desconto}" label="Desconto" rendered="#{loginMB.usuario.admin}">
 
                     </p:inputText>
 
                 </p:panelGrid>
 
                 <f:facet name="footer">
-                    <p:commandButton value="Gravar" actionListener="#{pedidoMB.gravarItem}" update=":form:itemsTable, frm2"/>
+                    <p:commandButton value="Gravar" update=":form:itemsTable, frm2" actionListener="#{pedidoMB.gravaItem()}"/>
                     <p:commandButton value="Cancela" oncomplete="itForm.hide()" immediate="true"/>
                 </f:facet>
 
@@ -97,15 +97,15 @@
 
             <p:contextMenu for="itemsTable">  
                 <p:menuitem value="Editar" update=":formItem" icon="ui-icon-pencil" oncomplete="itForm.show()"/>  
-                <p:menuitem value="Excluir" actionListener="#{pedidoMB.excluirPag}" update=":form" icon="ui-icon-trash"/>  
+                <p:menuitem value="Excluir" actionListener="#{pedidoMB.excluirItem()}" update=":form" icon="ui-icon-trash"/>  
             </p:contextMenu>  
 
-            <p:dataTable value="#{pedidoMB.items}" var="it" 
+            <p:dataTable value="#{pedidoMB.pedido.itens}" var="it" 
                          id="itemsTable"
                          selection="#{pedidoMB.itemSelected}"
                          selectionMode="single"
                          rowKey="#{it.pedidoProdutoPK}"
-                         rendered="#{pedidoMB.items.size() > 0}">
+                         rendered="#{pedidoMB.pedido.itens.size() gt 0}">
 
                 <f:facet name="header">Ítens do Pedido</f:facet>
 
@@ -162,7 +162,7 @@
                          var="it" id="pagTable"  rowKey="#{it.id}"
                          selectionMode="single"
                          selection="#{pedidoMB.pagamento}"
-                         rendered="#{pedidoMB.items.size() > 0}">
+                         rendered="#{not empty pedidoMB.pedido.itens}">
 
                 <f:facet name="header">Pagamento</f:facet>
 

@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import model.Boleto;
 
+
 /**
  *
  * @author eqalmeida
@@ -23,9 +24,10 @@ public class PagtoService implements IPagtoService {
     public BigDecimal regPagto(BigDecimal valorRecebido, Date dataInf) {
 
     
-        BigDecimal valorAtualComTaxas = boleto.getValorAtualComTaxas(dataInf);
+        BigDecimal valorAtualComTaxas = boleto.getValorAtualComTaxas(dataInf, desconto);
         BigDecimal sobra;
         BigDecimal valParcela;
+        
 
         /*
          * Calcula o valor de sobra
@@ -46,11 +48,8 @@ public class PagtoService implements IPagtoService {
         }
 
         // Calcula Juros
-        BigDecimal jurosAtual = boleto.getJuros(dataInf);
+        BigDecimal jurosAtual = boleto.getJuros(dataInf, desconto);
         
-        // Subtrai desconto
-        jurosAtual = valComDesconto(jurosAtual, this.desconto);
-
         boleto.setJuros(temp.add(jurosAtual));
 
         temp = boleto.getMulta();
@@ -59,10 +58,7 @@ public class PagtoService implements IPagtoService {
             temp = BigDecimal.ZERO;
         }
 
-        BigDecimal multaAtual = boleto.getMulta(dataInf);
-
-        // Subtrai desconto
-        multaAtual = valComDesconto(multaAtual, this.desconto);
+        BigDecimal multaAtual = boleto.getMulta(dataInf, desconto);
 
         boleto.setMulta(temp.add(multaAtual));
 
@@ -113,22 +109,5 @@ public class PagtoService implements IPagtoService {
     @Override
     public void setDesconto(double desconto) {
         this.desconto = desconto;
-    }
-    
-    /**
-     * Calcula o valor com desconto
-     * @param val
-     * @param desc
-     * @return 
-     */
-    private BigDecimal valComDesconto(BigDecimal val, double desc){
-        
-        if(desc == 0.0){
-            return val;
-        }
-        
-        BigDecimal descVal = val.multiply(new BigDecimal(desc)).divide(new BigDecimal(100)); 
-        
-        return(val.subtract(descVal));
     }
 }

@@ -24,6 +24,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import util.Util;
 
 /**
  *
@@ -281,15 +282,29 @@ public class Boleto implements Serializable {
      * @param dataInf Data informada
      * @return Valor
      */
-    public BigDecimal getValorAtualComTaxas(Date dataInf){
+    public BigDecimal getValorAtualComTaxas(Date dataInf, double desconto){
         
-        BigDecimal jurosAtual = getJuros(dataInf);
-        BigDecimal multaAtual = getMulta(dataInf);
+        BigDecimal jurosAtual = getJuros(dataInf, desconto);
+        BigDecimal multaAtual = getMulta(dataInf, desconto);
         
         return(getValorAtual().add(jurosAtual).add(multaAtual));
     }
+    
+    public BigDecimal getValorDevido(){
+        if(this.status == CANCELADO || this.status == PAGO){
+            return BigDecimal.ZERO;
+        }
+        else if(this.status == ATIVO){
+            return this.valor;
+        }
+        else if(this.status == PAGO_PARCIAL){
+            return this.valorFaltante;
+        }else{
+            return this.valor;
+        }
+    }
 
-    public BigDecimal getValorDevido(Date data) {
+    public BigDecimal getValorDevido(Date data, double desconto) {
 
         BigDecimal val = BigDecimal.ZERO;
 
@@ -299,12 +314,12 @@ public class Boleto implements Serializable {
             val = getValorFaltante();
         }
 
-        val = val.add(getJuros(data)).add(getMulta(data));
+        val = val.add(getJuros(data, desconto)).add(getMulta(data, desconto));
 
         return val;
     }
 
-    public BigDecimal getJuros(Date data) {
+    public BigDecimal getJuros(Date data, double desconto) {
         
         Double j = this.getPedidoPag().getJurosDiario();
         
@@ -322,6 +337,7 @@ public class Boleto implements Serializable {
 
             if (atraso > 0) {
                 BigDecimal temp = getValor().multiply(new BigDecimal(atraso)).multiply(new BigDecimal(j)).divide(new BigDecimal(100.0)).setScale(2, RoundingMode.DOWN);
+                temp = Util.valComDesconto(temp, desconto);
                 return (temp);
 
             } else {
@@ -343,6 +359,7 @@ public class Boleto implements Serializable {
 
             if (atraso > 0) {
                 BigDecimal temp = getValorFaltante().multiply(new BigDecimal(atraso)).multiply(new BigDecimal(j)).divide(new BigDecimal(100.0)).setScale(2, RoundingMode.DOWN);
+                temp = Util.valComDesconto(temp, desconto);
                 return (temp);
             } else {
                 return (BigDecimal.ZERO);
@@ -351,7 +368,7 @@ public class Boleto implements Serializable {
         return (BigDecimal.ZERO);
     }
 
-    public BigDecimal getMulta(Date data) {
+    public BigDecimal getMulta(Date data, double desconto) {
         
         Double m = this.getPedidoPag().getMultaPercent();
         BigDecimal mVal = this.getPedidoPag().getMultaVal();
@@ -379,6 +396,7 @@ public class Boleto implements Serializable {
             if (atraso > 0) {
                 BigDecimal temp = getValor().multiply(new BigDecimal(m)).divide(new BigDecimal(100)).setScale(2, RoundingMode.DOWN);
                 temp = temp.add(mVal);
+                temp = Util.valComDesconto(temp, desconto);
                 return (temp);
 
             } else {

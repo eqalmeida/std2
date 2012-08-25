@@ -4,6 +4,7 @@
  */
 package util;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,4 +49,23 @@ public class Util {
         long d = (c.getTimeInMillis() / (24 * 60 * 60 * 1000));
         return d;
     }
+    
+    
+    /**
+     * Calcula o valor com desconto
+     * @param val
+     * @param desc
+     * @return 
+     */
+    public static BigDecimal valComDesconto(BigDecimal val, double desc){
+        
+        if(desc == 0.0){
+            return val;
+        }
+        
+        BigDecimal descVal = val.multiply(new BigDecimal(desc)).divide(new BigDecimal(100)); 
+        
+        return(val.subtract(descVal));
+    }
+    
 }

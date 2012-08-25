@@ -226,7 +226,7 @@ public class PedidoPag implements Serializable {
         BigDecimal valorDevido = BigDecimal.ZERO;
         for(Boleto b : this.getParcelas()){
             if(b.isAtrasado(d)){
-                valorDevido = valorDevido.add( b.getValorAtualComTaxas(d) );
+                valorDevido = valorDevido.add( b.getValorAtualComTaxas(d, 0.0) );
             }
         }
         return(valorDevido);
@@ -235,8 +235,8 @@ public class PedidoPag implements Serializable {
     public BigDecimal getTaxasAtual(Date d){
         BigDecimal val = BigDecimal.ZERO;
         for(Boleto b : this.getParcelas()){
-            val = val.add(b.getJuros(d));
-            val = val.add(b.getMulta(d));
+            val = val.add(b.getJuros(d, 0.0));
+            val = val.add(b.getMulta(d, 0.0));
         }
         return(val);
     }
