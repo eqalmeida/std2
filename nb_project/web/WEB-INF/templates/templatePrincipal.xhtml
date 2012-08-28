@@ -13,11 +13,11 @@
 
         <script type="text/javascript">
             $(document).ajaxSuccess(function(){
-                $(".valor").maskMoney({symbol:"",  decimal:",", thousands:"."});
+                $(".valor").maskMoney({symbol:"",allowZero:true,  decimal:",", thousands:"."});
             })
             
             $(document).ready(function() {
-                $(".valor").maskMoney({symbol:"",  decimal:",", thousands:"."});
+                $(".valor").maskMoney({symbol:"",allowZero:true,  decimal:",", thousands:"."});
             })    
         </script>
 

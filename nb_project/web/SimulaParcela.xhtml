@@ -29,9 +29,9 @@
 
         <h:form>
 
-            <p:panelGrid columns="2">
+            <p:panelGrid columns="2" id="fsim">
                 <f:facet name="header">Simulação de Parcelamento</f:facet>
-                
+
                 <h:outputText value="Selecione um veículo"/>
                 <p:selectOneMenu value="#{simulaMB.produtoId}" required="true" label="Veículo">
                     <f:selectItem itemValue="" itemLabel="" />
@@ -39,14 +39,16 @@
                                    var="it"
                                    itemValue="#{it.id}"
                                    itemLabel="#{it.descricaoGeral}" />
-                    
+
                     <p:ajax listener="#{simulaMB.veiculoChanged()}" update="txValorVeiculo" /> 
 
                 </p:selectOneMenu>
-                
+
                 <h:outputText value="Valor Veículo"/>
-                <p:inputText id="txValorVeiculo" value="#{simulaMB.valorVeiculo}" required="true" label="Valor Veículo"/>
-                
+                <p:inputText id="txValorVeiculo" value="#{simulaMB.valorVeiculo}" required="true" label="Valor Veículo" styleClass="valor">
+                    <f:convertNumber  pattern="#,##0.00" />
+                </p:inputText>
+
                 <h:outputText value="Selecione a Forma de Pgto"/>
                 <p:selectOneMenu value="#{simulaMB.tipoId}" required="true" label="Forma Pagto">
                     <f:selectItem itemValue="" itemLabel="" />
@@ -54,11 +56,11 @@
                                    var="it"
                                    itemValue="#{it.id}"
                                    itemLabel="#{it.descricao}" />
-                    
+
                     <p:ajax update="tabListId" />
 
                 </p:selectOneMenu>
-                
+
                 <h:outputText value="Selecione uma tabela"/>
                 <p:selectOneMenu id="tabListId" value="#{simulaMB.tabelaId}" required="true" label="Tabela">
                     <f:selectItem itemValue="" itemLabel="" />
@@ -70,33 +72,102 @@
                 </p:selectOneMenu>
 
                 <h:outputText value="Valor Entrada"/>
-                <p:inputText value="#{simulaMB.valorEntrada}" required="true" label="Valor Entrada"/>
-                
+                <p:inputText value="#{simulaMB.valorEntrada}" required="true" label="Valor Entrada" styleClass="valor">
+                    <f:convertNumber  pattern="#,##0.00" />
+                </p:inputText>
+
                 <h:outputText value="Valor TAC"/>
-                <p:inputText value="#{simulaMB.valorTac}" required="true" label="Valor TAC"/>
-                
+                <p:inputText value="#{simulaMB.valorTac}" required="true" label="Valor TAC" styleClass="valor">
+                    <f:convertNumber  pattern="#,##0.00" />
+                </p:inputText>
+
                 <f:facet name="footer">
-                    <p:commandButton value="Calcular" update="@parent, :fresult" actionListener="#{simulaMB.gerar()}"/>
+                    <p:commandButton value="Calcular" icon="ui-icon-check" update="fsim :fresult" actionListener="#{simulaMB.gerar()}"/>
+                    <p:commandButton value="Imprimir" icon="ui-icon-print" ajax="false" rendered="#{simulaMB.mostrar}">
+                        <p:printer target=":fresult:presult"/>
+                    </p:commandButton>
+
                 </f:facet>
-                
+
             </p:panelGrid>
         </h:form>
-        
+
+        <br/>
+
         <h:form id="fresult">
-            
-            <br/>
-            
-            <h:panelGrid columns="3" rendered="#{simulaMB.mostrar}" styleClass="prn">
-                
-                <f:facet name="header">Parcelas</f:facet>
 
-                <c:forEach items="#{simulaMB.parcelas}" var="it" varStatus="rep">
-                    <h:outputText value="#{it}"/>
-                </c:forEach>
+            <p:panel id="presult"  rendered="#{simulaMB.mostrar}">
 
-            </h:panelGrid>
-            
+                <table width="100%">
+                    <tr valign="bottom">
+                        <td><h:graphicImage value="/resources/img/logo_rogerinho_pq.jpeg"/></td>
+                        <td valign="bottom">
+                            <h2 class="prn">Simulação de Financiamento</h2>
+                            <h:outputText value="#{simulaMB.data}" >
+                                <f:convertDateTime dateStyle="full"/>
+                            </h:outputText>
+                        </td>
+                    </tr>
+                </table>
+                <hr class="prn" />
+
+                <table>
+                    <tr valign="top">
+                        <td valign="top">
+                            <h:panelGrid columns="2" styleClass="prn" columnClasses="label, field,label, field">
+                                <h:outputText value="Veículo:" />
+                                <h:outputText value="#{simulaMB.veiculo.descricaoGeral}" />
+
+                                <h:outputText value="Valor:" />
+                                <h:outputText value="#{simulaMB.valorVeiculo}" >
+                                    <f:convertNumber type="currency" />
+                                </h:outputText>
+
+                                <h:outputText value="T.A.C.:" />
+                                <h:outputText value="#{simulaMB.valorTac}" >
+                                    <f:convertNumber type="currency" />
+                                </h:outputText>
+
+                                <h:outputText value="Entrada:" />
+                                <h:outputText value="#{simulaMB.valorEntrada}" >
+                                    <f:convertNumber type="currency" />
+                                </h:outputText>
+
+                                <h:outputText value="Tipo de finaciamento:" />
+                                <h:outputText value="#{simulaMB.tipoPagto}" />
+
+                            </h:panelGrid>
+
+                        </td>
+                        
+                        <td width="10"></td>
+
+                        <td valign="top">
+                            <h:panelGrid columns="2" styleClass="prn">
+
+                                <f:facet name="header">Planos</f:facet>
+
+                                <c:forEach items="#{simulaMB.parcelas}" var="it" varStatus="rep">
+                                    <h:outputText value="#{it}"/>
+                                </c:forEach>
+
+                            </h:panelGrid>
+
+                        </td>
+                    </tr>
+                </table>
+
+                <hr class="prn" />
+
+                <h:outputText value="#{configMB.config.empresaNome}"/><br/>
+                <h:outputText value="#{configMB.config.empresaEndereco}"/><br/>
+                <h:outputText value="#{configMB.config.empresaTelefones}"/> - <h:outputText value="#{configMB.config.empresaEmail}"/> -  <h:outputText value="#{configMB.config.empresaHomepage}"/>  
+
+            </p:panel>
+
         </h:form>
+
+        <br/>
 
     </ui:define>
 

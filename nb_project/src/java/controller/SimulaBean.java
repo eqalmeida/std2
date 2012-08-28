@@ -1,10 +1,12 @@
 package controller;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Currency;
+import java.util.Date;
 import java.util.Formatter;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -25,7 +27,7 @@ import util.Util;
  */
 @ManagedBean(name = "simulaMB")
 @ViewScoped
-public class SimulaBean extends ControllerBase {
+public class SimulaBean extends ControllerBase implements Serializable{
 
     private List<Produto> produtos;
     private List<TipoPagto> tipoPagtos;
@@ -114,7 +116,6 @@ public class SimulaBean extends ControllerBase {
      */
     public void gerar() {
         TabelaFinanc tabela;
-        TipoPagto tipoPagto;
 
         mostrar = false;
 
@@ -135,7 +136,7 @@ public class SimulaBean extends ControllerBase {
             return;
         }
 
-        BigDecimal valorTotal = veiculo.getValor().add(valorTac).subtract(valorEntrada);
+        BigDecimal valorTotal = valorVeiculo.add(valorTac).subtract(valorEntrada);
 
         List<Coeficiente> coeficientes = new CoeficienteJpaController(getEmf()).findCoeficienteEntities(tabelaId);
 
@@ -183,5 +184,11 @@ public class SimulaBean extends ControllerBase {
         this.valorVeiculo = valorVeiculo;
     }
 
-    
+    public TipoPagto getTipoPagto() {
+        return tipoPagto;
+    }
+
+    public Date getData(){
+        return new Date();
+    }
 }
