@@ -19,7 +19,9 @@ import javax.persistence.criteria.Root;
 import model.Boleto;
 import model.Pedido;
 import model.PedidoPag;
+import model.PedidoProduto;
 import model.PedidoStatus;
+import model.Produto;
 import model.Usuario;
 import org.primefaces.model.SortOrder;
 import repo.exceptions.NonexistentEntityException;
@@ -126,6 +128,8 @@ public class PedidoJpaController implements Serializable {
             em.getTransaction().begin();
             //try {
             pedido = em.find(Pedido.class, pedido.getId());
+            
+            short statusAnt = pedido.getStatus();
 
             pedido.setStatus(status);
             em.merge(pedido);
@@ -145,6 +149,41 @@ public class PedidoJpaController implements Serializable {
                         }
 
                         em.merge(b);
+                    }
+                }
+            }
+            
+            //
+            // Tratamento de estoque
+            //
+            if(status == Boleto.CANCELADO && statusAnt == Boleto.ATIVO){
+                for(PedidoProduto p : pedido.getItens()){
+                    
+                    Produto pr = em.find(Produto.class, p.getProduto().getId());
+                    
+                    Integer qtd = pr.getQtdEstoque();
+                    if(qtd >= 0){
+                        
+                        pr.setQtdEstoque(qtd+1);
+                        em.merge(pr);
+                    }
+                }
+            }
+
+            else if(statusAnt == Boleto.CANCELADO && status == Boleto.ATIVO){
+                for(PedidoProduto p : pedido.getItens()){
+                    
+                    Produto pr = em.find(Produto.class, p.getProduto().getId());
+                    
+                    Integer qtd = pr.getQtdEstoque();
+                    
+                    if(qtd == 0){
+                        throw new IllegalAccessException("O produto "+pr.getDescricaoGeral()+" está sem estoque!");
+                    }
+                    else if(qtd > 0 ){
+                        
+                        pr.setQtdEstoque(qtd-1);
+                        em.merge(pr);
                     }
                 }
             }

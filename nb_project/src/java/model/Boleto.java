@@ -241,6 +241,10 @@ public class Boleto implements Serializable {
     private long getDias(Date data) {
         Calendar c = Calendar.getInstance();
         c.setTime(data);
+        c.set(Calendar.HOUR, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
         long d = (c.getTimeInMillis() / (24 * 60 * 60 * 1000));
         return d;
     }
@@ -359,15 +363,23 @@ public class Boleto implements Serializable {
             }
         } else if (status == PAGO_PARCIAL) {
 
-            long diasVencimento = getDias(dataPag);
+            long diasUltPag = getDias(dataPag);
             long diasVencimentoPrincipal = getDias(vencimento);
+            
+            if(diasVencimentoPrincipal >= diasDataPag){
+                return BigDecimal.ZERO;
+            }
+
+            if(diasUltPag >= diasDataPag){
+                return BigDecimal.ZERO;
+            }
 
             long atraso;
 
-            if (diasVencimentoPrincipal > diasVencimento) {
+            if (diasVencimentoPrincipal > diasUltPag) {
                 atraso = diasDataPag - diasVencimentoPrincipal;
             } else {
-                atraso = diasDataPag - diasVencimento;
+                atraso = diasDataPag - diasUltPag;
             }
 
 

@@ -51,70 +51,74 @@
             <h:form>
                 <p:menubar>
 
-                        <p:submenu label="Cadastros" icon="ui-icon-note">  
-                            <p:menuitem value="Clientes" action="ManterCliente" icon="ui-icon-disk" ajax="false"/>  
-                            <p:menuitem value="Produtos" action="ManterProduto" icon="ui-icon-disk" ajax="false"/>  
-                            <p:menuitem value="Novo Pedido" action="ManterPedido" icon="ui-icon-disk" ajax="false"/>  
-                        </p:submenu>  
+                    <p:submenu label="Cadastros" icon="ui-icon-note">  
+                        <p:menuitem value="Clientes" action="ManterCliente" icon="ui-icon-disk" ajax="false"/>  
+                        <p:menuitem value="Produtos" action="ManterProduto" icon="ui-icon-disk" ajax="false"/>  
+                        <p:menuitem value="Novo Pedido" action="ManterPedido" icon="ui-icon-disk" ajax="false"/>  
+                        <p:menuitem value="Tab. Financ." action="ManterTabelaFinanc" ajax="false"  disabled="#{not loginMB.usuario.admin}"/>  
+                        <p:menuitem value="Tipo Pagamento" action="ManterTipoPagto" ajax="false" disabled="#{not loginMB.usuario.admin}"/>  
+                    </p:submenu>  
 
-                        <p:submenu label="Configurações" icon="ui-icon-wrench" rendered="#{loginMB.usuario.admin eq true}">  
-                            <p:menuitem value="Tab. Financ." action="ManterTabelaFinanc" ajax="false"/>  
-                            <p:menuitem value="Tipo Pagamento" action="ManterTipoPagto" ajax="false"/>  
-                            <p:menuitem value="Usuários" action="ManterUsuario" ajax="false"/>  
-                            <p:menuitem value="Gerais" action="ManterConfig" ajax="false"/>  
-                        </p:submenu>  
-                        <p:submenu label="Consultas" icon="ui-icon-document">
-                            <p:menuitem value="Pedidos" action="ShowPedido" icon="ui-icon-disk" update=":corpoId" ajax="false"/>  
-                            <p:menuitem value="Boletos" action="ManterBoleto" icon="ui-icon-disk" update=":corpoId" ajax="false"/>  
-                        </p:submenu>
-                        <p:submenu label="Relatórios" icon="ui-icon-document">
-                            <p:menuitem value="Carta Autorização" action="PrintAutorizacao" icon="ui-icon-disk" update=":corpoId" ajax="false"/>  
-                        </p:submenu>
+                    <p:submenu label="Configurações" icon="ui-icon-wrench">  
+                        <p:menuitem value="Usuários" action="ManterUsuario" ajax="false" disabled="#{not loginMB.usuario.admin}"/>  
+                        <p:menuitem value="Gerais" action="ManterConfig" ajax="false" disabled="#{not loginMB.usuario.admin}"/>  
+                    </p:submenu>  
 
-                    </p:menubar>
+                    <p:submenu label="Consultas" icon="ui-icon-document">
+                        <p:menuitem value="Pedidos" action="ShowPedido" icon="ui-icon-disk" update=":corpoId" ajax="false"/>  
+                        <p:menuitem disabled="#{not loginMB.usuario.admin}" value="Boletos" action="ManterBoleto" icon="ui-icon-disk" update=":corpoId" ajax="false"/>  
+                    </p:submenu>
+                    
+                    <p:submenu label="Relatórios" icon="ui-icon-document">
+                        <p:menuitem value="Carta Autorização" action="PrintAutorizacao" icon="ui-icon-disk" update=":corpoId" ajax="false"/>  
+                    </p:submenu>
+                    
+                    <p:menuitem value="Simulação" action="SimulaParcela" ajax="false"/>
+
+                </p:menubar>
             </h:form>
         </div>
         <div id="corpo">
-        <h:panelGroup id="corpoId">
-            <table cellpadding="5" cellspacing="0" width="100%">
-                <tr>
-                    <td style="vertical-align: top">
-                        <ui:insert name="left">Left</ui:insert>
-                    </td>
-                    <td style="vertical-align: top; width: 100%">
-                        <h:panelGroup rendered="#{not(loginMB.usuario eq null)}">
-                            <ui:insert name="content">Content</ui:insert>    
-                        </h:panelGroup>
-
-                        <h:form id="loginForm">
-
-                            <h:panelGroup>
-                                <p:dialog widgetVar="loginDialog" closable="false" modal="true" visible="#{loginMB.usuario eq null?'true':'false'}" resizable="false" header="Login de Usuário">
-                                    <p:panelGrid columns="2">
-                                        <h:outputText value="Login:" />
-                                        <p:inputText value="#{loginMB.login}" required="true" label="Login"/>
-
-
-                                        <h:outputText value="Senha:" />
-                                        <p:password value="#{loginMB.senha}" required="true" label="Senha"/>
-                                        <f:facet name="footer">
-                                            <p:commandButton value="Efetuar Login" actionListener="#{loginMB.login}" update=":loginForm, :menuBarForm" ajax="false"/>
-                                        </f:facet>
-                                    </p:panelGrid>
-
-                                </p:dialog>
-
+            <h:panelGroup id="corpoId">
+                <table cellpadding="5" cellspacing="0" width="100%">
+                    <tr>
+                        <td style="vertical-align: top">
+                            <ui:insert name="left">Left</ui:insert>
+                        </td>
+                        <td style="vertical-align: top; width: 100%">
+                            <h:panelGroup rendered="#{not(loginMB.usuario eq null)}">
+                                <ui:insert name="content">Content</ui:insert>    
                             </h:panelGroup>
 
-                        </h:form>
+                            <h:form id="loginForm">
+
+                                <h:panelGroup>
+                                    <p:dialog widgetVar="loginDialog" closable="false" modal="true" visible="#{loginMB.usuario eq null?'true':'false'}" resizable="false" header="Login de Usuário">
+                                        <p:panelGrid columns="2">
+                                            <h:outputText value="Login:" />
+                                            <p:inputText value="#{loginMB.login}" required="true" label="Login"/>
+
+
+                                            <h:outputText value="Senha:" />
+                                            <p:password value="#{loginMB.senha}" required="true" label="Senha"/>
+                                            <f:facet name="footer">
+                                                <p:commandButton value="Efetuar Login" actionListener="#{loginMB.login}" update=":loginForm, :menuBarForm" ajax="false"/>
+                                            </f:facet>
+                                        </p:panelGrid>
+
+                                    </p:dialog>
+
+                                </h:panelGroup>
+
+                            </h:form>
 
 
 
 
-                    </td>
-                </tr>
-            </table>
-        </h:panelGroup>
+                        </td>
+                    </tr>
+                </table>
+            </h:panelGroup>
         </div>
     </h:body>
 

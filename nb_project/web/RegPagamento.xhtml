@@ -55,10 +55,9 @@
                 </f:facet>
 
                 <h:outputText value="Data:"/>
-                <p:inputText value="#{pagMB.data}" label="Data" required="true"
-                             valueChangeListener="#{pagMB.dataChanged}">
+                <p:inputText value="#{pagMB.data}" label="Data" required="true">
                     <f:convertDateTime type="date"  timeZone="#{app.timeZone}"/>
-                    <p:ajax update="@form" />
+                    <p:ajax listener="#{pagMB.dataChanged()}" update="@form" />
                 </p:inputText>
 
                 <h:outputText value="Juros:"  />

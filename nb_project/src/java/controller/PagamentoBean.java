@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -16,6 +17,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 import model.Boleto;
 import model.PagtoRecebido;
+import model.Pedido;
 import model.PedidoPag;
 import model.Usuario;
 import org.primefaces.context.RequestContext;
@@ -99,14 +101,14 @@ public class PagamentoBean extends ControllerBase implements Serializable {
         this.pagId = pagId;
     }
 
-    public void dataChanged(ValueChangeEvent ev) {
-
-        data = (Date) ev.getNewValue();
-
+    public void dataChanged() {
         updateTotais(data);
-
     }
 
+    /**
+     * Atualiza os valores de Juros, Multa, etc
+     * @param d Data do Pagamento
+     */
     private void updateTotais(Date d) {
 
         totalJuros = BigDecimal.ZERO;
@@ -130,9 +132,11 @@ public class PagamentoBean extends ControllerBase implements Serializable {
         taxas = totalJuros.add(totalMulta);
         descontoVal = taxas.multiply(new BigDecimal(desconto)).divide(new BigDecimal(100)).setScale(2, RoundingMode.DOWN);
         valorDevido = taxas.add(totalParcela).subtract(descontoVal);
-
     }
 
+    /**
+     * Prepara para adicionar novo pagamento
+     */
     public void novoPagamento() {
 
         Usuario user = getUsuarioLogado();
@@ -143,7 +147,8 @@ public class PagamentoBean extends ControllerBase implements Serializable {
         }
 
 
-        data = new Date();
+        data = Calendar.getInstance().getTime();
+
         updateTotais(data);
         valorRecebido = null;
         desconto = 0.0;
@@ -230,10 +235,11 @@ public class PagamentoBean extends ControllerBase implements Serializable {
                     }
                 }
             }
-            
-            if(sobra.doubleValue() > 0.0){
+
+            if (sobra.doubleValue() > 0.0) {
                 throw new Exception("O valor informado é maior que o devido!");
             }
+
 
             PagtoRecebido pagamento = new PagtoRecebido();
             pagamento.setData(new Date());
@@ -254,6 +260,32 @@ public class PagamentoBean extends ControllerBase implements Serializable {
             em.merge(pedidoPag);
 
             em.getTransaction().commit();
+
+            Pedido pedido = em.getReference(Pedido.class, pedidoPag.getPedido().getId());
+
+            boolean quitado = true;
+
+            //
+            // Verifica se todas as parcelas estão pagas
+            //
+            for (PedidoPag pag : pedido.getPagamentos()) {
+                for (Boleto b : pag.getParcelas()) {
+                    if (b.getStatus() != Boleto.PAGO) {
+                        quitado = false;
+                        break;
+                    }
+                }
+            }
+
+            //
+            // Define o status do Pedido
+            //
+            if (quitado) {
+                em.getTransaction().begin();
+                pedido.setStatus(Boleto.PAGO);
+                em.merge(pedido);
+                em.getTransaction().commit();
+            }
 
             novoPagamento();
 
