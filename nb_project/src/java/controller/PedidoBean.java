@@ -458,20 +458,8 @@ public class PedidoBean extends ControllerBase implements Serializable {
         return valorParcela;
     }
 
-    public void valorChanged(ValueChangeEvent ev) {
-
-        if (ev.getNewValue() == null) {
-            return;
-        }
-
-        this.pagamento.setValor((BigDecimal) ev.getNewValue());
-
-        BigDecimal oldValue = (BigDecimal) ev.getOldValue();
-
-        // Se mudou o valor...
-        if (!(pagamento.getValor().equals(oldValue))) {
+    public void valorChanged() {
             populateParcelaList();
-        }
     }
 
     public void tipoChanged() {
@@ -559,8 +547,6 @@ public class PedidoBean extends ControllerBase implements Serializable {
     }
 
     public void tabelaChanged() {
-
-        System.out.println("Tabela ID:  " + getTabela().getId());
 
         if (getTabela().getId() > 0) {
             tabela = new TabelaFinancJpaController(ControllerBase.getEmf()).findTabelaFinanc(tabela.getId());
@@ -782,7 +768,7 @@ public class PedidoBean extends ControllerBase implements Serializable {
 
 //            addMessage("Pedido Gravado com sucesso com num.: " + pedido.getId());
 
-            pedido = new Pedido();
+            pedido = null;
             pagamentos = null;
 
             FacesContext.getCurrentInstance().getExternalContext().redirect(red);
@@ -805,5 +791,12 @@ public class PedidoBean extends ControllerBase implements Serializable {
 
         pedido.setItens(itensCopy);
 
+    }
+    
+    /**
+     * Cancela o Pedido Atual
+     */
+    public void cancelaPedido(){
+        this.pedido = new Pedido();
     }
 }

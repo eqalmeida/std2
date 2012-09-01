@@ -40,7 +40,7 @@
                                    itemValue="#{it.id}"
                                    itemLabel="#{it.descricaoGeral}" />
 
-                    <p:ajax listener="#{simulaMB.veiculoChanged()}" update="txValorVeiculo" /> 
+                    <p:ajax listener="#{simulaMB.veiculoChanged()}" update="@form" /> 
 
                 </p:selectOneMenu>
 
@@ -57,7 +57,7 @@
                                    itemValue="#{it.id}"
                                    itemLabel="#{it.descricao}" />
 
-                    <p:ajax update="tabListId" />
+                    <p:ajax update="@form" />
 
                 </p:selectOneMenu>
 

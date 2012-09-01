@@ -16,9 +16,10 @@
         <h:form id="fmenu">
             <p:menu>
                 <p:submenu label="Opções">
-                    <p:menuitem value="Adicionar Pagamento" actionListener="#{pedidoMB.novoPag}" update=":formPagDialog"/>
+                    <p:menuitem icon="ui-icon-document" value="Pagamento" actionListener="#{pedidoMB.novoPag}" update=":formPagDialog"/>
 
-                    <p:menuitem actionListener="#{pedidoMB.gravaPedido}" value="Gravar Pedido" update=":formPagDialog, :formItem, :form"/>
+                    <p:menuitem icon="ui-icon-disk" actionListener="#{pedidoMB.gravaPedido}" value="Gravar" update=":formPagDialog, :formItem, :form"/>
+                    <p:menuitem icon="ui-icon-trash" actionListener="#{pedidoMB.cancelaPedido()}" value="Cancelar" onclick="return confirm('Confirma o cancelamento?')" ajax="false"/>
                 </p:submenu>
             </p:menu>
         </h:form>
@@ -28,13 +29,13 @@
         <p:growl autoUpdate="true" id="message"/>
 
 
-        <p:panel header="Atenção" rendered="#{pedidoMB.pedido.itens.size() == 0 or pedidoMB.pedido.cliente.id == null}">
+        <p:panel header="Atenção" rendered="#{empty pedidoMB.pedido.itens or pedidoMB.pedido.cliente.id == null}" id="pedidoPanel1">
             Este pedido está incompleto. Você deve selecionar um cliente no Cadastro de Clientes 
             e ao menos um produto no Cadastro de Produtos.
         </p:panel>
 
 
-        <p:panelGrid columns="4" rendered="#{pedidoMB.pedido.cliente.id > 0}" style="width: 100%">
+        <p:panelGrid columns="4" rendered="#{pedidoMB.pedido.cliente.id > 0}" style="width: 100%" id="pedidoPanel2">
             <f:facet name="header">Dados do cliente</f:facet>
 
             <h:outputText value="Nome:"/>
@@ -210,10 +211,10 @@
                 <p:panelGrid columns="2" columnClasses="label,field,label,field" id="frm">
 
                     <h:outputText value="Valor"/>
-                    <p:inputText value="#{pedidoMB.pagamento.valor}" label="Valor" required="true" styleClass="valor" 
-                                 valueChangeListener="#{pedidoMB.valorChanged}" >
+                    <p:inputText value="#{pedidoMB.pagamento.valor}" label="Valor" required="true" >
                         <f:convertNumber  pattern="#,##0.00"/>
-                        <p:ajax update="frm" />
+                        <p:ajax event="keyup"/>
+                        <p:ajax update="frm" listener="#{pedidoMB.valorChanged}"/>
                     </p:inputText>
 
                     <h:outputText value="Forma de Pagto:"/>

@@ -22,7 +22,7 @@
 
                 <p:submenu label="Selecionado" >
                     <p:menuitem disabled="#{produtoBean.selected.id eq null}" value="Editar" update=":formNewCar" actionListener="#{produtoBean.editar}" icon="ui-icon-pencil"/>  
-                    <p:menuitem  disabled="#{produtoBean.selected.id eq null}" value="Excluir" update=":formTable" icon="ui-icon-trash" actionListener="#{produtoBean.excluir}" onstart="return confirm('Confirma?')"/>  
+                    <p:menuitem  disabled="#{produtoBean.selected.id eq null or not loginMB.usuario.admin}" value="Excluir" update=":formTable" icon="ui-icon-trash" actionListener="#{produtoBean.excluir}" onstart="return confirm('Confirma?')"/>  
                     <p:menuitem  disabled="#{produtoBean.selected.id eq null}" value="Adicionar ao Pedido" update=":formTable" icon="ui-icon-plus" actionListener="#{produtoBean.addToPedido}"/>
                 </p:submenu>
 
@@ -146,7 +146,9 @@
 
 
                     <h:outputText value="Estoque: (-1 para não controlar)" />
-                    <p:spinner min="-1" value="#{produtoBean.selected.qtdEstoque}" size="5"/>
+                    <p:spinner 
+                        disabled="#{(not loginMB.usuario.admin) and (produtoBean.selected.id gt 0)}"
+                        min="-1" value="#{produtoBean.selected.qtdEstoque}" size="5"/>
 
                 </p:panelGrid>
 
