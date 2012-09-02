@@ -152,14 +152,20 @@ public class ProdutoBean extends ControllerBase implements Serializable {
     public void exibir() {
     }
 
-    public void excluir() {
+    public void excluirProduto(int id) {
         if (!verificaLogin("")) {
             addErrorMessage("Falha de Login");
             return;
         }
+        
+        if(!getUsuarioLogado().isAdmin()){
+            addErrorMessage("Acesso negado");
+            return;
+        }
+            
 
         try {
-            ctl.destroy(this.selected.getId());
+            ctl.destroy(id);
             this.selected = new Produto();
         } catch (Exception ex) {
             addMessage("Não foi possível excluir!");
@@ -245,7 +251,7 @@ public class ProdutoBean extends ControllerBase implements Serializable {
         e.getNewValue();
     }
 
-    public void addToPedido() {
+    public void addToPedido(int id) {
 
         if (!verificaLogin("")) {
             addErrorMessage("Falha de Login");
@@ -259,7 +265,7 @@ public class ProdutoBean extends ControllerBase implements Serializable {
 
             PedidoBean pedidoMB = context.getApplication().evaluateExpressionGet(context, "#{pedidoMB}", PedidoBean.class);
 
-            selected = ctl.findProduto(selected.getId());
+            selected = ctl.findProduto(id);
 
             pedidoMB.addProduto(selected);
 
@@ -267,5 +273,15 @@ public class ProdutoBean extends ControllerBase implements Serializable {
         } catch (Exception ex) {
             addErrorMessage("Não foi possível adicionar!\n" + ex.getMessage());
         }
+    }
+    
+    public void editarProduto(int id){
+        if (!verificaLogin("")) {
+            addErrorMessage("Falha de Login");
+            return;
+        }
+
+            selected = ctl.findProduto(id);
+            RequestContext.getCurrentInstance().execute("dialogNewCar.show()");
     }
 }

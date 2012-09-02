@@ -238,7 +238,7 @@ public class Boleto implements Serializable {
      * Converte a Data em um número que representa os dias
      *
      */
-    private long getDias(Date data) {
+    private static long getDias(Date data) {
         Calendar c = Calendar.getInstance();
         c.setTime(data);
         c.set(Calendar.HOUR, 0);

@@ -13,20 +13,6 @@
 
     <ui:define name="left">
         <h:form id="fmenu">
-            <p:menu>  
-
-                <p:submenu icon="ui-icon-plus" label="Novo" >
-                    <p:menuitem value="Veículo" actionListener="#{produtoBean.novoProduto(1)}" update=":formNewCar"/>
-                    <p:menuitem value="Outro" actionListener="#{produtoBean.novoProduto(0)}" update=":formNewCar"/>
-                </p:submenu>
-
-                <p:submenu label="Selecionado" >
-                    <p:menuitem disabled="#{produtoBean.selected.id eq null}" value="Editar" update=":formNewCar" actionListener="#{produtoBean.editar}" icon="ui-icon-pencil"/>  
-                    <p:menuitem  disabled="#{produtoBean.selected.id eq null or not loginMB.usuario.admin}" value="Excluir" update=":formTable" icon="ui-icon-trash" actionListener="#{produtoBean.excluir}" onstart="return confirm('Confirma?')"/>  
-                    <p:menuitem  disabled="#{produtoBean.selected.id eq null}" value="Adicionar ao Pedido" update=":formTable" icon="ui-icon-plus" actionListener="#{produtoBean.addToPedido}"/>
-                </p:submenu>
-
-            </p:menu>
 
         </h:form>
     </ui:define>
@@ -35,26 +21,40 @@
         <p:growl autoUpdate="true" id="message"/>
 
         <h:form id="formTable">
-            <p:panelGrid columns="2" style="width:100%">
 
-                            <p:selectOneButton value="#{produtoBean.tipoProduto}">
-                                <f:selectItem itemValue="0" itemLabel="Outros" />
-                                <f:selectItem itemValue="1" itemLabel="Veículos" />
-                                <p:ajax update="tbl" listener="#{produtoBean.emEstoqueChanged}" />  
-                            </p:selectOneButton>
+            <table width="100%">
+                <tr>
+                    <td nowrap="nowrap">
+                        <p:selectOneButton value="#{produtoBean.tipoProduto}">
+                            <f:selectItem itemValue="0" itemLabel="Outros" />
+                            <f:selectItem itemValue="1" itemLabel="Veículos" />
+                            <p:ajax update="tbl, Nbts" listener="#{produtoBean.emEstoqueChanged}" />  
+                        </p:selectOneButton>
 
-                <h:panelGroup>
-                            
-                            <p:selectBooleanCheckbox value="#{produtoBean.emEstoque}">  
-                                <p:ajax update="tbl" listener="#{produtoBean.emEstoqueChanged}" />  
-                            </p:selectBooleanCheckbox>  
-                            <h:outputText value="Não mostrar itens fora de estoque"/>
-                </h:panelGroup>
-            </p:panelGrid>
+                    </td>
+
+                    <td width="100%">
+                        <p:selectBooleanCheckbox value="#{produtoBean.emEstoque}">  
+                            <p:ajax update="tbl" listener="#{produtoBean.emEstoqueChanged}" />  
+                        </p:selectBooleanCheckbox>  
+                        <h:outputText value="Não mostrar itens fora de estoque"/>
+
+
+                    </td>
+
+                    <td nowrap="nowrap">
+                        <h:panelGroup  id="Nbts">
+                        <p:commandButton value="Novo Produto"  actionListener="#{produtoBean.novoProduto(0)}" update=":formNewCar" rendered="#{produtoBean.tipoProduto eq 0}"/>
+                        <p:commandButton value="Novo Veículo"  actionListener="#{produtoBean.novoProduto(1)}" update=":formNewCar" rendered="#{produtoBean.tipoProduto eq 1}"/>
+                        </h:panelGroup>
+                    </td>
+
+                </tr>
+            </table>
+
             <p:spacer height="2"/>
 
             <p:dataTable lazy="true" var="it" id="tbl" 
-                         selectionMode="single" selection="#{produtoBean.selected}"
                          value="#{produtoBean.lazyList}" rows="10"
                          paginatorAlwaysVisible="false"
                          paginator="true">
@@ -66,11 +66,19 @@
                         update=":fmenu"/>  
 
                 <p:column headerText="Descrição" rendered="#{produtoBean.tipoProduto eq 0}">
-                    #{it.descricaoGeral}
+                    <p:commandLink 
+                        update=":formNewCar"
+                        value="#{it.descricaoGeral}" 
+                        action="#{produtoBean.editarProduto(it.id)}"/>
+
                 </p:column>
 
                 <p:column headerText="Placa" sortBy="#{it.placa}" rendered="#{produtoBean.tipoProduto eq 1}">
-                    #{it.placa}
+                    <p:commandLink 
+                        update=":formNewCar"
+                        value="#{it.placa}" 
+                        action="#{produtoBean.editarProduto(it.id)}"/>
+
                 </p:column>
 
                 <p:column headerText="Fabricante" sortBy="#{it.fabricante}" rendered="#{produtoBean.tipoProduto eq 1}">
@@ -95,6 +103,11 @@
                     <h:outputText value="#{it.qtdEstoque}" rendered="#{it.qtdEstoque >= 0}" />
                 </p:column>
 
+                <p:column style="width: fit-content; text-align: center">
+                    <p:commandLink 
+                        value="Adicionar ao pedido" 
+                        actionListener="#{produtoBean.addToPedido(it.id)}"/>
+                </p:column>
 
             </p:dataTable>
 
@@ -103,7 +116,7 @@
         <h:form id="formNewCar">
 
             <p:dialog header="#{produtoBean.selected.id gt 0?'Editando':'Inserindo'} #{produtoBean.selected.tipo eq 0?'Produto':'Veículo'}"
-                id="dlgNewCar" widgetVar="dialogNewCar" modal="true" resizable="false">
+                      id="dlgNewCar" widgetVar="dialogNewCar" modal="true" resizable="false">
 
                 <h:inputHidden value="#{produtoBean.selected.id}" />
 
@@ -153,8 +166,28 @@
                 </p:panelGrid>
 
                 <f:facet name="footer">
-                    <p:commandButton value="Gravar" actionListener="#{produtoBean.inserir}" update=":formTable, frm"/>
-                    <p:commandButton value="Cancela" oncomplete="dialogNewCar.hide()" immediate="true"/>
+                    <table width="100%">
+                        <tr>
+                            <td nowrap="nowrap">
+                                <p:commandButton value="Gravar" actionListener="#{produtoBean.inserir}" update=":formTable, frm"/>
+                                <p:commandButton value="Cancela" oncomplete="dialogNewCar.hide()" immediate="true"/>
+                            </td>
+                            <td nowrap="nowrap" width="100%">
+
+                            </td>
+                            <td nowrap="nowrap">
+                                <p:commandButton
+                                    icon="ui-icon-trash"
+                                    disabled="#{not loginMB.usuario.admin}"
+                                    update=":formTable"
+                                    value="Excluir" 
+                                    immediate="true" 
+                                    onstart="return confirm('Confirma excluir este produto?')"
+                                    action="#{produtoBean.excluirProduto(produtoBean.selected.id)}" />
+                            </td>
+                        </tr>
+                    </table>
+
                 </f:facet>
 
             </p:dialog>
