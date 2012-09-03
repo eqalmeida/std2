@@ -167,6 +167,7 @@ public class ProdutoBean extends ControllerBase implements Serializable {
         try {
             ctl.destroy(id);
             this.selected = new Produto();
+            RequestContext.getCurrentInstance().execute("dialogNewCar.hide()");
         } catch (Exception ex) {
             addMessage("Não foi possível excluir!");
 

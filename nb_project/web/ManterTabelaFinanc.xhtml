@@ -18,58 +18,64 @@
             </ui:define>
 
             <ui:define name="left">
-                <h:form id="fmenu">
-                    <p:menu>
-                        <p:submenu label="Opções">
-                            <p:menuitem 
-                                value="Novo"
-                                icon="ui-icon-plus" 
-                                actionListener="#{tabelaFinancBean.novo}" 
-                                update=":fEdit,:form, @form"
-                                oncomplete="tblDlg.show()"/>
-                        </p:submenu>
-                        <p:submenu label="Selecionado">
-
-                            <p:menuitem 
-                                value="Editar"
-                                disabled="#{not(tabelaFinancBean.selected.id > 0)}"
-                                icon="ui-icon-pencil" 
-                                update=":fEdit" 
-                                oncomplete="tblDlg.show()" />
-
-                            <p:menuitem
-                                value="Excluir"
-                                icon="ui-icon-trash"
-                                disabled="#{not(tabelaFinancBean.selected.id > 0)}"
-                                update=":form"
-                                actionListener="#{tabelaFinancBean.excluir}"/>
-
-                            <p:menuitem 
-                                disabled="#{not(tabelaFinancBean.selected.id > 0)}"
-                                icon="ui-icon-plus" value="Novo coeficiente" 
-                                update=":fCoef"
-                                actionListener="#{tabelaFinancBean.novoCoef}" />
-                            
-                        </p:submenu>
-                    </p:menu>
-                </h:form>
             </ui:define>
 
             <ui:define name="content">
 
                 <p:growl autoUpdate="true" id="message"/>
 
+
                 <h:form id="form">
 
+                    <table>
+                        <tr>
+                            <td width="100%">
+
+                            </td>
+
+                            <td nowrap="nowrap">
+                                <p:commandButton value="Nova Tabela"
+                                                 action="#{tabelaFinancBean.novo()}"
+                                                 update=":fEdit"/>
+                            </td>
+
+                        </tr>
+                    </table>
+                    
                     <p:dataTable 
-                        selection="#{tabelaFinancBean.selected}" selectionMode="single" rowKey="#{it.id}"
+                        selectionMode="single" selection="#{tabelaFinancBean.selected}" rowKey="#{it.id}"
                         value="#{tabelaFinancBean.tabelas}" var="it">
 
                         <f:facet name="header">Tabelas de Financiamento</f:facet>
 
-                        <p:ajax event="rowSelect" update="@form, :fmenu" />
+                        <p:ajax event="rowSelect" update="@form" />
+
+                        <f:facet name="footer">
+                            <p:commandButton
+                                disabled="#{not(tabelaFinancBean.selected.id gt 0)}"
+                                value="Editar Tabela"
+                                action="#{tabelaFinancBean.editarTabela(tabelaFinancBean.selected.id)}"
+                                update=":fEdit"/>
+
+                    <p:commandButton 
+                        update=":fCoef"
+                                rendered="#{tabelaFinancBean.selected.id gt 0}"
+                        value="Novo Coeficiente" 
+                        action="#{tabelaFinancBean.novoCoef()}"/>
+
+                            <p:commandButton
+                                value="Excluir"
+                                onstart="return confirm('Confirma excluir tabela?')"
+                                icon="ui-icon-trash"
+                                action="#{tabelaFinancBean.excluirTabela(tabelaFinancBean.selected.id)}"
+                                rendered="#{tabelaFinancBean.selected.id gt 0}"
+                                disabled="#{not loginMB.usuario.admin}"
+                                update=":form"/>
+
+                        </f:facet>
 
                         <p:column headerText="Descrição">
+
                             #{it.descricao}
                         </p:column>
 
@@ -155,20 +161,18 @@
                             <p:commandButton value="Gravar" 
                                              actionListener="#{tabelaFinancBean.gravar}" 
                                              update=":form, editGrid" />
-
                         </f:facet>
                     </p:dialog>
                 </h:form>
 
                 <h:form id="fCoef">
- 
+
                     <p:dialog 
                         resizable="false"
-                        showEffect="explode"
                         modal="true"
                         widgetVar="coefDlg" 
                         header="#{tabelaFinancBean.subItem.coeficientePK.tabelaFinanc > 0 ? 'Editando' : 'Inserindo'} Coeficiente">
-                        
+
                         <h:inputHidden value="#{tabelaFinancBean.subItem.coeficientePK.tabelaFinanc}"/>
 
                         <p:panelGrid columns="2" id="coefGrid">
@@ -187,7 +191,7 @@
                                 value="Gravar" 
                                 actionListener="#{tabelaFinancBean.gravarCoef}" 
                                 update=":form, coefGrid" />
-                            
+
                         </f:facet>
                     </p:dialog>
                 </h:form>

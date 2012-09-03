@@ -177,6 +177,7 @@
                             </td>
                             <td nowrap="nowrap">
                                 <p:commandButton
+                                    rendered="#{produtoBean.selected.id gt 0}"
                                     icon="ui-icon-trash"
                                     disabled="#{not loginMB.usuario.admin}"
                                     update=":formTable"

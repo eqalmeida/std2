@@ -32,6 +32,7 @@ public class ClienteBean extends ControllerBase implements Serializable {
     private ClienteJpaController service = null;
     private LazyDataModel<Cliente> lazyList = null;
     private List<Pedido> pedidos = null;
+    private boolean showForm = false;
 
     public Cliente getSelected() {
         return selected;
@@ -54,7 +55,7 @@ public class ClienteBean extends ControllerBase implements Serializable {
                 service.create(selected);
             }
             
-            RequestContext.getCurrentInstance().execute("cliForm.hide()");
+            showForm = false;
         }
         catch(Exception ex) {
             addMessage(ex.getMessage());
@@ -72,39 +73,46 @@ public class ClienteBean extends ControllerBase implements Serializable {
 
     }
 
-    
-
-    public void onRowSelect() {
-    
-        pedidos = null;
-        
-        if(selected != null){
-            pedidos = new ClienteJpaController().findPedidos(selected);
-        }
-    }
-
     public List<Pedido> getPedidos() {
         return pedidos;
     }
 
-    public void novo() {
+    public void novoCliente() {
         selected = new Cliente();
+        showForm = true;
     }
     
     public void exibirClientes(){
     }
     
-    public void excluir() {
+    public void excluirCliente(int id) {
+        
+        if(!getUsuarioLogado().isAdmin()){
+            addErrorMessage("Acesso Negado!");
+            return;
+        }
+        
         try {
-            service.destroy(this.selected.getId());
+            service.destroy(id);
             this.selected = new Cliente();
         } catch (Exception ex) {
-            addMessage("Não foi possível excluir este cliente!");
+            addErrorMessage("Não foi possível excluir este cliente!");
         }
     }
     
-    public void editar(){
-        selected = service.findCliente(selected.getId());
+    public void editarCliente(int id){
+        selected = service.findCliente(id);
+        pedidos = null;
+        
+        if(selected != null){
+            pedidos = new ClienteJpaController().findPedidos(selected);
+        }
+        showForm = true;
+    }
+    
+    public void listarClientes(){
+        showForm = false;
+        pedidos = null;
     }
 
     public ClienteBean() {
@@ -114,8 +122,9 @@ public class ClienteBean extends ControllerBase implements Serializable {
     /*
      * Adiciona cliente ao pedido na session
      */
-    public void addToPedido(){
+    public void addToPedido(int id){
         try {
+            selected = service.findCliente(id);
             
             FacesContext context = FacesContext.getCurrentInstance();
             
@@ -138,6 +147,10 @@ public class ClienteBean extends ControllerBase implements Serializable {
 
     public void setLazyList(LazyDataModel<Cliente> lazyList) {
         this.lazyList = lazyList;
+    }
+
+    public boolean isShowForm() {
+        return showForm;
     }
     
     

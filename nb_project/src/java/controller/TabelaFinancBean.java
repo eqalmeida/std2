@@ -88,26 +88,27 @@ public class TabelaFinancBean extends ControllerBase {
 
     public void novo() {
         selected = new TabelaFinanc();
+        RequestContext.getCurrentInstance().execute("tblDlg.show()");
     }
 
     public void exibir() {
     }
 
-    public void excluir() {
+    public void excluirTabela(Short id) {
         try {
-            service.destroy(this.selected.getId());
+            service.destroy(id);
             this.selected = new TabelaFinanc();
+            RequestContext.getCurrentInstance().execute("tblDlg.hide()");
         } catch (Exception ex) {
-            addMessage("Não foi possível excluir!");
+            addErrorMessage("Não foi possível excluir!");
 
         }
 
     }
 
-    public void editar() {
-        if (this.selected.getId() != null) {
-            selected = service.findTabelaFinanc(this.selected.getId());
-        }
+    public void editarTabela(Short id) {
+        selected = service.findTabelaFinanc(id);
+        RequestContext.getCurrentInstance().execute("tblDlg.show()");
     }
 
     public List<Coeficiente> getSubItems() {
@@ -154,11 +155,11 @@ public class TabelaFinancBean extends ControllerBase {
                 /**
                  * Se é uma edição, apaga o coeficiente anterior
                  */
-                System.out.println("Coef id :"+coefIdAnt.getNumParcelas() + " " + coefIdAnt.getTabelaFinanc());
+                System.out.println("Coef id :" + coefIdAnt.getNumParcelas() + " " + coefIdAnt.getTabelaFinanc());
                 Coeficiente coefAnt = em.find(Coeficiente.class, coefIdAnt);
                 em.remove(coefAnt);
                 em.flush();
-                
+
                 em.persist(subItem);
             }
 

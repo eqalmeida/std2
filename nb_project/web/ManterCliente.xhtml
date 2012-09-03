@@ -16,18 +16,6 @@
     <ui:define name="left">
         <h:form id="fmenu">
 
-            <p:menu>
-                
-                <p:submenu label="Opcões">
-                    <p:menuitem value="Novo" actionListener="#{clienteMB.novo}" update=":formDialog @form :formTable" oncomplete="cliForm.show()"/>
-                </p:submenu>
-                
-                <p:submenu label="Selecionado">
-                    <p:menuitem disabled="#{clienteMB.selected.id eq null}" value="Editar" update=":formDialog" actionListener="#{clienteMB.editar}" icon="ui-icon-pencil" oncomplete="cliForm.show()"/>  
-                    <p:menuitem disabled="#{clienteMB.selected.id eq null}" value="Excluir" update=":formTable" icon="ui-icon-trash" actionListener="#{clienteMB.excluir}" onstart="return confirm('Confirma?')" />  
-                    <p:menuitem disabled="#{clienteMB.selected.id eq null}" value="Adicionar ao Pedido" icon="ui-icon-plus" actionListener="#{clienteMB.addToPedido}"/>
-                </p:submenu>
-            </p:menu>
 
         </h:form>    
     </ui:define>
@@ -35,156 +23,196 @@
     <ui:define name="content">
         <p:growl autoUpdate="true" id="message"/>
 
-        <h:form id="formTable">
+        <h:panelGroup id="cadCliente">
 
-            <p:dataTable lazy="true" var="it" id="tbl"
-                         selectionMode="single" selection="#{clienteMB.selected}"
-                         value="#{clienteMB.lazyList}" rows="10"
-                         paginatorAlwaysVisible="true"
-                         paginator="true">
-                
-                <p:ajax event="rowSelect" update=":fmenu, :pedidosForm" listener="#{clienteMB.onRowSelect}" />
-                <p:ajax event="rowUnselect" update=":fmenu" />
+            <h:form id="formTable" rendered="#{not clienteMB.showForm}">
 
-                <p:column headerText="ID" sortBy="#{it.id}">#{it.id}</p:column>
+                <table>
+                    <tr>
+                        <td width="100%">
 
-                <p:column headerText="Nome" sortBy="#{it.nome}" filterBy="#{it.nome}">
-                    #{it.nome}
-                </p:column>
+                        </td>
+                        <td nowrap="nowrap">
+                            <p:commandButton 
+                                value="Novo Cliente" 
+                                action="#{clienteMB.novoCliente()}" update=":cadCliente" />
+                        </td>
+                    </tr>
+                </table>
 
-                <p:column headerText="CPF">#{it.cpf}</p:column>
+                <p:dataTable lazy="true" var="it" id="tbl"
+                             value="#{clienteMB.lazyList}" rows="10"
+                             paginatorAlwaysVisible="true"
+                             paginator="true">
 
-                <p:column headerText="Telefones">#{it.telefones}</p:column>
+                    <p:column headerText="Nome" sortBy="#{it.nome}" filterBy="#{it.nome}">
+                        <p:commandLink 
+                            value="#{it.nome}" 
+                            action="#{clienteMB.editarCliente(it.id)}" update=":cadCliente"/>
 
+                    </p:column>
 
-            </p:dataTable>
+                    <p:column headerText="CPF">#{it.cpf}</p:column>
 
-        </h:form>
+                    <p:column headerText="Telefones">#{it.telefones}</p:column>
+                </p:dataTable>
 
-        <h:form id="formDialog">
-
-            <p:dialog id="cliFormId" 
-                      header="${clienteMB.selected.id gt 0?'Editando':'Inserindo'} Cliente"
-                      widgetVar="cliForm" modal="true" resizable="false">
-
-                <h:inputHidden value="#{clienteMB.selected.id}" />
-
-                <p:panelGrid columnClasses="label,field,label,field" id="frm">
-
-                    <p:row>
-                        <p:column styleClass="label">
-                            <h:outputText value="Nome:"/>
-                        </p:column>
-                        <p:column colspan="3">
-                            <p:inputText value="#{clienteMB.selected.nome}" label="Nome" required="true" size="50"/>
-                        </p:column>
-                    </p:row>
-
-                    <p:row>
-                        <p:column styleClass="label">CPF:</p:column>
-                        <p:column>
-                            <p:inputText value="#{clienteMB.selected.cpf}" label="CPF">
-                                <f:validateLength minimum="11" />
-                                <stella:validateCPF  />
-                            </p:inputText>
-                        </p:column>
-                        <p:column styleClass="label">RG:</p:column>
-                        <p:column>
-                            <p:inputText value="#{clienteMB.selected.rg}" label="RG"/>
-                        </p:column>
-                    </p:row>
-
-                    <p:row>
-                        <p:column styleClass="label">Tel. Res.:</p:column>
-                        <p:column>
-                            <p:inputText value="#{clienteMB.selected.telRes}" label="Tel. Res."/>
-                        </p:column>
-                        <p:column styleClass="label">Tel. Cel.:</p:column>
-                        <p:column>
-                            <p:inputText value="#{clienteMB.selected.telCel}" label="Tel. Cel.">
-                                <f:validateLength minimum="8"/>
-                            </p:inputText>
-                        </p:column>
-                    </p:row>
-
-                    <p:row>
-                        <p:column styleClass="label">Tel. COM.:</p:column>
-                        <p:column colspan="3">
-                            <p:inputText value="#{clienteMB.selected.telCom}" label="Tel. COM.">
-                                <f:validateLength minimum="8" />
-                            </p:inputText>
-                        </p:column>
-                    </p:row>
+            </h:form>
 
 
-                    <p:row>
-                        <p:column styleClass="label">Endereço:</p:column>
-                        <p:column colspan="3">
-                            <p:inputText value="#{clienteMB.selected.endRua}" label="Endereço" size="50">
-                                <f:validateLength minimum="3" />
-                            </p:inputText>
-                        </p:column>
-                    </p:row>
+            <h:form id="formDialog" rendered="#{clienteMB.showForm}">
+
+                <p:panel id="cliFormId" 
+                         header="${clienteMB.selected.id gt 0?'Editando':'Inserindo'} Cliente">
+
+                    <h:inputHidden value="#{clienteMB.selected.id}" />
+
+                    <p:panelGrid columnClasses="label,field,label,field" id="frm">
+
+                        <p:row>
+                            <p:column styleClass="label">
+                                <h:outputText value="Nome:"/>
+                            </p:column>
+                            <p:column colspan="3">
+                                <p:inputText value="#{clienteMB.selected.nome}" label="Nome" required="true" size="50"/>
+                            </p:column>
+                        </p:row>
+
+                        <p:row>
+                            <p:column styleClass="label">CPF:</p:column>
+                            <p:column>
+                                <p:inputText value="#{clienteMB.selected.cpf}" label="CPF">
+                                    <f:validateLength minimum="11" />
+                                    <stella:validateCPF  />
+                                </p:inputText>
+                            </p:column>
+                            <p:column styleClass="label">RG:</p:column>
+                            <p:column>
+                                <p:inputText value="#{clienteMB.selected.rg}" label="RG"/>
+                            </p:column>
+                        </p:row>
+
+                        <p:row>
+                            <p:column styleClass="label">Tel. Res.:</p:column>
+                            <p:column>
+                                <p:inputText value="#{clienteMB.selected.telRes}" label="Tel. Res."/>
+                            </p:column>
+                            <p:column styleClass="label">Tel. Cel.:</p:column>
+                            <p:column>
+                                <p:inputText value="#{clienteMB.selected.telCel}" label="Tel. Cel.">
+                                    <f:validateLength minimum="8"/>
+                                </p:inputText>
+                            </p:column>
+                        </p:row>
+
+                        <p:row>
+                            <p:column styleClass="label">Tel. COM.:</p:column>
+                            <p:column colspan="3">
+                                <p:inputText value="#{clienteMB.selected.telCom}" label="Tel. COM.">
+                                    <f:validateLength minimum="8" />
+                                </p:inputText>
+                            </p:column>
+                        </p:row>
 
 
-                    <p:row>
-                        <p:column styleClass="label">Num.:</p:column>
-                        <p:column>
-                            <p:inputText value="#{clienteMB.selected.endNum}" label="Num."/>
-                        </p:column>
-                        <p:column styleClass="label">Complemento:</p:column>
-                        <p:column>
-                            <p:inputText value="#{clienteMB.selected.endCompl}" label="Complemento"/>
-                        </p:column>
-                    </p:row>
+                        <p:row>
+                            <p:column styleClass="label">Endereço:</p:column>
+                            <p:column colspan="3">
+                                <p:inputText value="#{clienteMB.selected.endRua}" label="Endereço" size="50">
+                                    <f:validateLength minimum="3" />
+                                </p:inputText>
+                            </p:column>
+                        </p:row>
 
-                    <p:row>
-                        <p:column styleClass="label">Bairro:</p:column>
-                        <p:column>
-                            <p:inputText value="#{clienteMB.selected.endBairro}" label="Bairro"/>
-                        </p:column>
-                        <p:column styleClass="label">Município:</p:column>
-                        <p:column>
-                            <p:inputText value="#{clienteMB.selected.endMunicipio}" label="Município"/>
-                        </p:column>
-                    </p:row>
 
-                </p:panelGrid>
+                        <p:row>
+                            <p:column styleClass="label">Num.:</p:column>
+                            <p:column>
+                                <p:inputText value="#{clienteMB.selected.endNum}" label="Num."/>
+                            </p:column>
+                            <p:column styleClass="label">Complemento:</p:column>
+                            <p:column>
+                                <p:inputText value="#{clienteMB.selected.endCompl}" label="Complemento"/>
+                            </p:column>
+                        </p:row>
 
-                <f:facet name="footer">
-                    <p:commandButton value="Gravar" actionListener="#{clienteMB.gravar}" update=":formTable, frm"/>
-                </f:facet>
+                        <p:row>
+                            <p:column styleClass="label">Bairro:</p:column>
+                            <p:column>
+                                <p:inputText value="#{clienteMB.selected.endBairro}" label="Bairro"/>
+                            </p:column>
+                            <p:column styleClass="label">Município:</p:column>
+                            <p:column>
+                                <p:inputText value="#{clienteMB.selected.endMunicipio}" label="Município"/>
+                            </p:column>
+                        </p:row>
 
-            </p:dialog>
+                    </p:panelGrid>
 
-        </h:form>
-        
-        <h:form id="pedidosForm">
-            <br/>
-            <p:dataTable tableStyleClass="width:auto" value="#{clienteMB.pedidos}" var="it" rendered="#{not empty clienteMB.pedidos}">
-                
-                <f:facet name="header">Pedidos de #{clienteMB.selected.nome}</f:facet>
-                
-                <p:column headerText="N. Pedido">
-                    <p:commandLink value="#{it.id}" actionListener="#{clienteMB.verPedido(it.id)}" ajax="false"/>
-                </p:column>
-                
-                <p:column headerText="Data" >
-                    <h:outputText value="#{it.data}">
-                        <f:convertDateTime/>
-                    </h:outputText>
-                </p:column>
-                
-                <p:column headerText="Veículo">
-                    <h:outputText value="#{it.veiculo.produto.descricaoGeral}"></h:outputText>
-                </p:column>
-                
-                <p:column headerText="Status">
-                    <h:outputText value="#{it.statusStr}"/>
-                </p:column>
-                
-            </p:dataTable>
-        </h:form>
+                    <f:facet name="footer">
+
+                        <table>
+                            <tr>
+                                <td width="100%">
+                                    <p:commandButton value="Gravar" actionListener="#{clienteMB.gravar}" update=":cadCliente"/>
+                                    <p:commandButton value="Cancelar" actionListener="#{clienteMB.listarClientes()}" update=":cadCliente" immediate="true"/>
+                                </td>
+                                <td nowrap="nowrap">
+                                    <p:commandButton 
+                                        onstart="return confirm('Confirma excluir o Cliente?')"
+                                        value="Excluir" 
+                                        rendered="#{clienteMB.selected.id gt 0}"
+                                        disabled="#{not loginMB.usuario.admin}"
+                                        immediate="true"
+                                        icon="ui-icon-trash"
+                                        action="#{clienteMB.excluirCliente(clienteMB.selected.id)}" 
+                                        update=":cadCliente"/>
+                                    
+                                    <p:commandButton 
+                                        value="Adicionar ao Pedido" 
+                                        rendered="#{clienteMB.selected.id gt 0}"
+                                        immediate="true"
+                                        action="#{ clienteMB.addToPedido(clienteMB.selected.id)}" />
+                                    
+                                </td>
+                            </tr>
+                        </table>
+
+                    </f:facet>
+
+                </p:panel>
+
+            </h:form>
+
+            <h:form id="pedidosForm" rendered="#{clienteMB.showForm and not empty clienteMB.pedidos}">
+                <br/>
+                <p:dataTable tableStyleClass="width:auto" value="#{clienteMB.pedidos}" var="it">
+
+                    <f:facet name="header">Pedidos de #{clienteMB.selected.nome}</f:facet>
+
+                    <p:column headerText="N. Pedido">
+                        <p:commandLink value="#{it.id}" actionListener="#{clienteMB.verPedido(it.id)}" ajax="false"/>
+                    </p:column>
+
+                    <p:column headerText="Data" >
+                        <h:outputText value="#{it.data}">
+                            <f:convertDateTime/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Veículo">
+                        <h:outputText value="#{it.veiculo.produto.descricaoGeral}"></h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Status">
+                        <h:outputText value="#{it.statusStr}"/>
+                    </p:column>
+
+                </p:dataTable>
+            </h:form>
+
+        </h:panelGroup>
+
         <br/>
         <br/>
         <br/>
