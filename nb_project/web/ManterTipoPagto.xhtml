@@ -19,22 +19,6 @@
 
             <ui:define name="left">
                 <h:form id="fmenu">
-                    <p:menu>
-                        <p:submenu label="Opções">
-
-
-                            <p:menuitem 
-                                value="Novo"
-                                icon="ui-icon-plus" 
-                                actionListener="#{tipoPagtoBean.novo}" 
-                                update=":formIns"
-                                immediate="true" 
-                                oncomplete="insDlg.show()"/>
-
-
-                        </p:submenu>
-
-                    </p:menu>
                 </h:form>
             </ui:define>
 
@@ -44,19 +28,26 @@
 
                     <p:growl autoUpdate="true" id="message"/>
 
-                    <p:contextMenu for="tbl">  
-                        <p:menuitem value="Editar" update=":formEdit" icon="ui-icon-pencil" oncomplete="editDlg.show()"/>  
-                        <p:menuitem value="Excluir" update="tbl" icon="ui-icon-trash" actionListener="#{tipoPagtoBean.excluir}"/>  
-                        <p:menuitem value="Tabelas Financ." update=":formPick" icon="ui-icon-note" oncomplete="lstDlg.show()"/>  
-                    </p:contextMenu>  
+                    <table>
+                        <tr>
+                            <td width="100%">
+
+                            </td>
+                            <td nowrap="nowrap">
+                                <p:commandButton value="Novo Tipo de Pagamento"
+                                                 actionListener="#{tipoPagtoBean.novo()}"
+                                                 update=":formDlg"/>
+                            </td>
+                        </tr>
+                    </table>
 
                     <p:dataTable id="tbl" value="#{tipoPagtoBean.lista}" 
                                  rowKey="#{it.id}"
                                  selectionMode="single"
                                  selection="#{tipoPagtoBean.selected}"
-                                 var="it" tableStyle="width: auto">
+                                 var="it" >
 
-                        <p:ajax event="rowSelect" update=":formPick" listener="#{tipoPagtoBean.onRowSelect}"/>
+                        <p:ajax event="rowSelect" update=":formPick, @this" listener="#{tipoPagtoBean.onRowSelect}"/>
 
                         <p:column headerText="Id">
                             <h:outputText value="#{it.id}"/>
@@ -70,7 +61,28 @@
                             <h:outputText value="Sim" rendered="#{it.geraBoleto == true}" />
                             <h:outputText value="Não" rendered="#{it.geraBoleto == false}" />
                         </p:column>
-                        
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Editar"
+                                             disabled="#{not(tipoPagtoBean.selected.id gt 0)}"
+                                             actionListener="#{tipoPagtoBean.editar(tipoPagtoBean.selected.id)}"
+                                             update=":formDlg" />
+
+                            <p:commandButton value="Excluir"
+                                             icon="ui-icon-trash"
+                                             onstart="return confirm('Confirma excluir?')"
+                                             disabled="#{not(tipoPagtoBean.selected.id gt 0) or not loginMB.usuario.admin}"
+                                             actionListener="#{tipoPagtoBean.excluir(tipoPagtoBean.selected.id)}"
+                                             update=":form" />
+
+                            <p:commandButton value="Tabelas Financ." 
+                                             update=":formPick" 
+                                             disabled="#{not(tipoPagtoBean.selected.id gt 0)}"
+                                             icon="ui-icon-note" 
+                                             oncomplete="lstDlg.show()"/>  
+
+                        </f:facet>
+
                     </p:dataTable>
 
                 </h:form>
@@ -107,88 +119,34 @@
                 </h:form>
 
 
-                <h:form id="formIns">
-                    <p:dialog id="insDialog" 
-                              modal="true"
-                              showHeader="false"
-                              resizable="false"
-                              hideEffect="explode"
-                              widgetVar="insDlg">
-
-                        <p:panelGrid columns="2">
-
-                            <f:facet name="header">Novo Tipo de Pagamento</f:facet>
-
-                            <h:outputText value="Descrição:" />
-                            <p:inputText value="#{tipoPagtoBean.selected.descricao}" required="true"/>
-
-                            <h:outputText value="Gera Boleto:" />
-                            <p:selectBooleanButton value="#{tipoPagtoBean.selected.geraBoleto}" offLabel="Não" onLabel="Sim"/>
-                            
-                            <f:facet name="footer">
-                                <p:commandButton value="Gravar" 
-                                                 actionListener="#{tipoPagtoBean.inserir}" 
-                                                 update=":form" 
-                                                 oncomplete="handleDialog('insDialog',insDlg ,xhr, status, args)"/>
-
-                                <p:commandButton value="Cancela" 
-                                                 immediate="true"
-                                                 actionListener="#{tipoPagtoBean.cancela}" 
-                                                 update=":form" 
-                                                 oncomplete="insDlg.hide()" />
-                            </f:facet>
-                        </p:panelGrid>
-                    </p:dialog>
-                </h:form>
-
-
-
-                <h:form id="formEdit">
-                    <p:dialog id="editDialog" 
+                <h:form id="formDlg">
+                    <p:dialog header="#{tipoPagtoBean.selected.id gt 0?'Editando':'Novo'} Tipo de Pagamento"
                               modal="true"
                               resizable="false"
-                              showHeader="false"
-                              hideEffect="explode"
-                              widgetVar="editDlg">
+                              widgetVar="tipoDlg">
 
-                        <h:inputHidden value="#{tipoPagtoBean.selected.id}"/>
+                        <h:inputHidden value="#{tipoPagtoBean.selected.id}" />
 
-                        <p:panelGrid columns="2">
-
-                            <f:facet name="header">Editar Tipo de Pagamento</f:facet>
+                        <p:panelGrid columns="2" id="dlgPanel">
 
                             <h:outputText value="Descrição:" />
-                            <p:inputText value="#{tipoPagtoBean.selected.descricao}" required="true"/>
+                            <p:inputText value="#{tipoPagtoBean.selected.descricao}" label="Descrição" required="true"/>
 
                             <h:outputText value="Gera Boleto:" />
                             <p:selectBooleanButton value="#{tipoPagtoBean.selected.geraBoleto}" offLabel="Não" onLabel="Sim"/>
 
                             <f:facet name="footer">
                                 <p:commandButton value="Gravar" 
-                                                 actionListener="#{tipoPagtoBean.salvar}" 
-                                                 update=":form" 
-                                                 oncomplete="handleDialog('editDialog',editDlg ,xhr, status, args)"/>
+                                                 actionListener="#{tipoPagtoBean.gravar()}" 
+                                                 update="dlgPanel, :form" />
 
                                 <p:commandButton value="Cancela" 
                                                  immediate="true"
-                                                 actionListener="#{tipoPagtoBean.cancela}" 
-                                                 update=":form" 
-                                                 oncomplete="editDlg.hide()" />
+                                                 actionListener="#{tipoPagtoBean.cancela}" />
                             </f:facet>
                         </p:panelGrid>
                     </p:dialog>
                 </h:form>
-
-
-                <script type="text/javascript">  
-                    function handleDialog(dlgid, dlgw, xhr, status, args) {  
-                        if(args.validationFailed) {  
-                            jQuery('#'+dlgid).effect("shake", { times:3 }, 100);  
-                        } else {  
-                            dlgw.hide();  
-                        }  
-                    }  
-                </script>          
 
             </ui:define>
         </ui:composition> 

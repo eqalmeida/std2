@@ -54,8 +54,13 @@ public class UsuarioBean extends ControllerBase implements Serializable {
         this.selected = usuario;
     }
 
-    public void editar() {
-        RequestContext.getCurrentInstance().execute("uDlg.show()");
+    public void editar(Long id) {
+        if (getUsuarioLogado().isAdmin()) {
+            selected = service.findUsuario(id);
+            RequestContext.getCurrentInstance().execute("uDlg.show()");
+        } else {
+            addErrorMessage("Acesso negado!");
+        }
     }
 
     public void novo() {
@@ -64,43 +69,51 @@ public class UsuarioBean extends ControllerBase implements Serializable {
         selected.setAtivo(true);
         RequestContext.getCurrentInstance().execute("uDlg.show()");
     }
-    
-    public void editarSenha(){
+
+    public void editarSenha() {
         RequestContext.getCurrentInstance().execute("usDlg.show()");
     }
-    
-    public void excluir(){
-        try{
-            service.destroy(selected.getId());
-            addMessage("Usuário excluído com sucesso");
-        }catch(Exception ex){
-            addErrorMessage("Não foi possível excluir!");
+
+    public void excluir(Long id) {
+        if (getUsuarioLogado().isAdmin()) {
+            try {
+                service.destroy(id);
+            } catch (Exception ex) {
+                addErrorMessage("Não foi possível excluir!");
+            }
+        } else {
+            addErrorMessage("Acesso Negado!");
         }
     }
 
     public void gravar() {
 
-        try {
+        if (getUsuarioLogado().isAdmin()) {
+            try {
 
-            if (selected.getId() > 0) {
-                //Editando
-                service.edit(selected);
-            } else {
-                //Inserindo
-                if(selected.getSenha() == null){
-                    selected.setSenha("123456");
+                if (selected.getId() > 0) {
+                    //Editando
+                    service.edit(selected);
+                } else {
+                    //Inserindo
+                    if (selected.getSenha() == null) {
+                        selected.setSenha("123456");
+                    }
+                    service.create(selected);
                 }
-                service.create(selected);
+
+                RequestContext.getCurrentInstance().execute("uDlg.hide()");
+                RequestContext.getCurrentInstance().execute("usDlg.hide()");
+
+                addMessage("Gravado com sucesso");
+
+
+            } catch (Exception ex) {
+                addErrorMessage(ex.getMessage());
             }
-
-            RequestContext.getCurrentInstance().execute("uDlg.hide()");
-            RequestContext.getCurrentInstance().execute("usDlg.hide()");
-            
-            addMessage("Gravado com sucesso");
-
-
-        } catch (Exception ex) {
-            addErrorMessage(ex.getMessage());
+        }
+        else{
+            addErrorMessage("Acesso Negado!");
         }
     }
 }

@@ -41,7 +41,7 @@
 
                         </tr>
                     </table>
-                    
+
                     <p:dataTable 
                         selectionMode="single" selection="#{tabelaFinancBean.selected}" rowKey="#{it.id}"
                         value="#{tabelaFinancBean.tabelas}" var="it">
@@ -57,19 +57,18 @@
                                 action="#{tabelaFinancBean.editarTabela(tabelaFinancBean.selected.id)}"
                                 update=":fEdit"/>
 
-                    <p:commandButton 
-                        update=":fCoef"
-                                rendered="#{tabelaFinancBean.selected.id gt 0}"
-                        value="Novo Coeficiente" 
-                        action="#{tabelaFinancBean.novoCoef()}"/>
+                            <p:commandButton 
+                                update=":fCoef"
+                                disabled="#{not(tabelaFinancBean.selected.id gt 0)}"
+                                value="Novo Coeficiente" 
+                                action="#{tabelaFinancBean.novoCoef()}"/>
 
                             <p:commandButton
                                 value="Excluir"
                                 onstart="return confirm('Confirma excluir tabela?')"
                                 icon="ui-icon-trash"
                                 action="#{tabelaFinancBean.excluirTabela(tabelaFinancBean.selected.id)}"
-                                rendered="#{tabelaFinancBean.selected.id gt 0}"
-                                disabled="#{not loginMB.usuario.admin}"
+                                disabled="#{(not loginMB.usuario.admin) or not (tabelaFinancBean.selected.id gt 0)}"
                                 update=":form"/>
 
                         </f:facet>

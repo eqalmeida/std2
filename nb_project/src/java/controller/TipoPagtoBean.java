@@ -7,11 +7,12 @@ package controller;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.model.SelectItem;
 import model.TabelaFinanc;
 import model.TipoPagto;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DualListModel;
 import repo.TabelaFinancJpaController;
@@ -36,13 +37,6 @@ public class TipoPagtoBean extends ControllerBase {
      * Creates a new instance of ProdutoBean
      */
     public TipoPagtoBean() {
-
-        TabelaFinancJpaController ctl = new TabelaFinancJpaController(getEmf());
-        tabelasFinanc = ctl.findTabelaFinancEntities();
-
-        tabelas = new DualListModel<TabelaFinanc>();
-
-        selected = new TipoPagto();
     }
 
     public TipoPagto getSelected() {
@@ -54,7 +48,7 @@ public class TipoPagtoBean extends ControllerBase {
     }
 
     public List<TipoPagto> getLista() {
-        lista = getService().findTipoPagtoEntities();
+        lista = service.findTipoPagtoEntities();
         return lista;
     }
 
@@ -62,26 +56,22 @@ public class TipoPagtoBean extends ControllerBase {
         this.lista = lista;
     }
 
-    public void inserir() {
+    public void gravar() {
         try {
-            selected.setId(null);
-            getService().create(selected);
+            if (selected.getId() == null || selected.getId() == 0) {
+                service.create(selected);
+            } else {
+                service.edit(selected);
+            }
+            RequestContext.getCurrentInstance().execute("tipoDlg.hide()");
         } catch (Exception ex) {
-            addMessage(ex.getMessage());
-        }
-    }
-
-    public void salvar() {
-        try {
-            getService().edit(selected);
-        } catch (Exception ex) {
-            addMessage(ex.getMessage());
+            addErrorMessage(ex.getMessage());
         }
     }
 
     public void onRowSelect(SelectEvent event) {
 
-        selected = getService().findTipoPagto(((TipoPagto) event.getObject()).getId());
+        selected = service.findTipoPagto(((TipoPagto) event.getObject()).getId());
 
         if (selected.getId() != null) {
 
@@ -104,26 +94,27 @@ public class TipoPagtoBean extends ControllerBase {
 
     public void novo() {
         selected = new TipoPagto();
+        RequestContext.getCurrentInstance().execute("tipoDlg.show()");
     }
 
-    public void excluir() {
+    public void excluir(Short id) {
         try {
-            getService().destroy(this.selected.getId());
+            service.destroy(id);
             this.selected = new TipoPagto();
         } catch (Exception ex) {
-            addMessage("Não foi possível excluir!");
+            addErrorMessage("Não foi possível excluir!");
 
         }
 
     }
 
-    public void editar() {
-        if (this.selected.getId() != null) {
-            selected = getService().findTipoPagto(this.selected.getId());
-        }
+    public void editar(Short id) {
+        selected = service.findTipoPagto(id);
+        RequestContext.getCurrentInstance().execute("tipoDlg.show()");
     }
 
     public void cancela() {
+        RequestContext.getCurrentInstance().execute("tipoDlg.hide()");
     }
 
     public void setTabelas(DualListModel<TabelaFinanc> tabelas) {
@@ -152,12 +143,12 @@ public class TipoPagtoBean extends ControllerBase {
         try {
 
             // Carrega o item do banco
-            selected = getService().findTipoPagto(selected.getId());
+            selected = service.findTipoPagto(selected.getId());
 
 
             // Limpa o conteúdo antigo
             selected.getTabelasFinanc().clear();
-            getService().edit(selected);
+            service.edit(selected);
 
 
             for (Iterator it = tabelas.getTarget().iterator(); it.hasNext();) {
@@ -167,19 +158,21 @@ public class TipoPagtoBean extends ControllerBase {
                 selected.getTabelasFinanc().add(item);
             }
 
-            getService().edit(selected);
+            service.edit(selected);
         } catch (Exception ex) {
             addMessage("Não foi possível Salvar!" + ex.getMessage());
         }
 
     }
 
-    public TipoPagtoJpaController getService() {
-        if(service == null){
-            service = new TipoPagtoJpaController();
-        }
-        return service;
+    @PostConstruct
+    public void init() {
+        service = new TipoPagtoJpaController();
+        TabelaFinancJpaController ctl = new TabelaFinancJpaController(getEmf());
+        tabelasFinanc = ctl.findTabelaFinancEntities();
+
+        tabelas = new DualListModel<TabelaFinanc>();
+
+        selected = new TipoPagto();
     }
-    
-    
 }
