@@ -13,26 +13,9 @@
     </ui:define>
 
     <ui:define name="left">
-        <h:form>
-            <p:panel styleClass="ui-shadow">
-
-                <f:facet name="header">Filtros</f:facet>
-
-                <h:panelGrid columns="2">
-                    Mês:
-                    <p:selectOneListbox value="#{boletoMB.filtMes}" valueChangeListener="#{boletoMB.mesChanged}">
-                        <f:selectItems value="#{app.meses}"/>
-                        <f:ajax render=":formTable" />
-                    </p:selectOneListbox>
-
-                    Ano:
-                    <p:spinner min="1990" maxlength="5" size="5" value="#{boletoMB.filtAno}" valueChangeListener="#{boletoMB.anoChanged}">
-                        <f:ajax render=":formTable" />
-                    </p:spinner>
-                </h:panelGrid>
-
-            </p:panel>
-        </h:form>
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
+            <ui:param name="act" value="8" />
+        </ui:include>
     </ui:define>
 
     <ui:define name="content">
@@ -41,7 +24,21 @@
         <h:outputScript name="locales_prime.js" library="js" /> 
 
         <h:form id="formTable">
+            <p:panel>
+                <h:panelGrid columns="4">
+                    Mês:
+                    <p:selectOneMenu value="#{boletoMB.filtMes}" valueChangeListener="#{boletoMB.mesChanged}">
+                        <f:selectItems value="#{app.meses}"/>
+                        <f:ajax render=":formTable" />
+                    </p:selectOneMenu>
 
+                    Ano:
+                    <p:spinner min="1990" maxlength="5" size="5" value="#{boletoMB.filtAno}" valueChangeListener="#{boletoMB.anoChanged}">
+                        <f:ajax render=":formTable" />
+                    </p:spinner>
+                </h:panelGrid>
+            </p:panel>
+            <p:spacer height="5"/>
             <p:dataTable lazy="true" var="it" id="tbl"
                          value="#{boletoMB.lazyList}" rows="20"
                          paginatorAlwaysVisible="false" 

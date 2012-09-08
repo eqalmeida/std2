@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./WEB-INF/templates/templateRel.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <ui:define name="header">
+        <h3>Simulação de Parcelamento</h3>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <table>
+            <tr valign="top">
+                <td valign="top">
+                    <h:panelGrid columns="2" styleClass="prn" columnClasses="label, field,label, field">
+                        <h:outputText value="Veículo:" />
+                        <h:outputText value="#{simulaMB.veiculo.descricaoGeral}" />
+
+                        <h:outputText value="Valor:" />
+                        <h:outputText value="#{simulaMB.valorVeiculo}" >
+                            <f:convertNumber type="currency" />
+                        </h:outputText>
+
+                        <h:outputText value="T.A.C.:" />
+                        <h:outputText value="#{simulaMB.valorTac}" >
+                            <f:convertNumber type="currency" />
+                        </h:outputText>
+
+                        <h:outputText value="Entrada:" />
+                        <h:outputText value="#{simulaMB.valorEntrada}" >
+                            <f:convertNumber type="currency" />
+                        </h:outputText>
+
+                        <h:outputText value="Tipo de finaciamento:" />
+                        <h:outputText value="#{simulaMB.tipoPagto}" />
+
+                    </h:panelGrid>
+
+                </td>
+
+                <td width="10"></td>
+
+                <td valign="top">
+                    <h:panelGrid columns="2" styleClass="prn">
+
+                        <f:facet name="header">Planos</f:facet>
+
+                        <c:forEach items="#{simulaMB.parcelas}" var="it" varStatus="rep">
+                            <h:outputText value="#{it}"/>
+                        </c:forEach>
+
+                        <c:if test="#{simulaMB.parcelas.size() mod 2 eq 1}">
+                            <h:outputText value=" - "/>
+                        </c:if>
+
+                    </h:panelGrid>
+
+                </td>
+            </tr>
+        </table>
+
+        <hr class="prn" />
+
+        <h:outputText value="#{configMB.config.empresaNome}"/><br/>
+        <h:outputText value="#{configMB.config.empresaEndereco}"/><br/>
+        <h:outputText value="#{configMB.config.empresaTelefones}"/> - <h:outputText value="#{configMB.config.empresaEmail}"/> -  <h:outputText value="#{configMB.config.empresaHomepage}"/>  
+
+
+    </ui:define>
+
+</ui:composition>

@@ -13,15 +13,9 @@
     </ui:define>
 
     <ui:define name="left">
-        <h:form id="fmenu">
-
-            <p:menu>
-
-                <p:submenu label="Opcões">
-                </p:submenu>
-            </p:menu>
-
-        </h:form>    
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
+            <ui:param name="act" value="11" />
+        </ui:include>
     </ui:define>
 
     <ui:define name="content">

@@ -13,63 +13,10 @@
     </ui:define>
 
     <ui:define name="left">
-
-        <h:form id="flat">
-            <p:panel styleClass="ui-shadow" rendered="#{showPedidoMB.pedidoId == null}">
-
-                <f:facet name="header">Filtros</f:facet>
-
-                <h:panelGrid columns="2">
-                    Mês:
-                    <p:selectOneListbox value="#{showPedidoMB.mes}" valueChangeListener="#{showPedidoMB.mesChanged}">
-                        <f:selectItems value="#{app.meses}"/>
-                        <f:ajax render=":formTable:tbl" />
-                    </p:selectOneListbox>
-
-                    Ano:
-                    <p:spinner min="1990" maxlength="5" size="5" value="#{showPedidoMB.ano}" valueChangeListener="#{showPedidoMB.anoChanged}">
-                        <f:ajax render=":formTable:tbl" />
-                    </p:spinner>
-                </h:panelGrid>
-
-            </p:panel>
-            <br/>
-            <p:panel styleClass="ui-shadow" rendered="#{showPedidoMB.pedido.id gt 0}">
-
-                <f:facet name="header">Opções</f:facet>
-
-                <p:commandButton value="Imprimir" icon="ui-icon-print" ajax="false">
-                    <p:printer target=":form"/>
-                </p:commandButton>
-
-                <p:menu>
-                    <p:menuitem value="Cancelar Pedido" update=":fstatus" actionListener="#{showPedidoMB.changeStatus(3)}" rendered="#{showPedidoMB.pedido.status eq 0}"/>
-                    <p:menuitem value="Parar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(4)}" rendered="#{showPedidoMB.pedido.status eq 0}"/>
-                    <p:menuitem value="Reativar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(0)}" rendered="#{showPedidoMB.pedido.status gt 2}"/>
-                </p:menu>
-
-            </p:panel>
-        </h:form>
         
-        <h:form id="fstatus">
-            <p:dialog widgetVar="statusDlg"
-                      resizable="false" 
-                header="Mudança de Status">
-                
-                <p:panel id="statusPn">
-                    
-                    <h:outputText value="Justificativa"/><br/>
-                    <p:inputTextarea value="#{showPedidoMB.justif}" label="Justificativa" required="true"/>
-                    
-                    <f:facet name="footer">
-                        <p:commandButton value="Gravar" update=":formTable, :detPedido, statusPn, :flat" actionListener="#{showPedidoMB.gravaStatus()}"/>
-                    </f:facet>
-                    
-                </p:panel>
-                
-            </p:dialog>
-        </h:form>
-
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
+            <ui:param name="act" value="9" />
+        </ui:include>
 
 
     </ui:define>
@@ -82,9 +29,48 @@
 
         <p:growl autoUpdate="true" id="message"/>
 
+        
+
+        <h:form id="fstatus">
+            <p:dialog widgetVar="statusDlg"
+                      resizable="false" 
+                      header="Mudança de Status">
+
+                <p:panel id="statusPn">
+
+                    <h:outputText value="Justificativa"/><br/>
+                    <p:inputTextarea value="#{showPedidoMB.justif}" label="Justificativa" required="true"/>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Gravar" update=":formTable, :detPedido, statusPn" actionListener="#{showPedidoMB.gravaStatus()}"/>
+                    </f:facet>
+
+                </p:panel>
+
+            </p:dialog>
+        </h:form>
+
         <h:panelGroup rendered="#{showPedidoMB.pedidoId == null}" id="shpedido">
 
             <h:form id="formTable">
+
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        Mês:
+                        <p:selectOneMenu value="#{showPedidoMB.mes}" valueChangeListener="#{showPedidoMB.mesChanged}">
+                            <f:selectItems value="#{app.meses}"/>
+                            <f:ajax render=":formTable:tbl" />
+                        </p:selectOneMenu>
+
+                        Ano:
+                        <p:spinner min="1990" maxlength="5" size="5" value="#{showPedidoMB.ano}" valueChangeListener="#{showPedidoMB.anoChanged}">
+                            <f:ajax render=":formTable:tbl" />
+                        </p:spinner>
+                    </h:panelGrid>
+
+                </p:panel>
+                
+                <p:spacer height="5"/>
 
                 <p:dataTable lazy="true" var="it" id="tbl"
                              selection="#{showPedidoMB.pedido}" selectionMode="single" 
@@ -92,13 +78,33 @@
                              value="#{showPedidoMB.lista}" rows="10"
                              paginatorAlwaysVisible="false" 
                              paginator="true">
-                    
+
+
+                    <f:facet name="footer">
+
+
+
+
+
+                        <p:commandButton value="Imprimir" icon="ui-icon-print" ajax="false" disabled="#{not(showPedidoMB.pedido.id gt 0)}">
+                            <p:printer target=":form"/>
+                        </p:commandButton>
+
+                        <p:commandButton value="Cancelar Pedido" update=":fstatus" actionListener="#{showPedidoMB.changeStatus(3)}" rendered="#{showPedidoMB.pedido.status eq 0}"/>
+                        <p:commandButton value="Parar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(4)}" rendered="#{showPedidoMB.pedido.status eq 0}"/>
+                        <p:commandButton value="Reativar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(0)}" rendered="#{showPedidoMB.pedido.status gt 2}"/>
+
+
+
+
+                    </f:facet>
+
                     <f:facet name="header">
                         Pedidos de #{showPedidoMB.mesStr} de #{showPedidoMB.ano}
                     </f:facet>
 
                     <p:ajax event="rowSelect" listener="#{showPedidoMB.onRowSelected}"
-                            update=":detPedido, :flat"/>  
+                            update=":detPedido, @this"/>  
 
                     <p:column headerText="Número" sortBy="#{it.id}">
                         <h:outputText value="#{it.id}" />
@@ -170,7 +176,7 @@
                     </h:panelGrid>
 
                     <br />
-                    
+
                     <h:panelGrid columns="4" style="width: 100%" styleClass="prn"  columnClasses="label, field,label, field">
 
                         <f:facet name="header">Dados do Cliente</f:facet>
@@ -191,7 +197,7 @@
 
                     <h:panelGroup rendered="#{showPedidoMB.pedido.veiculo != null}">
                         <br/>
-                        
+
                         <h:panelGrid columns="4" style="width: 100%" styleClass="prn" columnClasses="label, field,label, field">
 
                             <f:facet name="header">Dados do Veículo</f:facet>
@@ -216,7 +222,7 @@
                         </h:panelGrid>
                     </h:panelGroup>
                     <br/>
-                    
+
                     <h:dataTable value="#{showPedidoMB.pedido.itens}" var="it" styleClass="prn" width="100%">
 
                         <f:facet name="header">Itens do Pedido</f:facet>
@@ -247,7 +253,7 @@
                     </h:dataTable>
 
                     <br/>
-                    
+
 
                     <h:dataTable var="it" value="#{showPedidoMB.pedido.pagamentos}" styleClass="prn" width="100%">
 
@@ -259,7 +265,7 @@
                         </h:column>
 
                         <h:column>
-                           <f:facet name="header">Valor</f:facet>
+                            <f:facet name="header">Valor</f:facet>
                             <h:outputText value="#{it.valor}">
                                 <f:convertNumber type="currency"/>
                             </h:outputText> 
@@ -296,7 +302,7 @@
                     <ui:repeat value="#{showPedidoMB.pedido.pagamentos}" var="it" id="pagTables">
 
                         <h:panelGroup rendered="#{it.parcelas.size() gt 0}">
-                            
+
                             <h:dataTable 
                                 width="100%"
                                 styleClass="prn"

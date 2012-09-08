@@ -13,15 +13,9 @@
     </ui:define>
 
     <ui:define name="left">
-        <h:form id="fmenu">
-            <p:menu>  
-
-                <p:submenu icon="ui-icon-plus" label="Novo" >
-                </p:submenu>
-
-            </p:menu>
-
-        </h:form>
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
+            <ui:param name="act" value="10" />
+        </ui:include>
     </ui:define>
 
     <ui:define name="content">
@@ -83,9 +77,8 @@
 
                 <f:facet name="footer">
                     <p:commandButton value="Calcular" icon="ui-icon-check" update="fsim :fresult" actionListener="#{simulaMB.gerar()}"/>
-                    <p:commandButton value="Imprimir" icon="ui-icon-print" ajax="false" rendered="#{simulaMB.mostrar}">
-                        <p:printer target=":fresult:presult"/>
-                    </p:commandButton>
+                    <p:commandLink value="Imprimir" rendered="#{simulaMB.mostrar}" action="SimulaParcelaPrint" target="_blank" />
+                    
 
                 </f:facet>
 

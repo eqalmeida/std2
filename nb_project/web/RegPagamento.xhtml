@@ -254,6 +254,10 @@
                     <p:column headerText="Usuario">
                         <h:outputText value="#{it.recebUsuario}"/>
                     </p:column>
+                    
+                    <p:column>
+                        <p:commandButton value="Recibo" action="#{printReciboMB.printRecibo(it.id)}" />
+                    </p:column>
                 </p:dataTable>
 
             </h:form>            

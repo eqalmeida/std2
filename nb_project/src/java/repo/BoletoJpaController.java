@@ -246,7 +246,7 @@ public class BoletoJpaController implements Serializable {
         EntityManager em = getEntityManager();
         try {
 
-            String query = ("SELECT COUNT(b) FROM Boleto b WHERE b.vencimento BETWEEN :ini AND :fin");
+            String query = ("SELECT COUNT(b) FROM Boleto b WHERE (b.vencimento BETWEEN :ini AND :fin) and b.status != " + Boleto.CANCELADO);
             Query q = em.createQuery(query);
             q.setParameter("ini", dateFrom, TemporalType.DATE);
             q.setParameter("fin", dateTo, TemporalType.DATE);

@@ -2,31 +2,29 @@ package controller;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
 import javax.faces.bean.ViewScoped;
 import model.Coeficiente;
 import model.Produto;
 import model.TabelaFinanc;
 import model.TipoPagto;
+import org.primefaces.context.RequestContext;
 import repo.CoeficienteJpaController;
 import repo.ProdutoJpaController;
 import repo.TabelaFinancJpaController;
 import repo.TipoPagtoJpaController;
-import util.Util;
 
 /**
  *
  * @author eqalmeida
  */
 @ManagedBean(name = "simulaMB")
-@ViewScoped
+@SessionScoped
 public class SimulaBean extends ControllerBase implements Serializable{
 
     private List<Produto> produtos;
@@ -153,6 +151,11 @@ public class SimulaBean extends ControllerBase implements Serializable{
         }
 
         mostrar = true;
+        
+            RequestContext.getCurrentInstance().execute("jan=window.open (\"SimulaParcelaPrint.jsf\",\"mywindow\");");
+            RequestContext.getCurrentInstance().execute("jan.print()");
+        
+        
 
     }
 

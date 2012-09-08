@@ -130,26 +130,26 @@
 
                 <p:panelGrid columns="#{2*(produtoBean.selected.tipo + 1)}" columnClasses="label,field,label,field" id="frm">
 
-                    <h:outputText value="Placa:"  rendered="#{produtoBean.selected.tipo == 1}"/>
-                    <p:inputText value="#{produtoBean.selected.placa}" required="true" maxlength="8" size="8" rendered="#{produtoBean.selected.tipo == 1}"/>
+                    <h:outputText value="Placa:"  rendered="#{produtoBean.selected.tipo eq 1}"/>
+                    <p:inputMask value="#{produtoBean.selected.placa}" mask="aaa-9999" required="true" maxlength="8" size="8" rendered="#{produtoBean.selected.tipo == 1}" label="Placa"/>
 
-                    <h:outputText value="Fabricante:"  rendered="#{produtoBean.selected.tipo == 1}"/>
-                    <p:inputText value="#{produtoBean.selected.fabricante}" required="true" rendered="#{produtoBean.selected.tipo == 1}"/>
+                    <h:outputText value="Fabricante:"  rendered="#{produtoBean.selected.tipo eq 1}"/>
+                    <p:inputText value="#{produtoBean.selected.fabricante}" required="true" rendered="#{produtoBean.selected.tipo == 1}" label="Fabricante"/>
 
                     <h:outputText value="Descrição:"  rendered="#{produtoBean.selected.tipo == 0}"/>
-                    <p:inputText value="#{produtoBean.selected.descricao}" required="true" rendered="#{produtoBean.selected.tipo == 0}"/>
+                    <p:inputText value="#{produtoBean.selected.descricao}" required="true" rendered="#{produtoBean.selected.tipo == 0}" label="Descrição"/>
 
                     <h:outputText value="Modelo:"  rendered="#{produtoBean.selected.tipo == 1}"/>
-                    <p:inputText value="#{produtoBean.selected.modelo}" required="true" rendered="#{produtoBean.selected.tipo == 1}"/>
+                    <p:inputText value="#{produtoBean.selected.modelo}" required="true" rendered="#{produtoBean.selected.tipo == 1}" label="Modelo"/>
 
                     <h:outputText value="Cilindradas:"  rendered="#{produtoBean.selected.tipo == 1}"/>
-                    <p:inputText value="#{produtoBean.selected.cilindradas}" rendered="#{produtoBean.selected.tipo == 1}"/>
+                    <p:inputText value="#{produtoBean.selected.cilindradas}" rendered="#{produtoBean.selected.tipo == 1}" label="Cilindradas"/>
 
                     <h:outputText value="Ano:"  rendered="#{produtoBean.selected.tipo == 1}"/>
-                    <p:inputText value="#{produtoBean.selected.ano}" required="true" rendered="#{produtoBean.selected.tipo == 1}"/>
+                    <p:inputText value="#{produtoBean.selected.ano}" required="true" rendered="#{produtoBean.selected.tipo == 1}" label="Ano"/>
 
                     <h:outputText value="Cor:" rendered="#{produtoBean.selected.tipo == 1}" />
-                    <p:inputText value="#{produtoBean.selected.cor}" required="true" rendered="#{produtoBean.selected.tipo == 1}"/>
+                    <p:inputText value="#{produtoBean.selected.cor}" required="true" rendered="#{produtoBean.selected.tipo == 1}" label="Cor"/>
 
                     <h:outputText value="Combustível:" rendered="#{produtoBean.selected.tipo == 1}" />
                     <p:selectOneMenu value="#{produtoBean.selected.combustivel}"  rendered="#{produtoBean.selected.tipo == 1}" label="Combustível" required="true">
@@ -158,10 +158,10 @@
                     </p:selectOneMenu>
 
                     <h:outputText value="Chassi:"  rendered="#{produtoBean.selected.tipo == 1}"/>
-                    <p:inputText value="#{produtoBean.selected.chassi}" rendered="#{produtoBean.selected.tipo == 1}"/>
+                    <p:inputText value="#{produtoBean.selected.chassi}" rendered="#{produtoBean.selected.tipo == 1}" label="Chassi"/>
 
                     <h:outputText value="Valor:" />
-                    <p:inputText value="#{produtoBean.selected.valor}" styleClass="valor">
+                    <p:inputText value="#{produtoBean.selected.valor}" styleClass="valor" label="Valor">
                         <f:convertNumber  pattern="#,##0.00"/>
                     </p:inputText>
 
@@ -169,7 +169,7 @@
                     <h:outputText value="Estoque: (-1 para não controlar)" />
                     <p:spinner 
                         disabled="#{(not loginMB.usuario.admin) and (produtoBean.selected.id gt 0)}"
-                        min="-1" value="#{produtoBean.selected.qtdEstoque}" size="5"/>
+                        min="-1" value="#{produtoBean.selected.qtdEstoque}" size="5" label="Estoque"/>
 
                 </p:panelGrid>
 

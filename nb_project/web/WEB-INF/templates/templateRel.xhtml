@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link href="./resources/css/print.css" rel="stylesheet" type="text/css" />
+    </h:head>
+
+    <h:body>
+        <div> 
+            <h:form>
+                <h:panelGroup id="painel">
+                    <h:panelGrid columns="2">
+                        <h:graphicImage value="/resources/img/logo_rogerinho_pq.jpeg" style="margin-right: 20px"/>
+
+                        <ui:insert name="header">header</ui:insert>   
+                    </h:panelGrid>
+
+                    <hr/>
+
+                    <ui:insert name="content">Content</ui:insert> 
+
+                    <div style="font-size: 10px;padding: 10px; text-align: right">
+                        <h:outputText value="#{simulaMB.data}" >
+                            <f:convertDateTime dateStyle="full"/>
+                        </h:outputText>
+                    </div>
+                    
+                </h:panelGroup>
+            </h:form>
+        </div>    
+        <script language="javascript">
+            window.print();
+        </script>
+    </h:body>
+
+</html>

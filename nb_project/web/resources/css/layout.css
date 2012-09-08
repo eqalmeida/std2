@@ -9,6 +9,11 @@ h3{
     margin: 0;
 }
 
+.menuselected{
+    background: #fff;
+    
+}
+
 .ui-widget, .ui-widget .ui-widget {
     font-size: 90% !important;
 }
