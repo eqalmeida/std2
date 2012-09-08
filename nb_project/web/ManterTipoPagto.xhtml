@@ -18,8 +18,9 @@
             </ui:define>
 
             <ui:define name="left">
-                <h:form id="fmenu">
-                </h:form>
+                <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
+                    <ui:param name="act" value="4" />
+                </ui:include>
             </ui:define>
 
             <ui:define name="content">
@@ -31,12 +32,12 @@
                     <table>
                         <tr>
                             <td width="100%">
-
+                                <h3>Cadastro de Tipos de Pagamento</h3>
                             </td>
                             <td nowrap="nowrap">
                                 <p:commandButton value="Novo Tipo de Pagamento"
                                                  actionListener="#{tipoPagtoBean.novo()}"
-                                                 update=":formDlg"/>
+                                                 update=":formDlg, tbl"/>
                             </td>
                         </tr>
                     </table>

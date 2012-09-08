@@ -14,10 +14,9 @@
     </ui:define>
 
     <ui:define name="left">
-        <h:form id="fmenu">
-
-
-        </h:form>    
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
+            <ui:param name="act" value="1" />
+        </ui:include>
     </ui:define>
 
     <ui:define name="content">
@@ -30,7 +29,7 @@
                 <table>
                     <tr>
                         <td width="100%">
-
+                            <h3>Cadastro de Clientes</h3>
                         </td>
                         <td nowrap="nowrap">
                             <p:commandButton 
@@ -55,6 +54,10 @@
                     <p:column headerText="CPF">#{it.cpf}</p:column>
 
                     <p:column headerText="Telefones">#{it.telefones}</p:column>
+                    
+                    <f:facet name="footer">
+                        <p:commandButton value="Editar" />
+                    </f:facet>
                 </p:dataTable>
 
             </h:form>

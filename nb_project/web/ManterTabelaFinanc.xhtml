@@ -18,6 +18,9 @@
             </ui:define>
 
             <ui:define name="left">
+                <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
+                    <ui:param name="act" value="5" />
+                </ui:include>
             </ui:define>
 
             <ui:define name="content">
@@ -30,19 +33,19 @@
                     <table>
                         <tr>
                             <td width="100%">
-
+                                <h3>Cadastro de Tabelas de Financiamento</h3>
                             </td>
 
                             <td nowrap="nowrap">
                                 <p:commandButton value="Nova Tabela"
                                                  action="#{tabelaFinancBean.novo()}"
-                                                 update=":fEdit"/>
+                                                 update=":fEdit, :form"/>
                             </td>
 
                         </tr>
                     </table>
 
-                    <p:dataTable 
+                    <p:dataTable
                         selectionMode="single" selection="#{tabelaFinancBean.selected}" rowKey="#{it.id}"
                         value="#{tabelaFinancBean.tabelas}" var="it">
 
@@ -177,7 +180,9 @@
                         <p:panelGrid columns="2" id="coefGrid">
 
                             <h:outputText value="N. Parcelas:" />
-                            <p:inputText value="#{tabelaFinancBean.subItem.coeficientePK.numParcelas}" label="N. Parcelas" required="true"/>
+                            <p:inputText value="#{tabelaFinancBean.subItem.coeficientePK.numParcelas}" label="N. Parcelas" required="true">
+                                <f:validateLongRange minimum="1" />
+                            </p:inputText>
 
                             <h:outputText value="Coeficiente:" />
                             <p:inputText value="#{tabelaFinancBean.subItem.coeficiente}" label="Coeficiente" required="true"/>

@@ -4,16 +4,31 @@
     xmlns:p="http://primefaces.org/ui"
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:h="http://java.sun.com/jsf/html">
+
     <h:form>
-        
-        <p:panel styleClass="ui-shadow">
 
-        <p:menu>  
-            <p:submenu label="Opções">  
+        <p:menu>
+            <p:submenu label="Cadastros">
+                <p:menuitem ajax="false" value="Clientes" action="ManterCliente" disabled="#{act eq 1}" />
+                <p:menuitem ajax="false" value="Produtos" action="ManterProduto" disabled="#{act eq 2}" />
+                <p:menuitem ajax="false" value="Pedido" action="ManterPedido" disabled="#{act==3}" />
+                <p:menuitem ajax="false" value="Tipo de Pagto" action="ManterTipoPagto" disabled="#{act==4}" />
+                <p:menuitem ajax="false" value="Tabelas Financ." action="ManterTabelaFinanc" disabled="#{act==5}" />
             </p:submenu>
-        </p:menu>  
-        </p:panel>
-    </h:form>
+            <p:submenu label="Configurações">
+                <p:menuitem ajax="false" value="Usuários" action="ManterUsuario"  disabled="#{not loginMB.usuario.admin or act eq 6}" />
+                <p:menuitem ajax="false" value="Gerais" action="ManterConfig" disabled="#{not loginMB.usuario.admin or act eq 7}" />  
+            </p:submenu>
+            <p:submenu label="Consultas">
+                <p:menuitem ajax="false" value="Pedidos" action="ShowPedido"/>
+                <p:menuitem ajax="false" disabled="#{not loginMB.usuario.admin or act eq 8}" value="Boletos" action="ManterBoleto"/> 
+            </p:submenu>
+            <p:submenu label="Relatório">
+                <p:menuitem ajax="false" value="Carta Autorização" action="PrintAutorizacao" disabled="#{act eq 9}" />
+                <p:menuitem ajax="false" value="Simulação" action="SimulaParcela" disabled="#{act eq 10}" />
+            </p:submenu>
+        </p:menu>
 
+    </h:form>
 
 </ui:composition>

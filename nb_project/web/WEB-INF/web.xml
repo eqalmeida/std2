@@ -34,11 +34,12 @@
 
     <context-param>  
         <param-name>primefaces.THEME</param-name>  
-        <param-value>humanity</param-value>  
-<!--        <param-value>ui-lightness</param-value>  
+<!--        <param-value>humanity</param-value>  
+        <param-value>ui-lightness</param-value>  
         <param-value>casablanca</param-value>  
         <param-value>pepper-grinder</param-value>  
         <param-value>cupertino</param-value>  -->
+        <param-value>aristo</param-value> 
     </context-param>   
     
 

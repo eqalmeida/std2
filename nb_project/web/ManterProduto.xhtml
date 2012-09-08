@@ -12,9 +12,9 @@
     </ui:define>
 
     <ui:define name="left">
-        <h:form id="fmenu">
-
-        </h:form>
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
+            <ui:param name="act" value="2" />
+        </ui:include>
     </ui:define>
 
     <ui:define name="content">
@@ -60,10 +60,7 @@
                          paginator="true">
 
                 <p:ajax event="rowSelect"
-                        update=":fmenu"/>  
-
-                <p:ajax event="rowUnselect"
-                        update=":fmenu"/>  
+                        update="@this"/>  
 
                 <p:column headerText="Descrição" rendered="#{produtoBean.tipoProduto eq 0}">
                     <p:commandLink 

@@ -13,6 +13,10 @@
     </ui:define>
 
     <ui:define name="left">
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
+            <ui:param name="act" value="3" />
+        </ui:include>
+        
         <h:form id="fmenu">
             <p:menu>
                 <p:submenu label="Opções">

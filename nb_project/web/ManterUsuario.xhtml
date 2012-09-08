@@ -12,10 +12,9 @@
     </ui:define>
 
     <ui:define name="left">
-        <h:form id="fmenu">
-
-
-        </h:form>    
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
+            <ui:param name="act" value="6" />
+        </ui:include>
     </ui:define>
 
     <ui:define name="content">
@@ -26,21 +25,21 @@
             <table>
                 <tr>
                     <td width="100%">
-                        
+                        <h3>Cadastro de Usuários</h3>
                     </td>
                     <td nowrap="nowrap">
                         <p:commandButton value="Novo Usuário"
                                          actionListener="#{usuarioMB.novo()}"
-                                         
+
                                          update=":formDialog, @form"/>
-                        
+
                     </td>
                 </tr>
             </table>
             <p:dataTable var="it" id="tbl" rowKey="#{it.id}"
                          selectionMode="single" selection="#{usuarioMB.selected}"
                          value="#{usuarioMB.lista}">
-                
+
                 <p:ajax event="rowSelect" update="@this" />
                 <p:ajax event="rowUnselect" update="@this" />
 
@@ -61,59 +60,59 @@
                 <p:column headerText="Admin?">
                     <h:outputText value="#{it.admin?'Sim':'Não'}" />
                 </p:column>
-                
+
                 <f:facet name="footer">
                     <p:commandButton value="Editar"
                                      actionListener="#{usuarioMB.editar(usuarioMB.selected.id)}"
                                      disabled="#{not (usuarioMB.selected.id gt 0)}"
                                      update=":formDialog"/>
-                    
+
                     <p:commandButton disabled="#{not(usuarioMB.selected.id gt 0)}" 
                                      value="Excluir" 
                                      update=":formTable, :message" 
                                      icon="ui-icon-trash" 
                                      actionListener="#{usuarioMB.excluir(usuarioMB.selected.id)}" 
                                      onstart="return confirm('Tem certeza?')"/>  
-                    
+
                     <p:commandButton disabled="#{not(usuarioMB.selected.id gt 0)}" 
                                      value="Alterar Senha" 
                                      update=":fsenha" 
                                      icon="ui-icon-key" 
                                      actionListener="#{usuarioMB.editarSenha}"/>  
-                    
+
                 </f:facet>
 
             </p:dataTable>
 
         </h:form>
-        
+
         <h:form id="fsenha">
             <p:dialog header="Alterando Senha"
-                widgetVar="usDlg" modal="true" resizable="false">
+                      widgetVar="usDlg" modal="true" resizable="false">
 
                 <h:inputHidden value="#{usuarioMB.selected.id}" />
-                
+
                 <p:panelGrid columns="2" columnClasses="label,field" id="frmp">
                     <h:outputText value="Senha:"/>
                     <p:password value="#{usuarioMB.selected.senha}" label="Senha" required="true" id="pw1" match="pw2"/>
-                    
+
                     <h:outputText value="Confirmação da Senha:"/>
                     <p:password value="#{usuarioMB.selected.senha}" label="Senha" required="true" id="pw2"/>
-                    
+
                 </p:panelGrid>
 
                 <f:facet name="footer">
                     <p:commandButton value="Gravar" actionListener="#{usuarioMB.gravar}" update=":formTable, frmp"/>
                 </f:facet>
 
-                
+
             </p:dialog>
         </h:form>
 
         <h:form id="formDialog">
 
             <p:dialog header="#{usuarioMB.selected.id > 0?'Editando':'Inserindo'} Usuário"
-                widgetVar="uDlg" modal="true" resizable="false">
+                      widgetVar="uDlg" modal="true" resizable="false">
 
                 <h:inputHidden value="#{usuarioMB.selected.id}" />
 
