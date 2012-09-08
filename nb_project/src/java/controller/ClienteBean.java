@@ -32,7 +32,6 @@ public class ClienteBean extends ControllerBase implements Serializable {
     private ClienteJpaController service = null;
     private LazyDataModel<Cliente> lazyList = null;
     private List<Pedido> pedidos = null;
-    private boolean showForm = false;
 
     public Cliente getSelected() {
         return selected;
@@ -55,7 +54,7 @@ public class ClienteBean extends ControllerBase implements Serializable {
                 service.create(selected);
             }
             
-            showForm = false;
+            hideDialog("clienteDlg");
         }
         catch(Exception ex) {
             addMessage(ex.getMessage());
@@ -79,7 +78,8 @@ public class ClienteBean extends ControllerBase implements Serializable {
 
     public void novoCliente() {
         selected = new Cliente();
-        showForm = true;
+        pedidos = null;
+        showDialog("clienteDlg");
     }
     
     public void exibirClientes(){
@@ -99,20 +99,20 @@ public class ClienteBean extends ControllerBase implements Serializable {
             addErrorMessage("Não foi possível excluir este cliente!");
         }
     }
-    
-    public void editarCliente(int id){
-        selected = service.findCliente(id);
-        pedidos = null;
-        
+
+    public void showPedidos(){
         if(selected != null){
             pedidos = new ClienteJpaController().findPedidos(selected);
         }
-        showForm = true;
     }
     
-    public void listarClientes(){
-        showForm = false;
-        pedidos = null;
+    public void editarCliente(int id){
+        selected = service.findCliente(id);
+        showDialog("clienteDlg");
+    }
+    
+    public void cancela(){
+        hideDialog("clienteDlg");
     }
 
     public ClienteBean() {
@@ -149,9 +149,4 @@ public class ClienteBean extends ControllerBase implements Serializable {
         this.lazyList = lazyList;
     }
 
-    public boolean isShowForm() {
-        return showForm;
-    }
-    
-    
 }

@@ -24,7 +24,7 @@
 
         <h:panelGroup id="cadCliente">
 
-            <h:form id="formTable" rendered="#{not clienteMB.showForm}">
+            <h:form id="formTable">
 
                 <table>
                     <tr>
@@ -34,39 +34,64 @@
                         <td nowrap="nowrap">
                             <p:commandButton 
                                 value="Novo Cliente" 
-                                action="#{clienteMB.novoCliente()}" update=":cadCliente" />
+                                action="#{clienteMB.novoCliente()}" update=":formDialog, @form, :pedidosForm" />
                         </td>
                     </tr>
                 </table>
 
                 <p:dataTable lazy="true" var="it" id="tbl"
                              value="#{clienteMB.lazyList}" rows="10"
-                             paginatorAlwaysVisible="true"
+                             selectionMode="single" selection="#{clienteMB.selected}" rowKey="#{it.id}"
+                             paginatorAlwaysVisible="false"
                              paginator="true">
 
-                    <p:column headerText="Nome" sortBy="#{it.nome}" filterBy="#{it.nome}">
-                        <p:commandLink 
-                            value="#{it.nome}" 
-                            action="#{clienteMB.editarCliente(it.id)}" update=":cadCliente"/>
+                    <p:ajax event="rowSelect" listener="#{clienteMB.showPedidos()}" update="@this, :pedidosForm"/>
 
+                    <p:column headerText="Nome" sortBy="#{it.nome}" filterBy="#{it.nome}">
+                        #{it.nome}
                     </p:column>
 
                     <p:column headerText="CPF">#{it.cpf}</p:column>
 
                     <p:column headerText="Telefones">#{it.telefones}</p:column>
-                    
+
                     <f:facet name="footer">
-                        <p:commandButton value="Editar" />
+
+                        <h:panelGroup style="with:100%;text-align: left">
+                            <p:commandButton 
+                                value="Editar" 
+                                icon="ui-icon-pencil"
+                                update=":formDialog"
+                                actionListener="#{clienteMB.editarCliente(clienteMB.selected.id)}" disabled="#{not(clienteMB.selected.id gt 0)}"/>
+
+                            <p:commandButton 
+                                onstart="return confirm('Confirma excluir o Cliente?')"
+                                value="Excluir" 
+                                disabled="#{not loginMB.usuario.admin or not (clienteMB.selected.id gt 0)}"
+                                immediate="true"
+                                icon="ui-icon-trash"
+                                action="#{clienteMB.excluirCliente(clienteMB.selected.id)}" 
+                                update="@form"/>
+
+                            <p:commandButton 
+                                value="Adicionar ao Pedido" 
+                                disabled="#{not(clienteMB.selected.id gt 0)}"
+                                immediate="true"
+                                action="#{ clienteMB.addToPedido(clienteMB.selected.id)}" />
+
+                        </h:panelGroup>
                     </f:facet>
                 </p:dataTable>
 
             </h:form>
 
 
-            <h:form id="formDialog" rendered="#{clienteMB.showForm}">
+            <h:form id="formDialog">
 
-                <p:panel id="cliFormId" 
-                         header="${clienteMB.selected.id gt 0?'Editando':'Inserindo'} Cliente">
+                <p:dialog id="cliFormId" 
+                          modal="true"
+                          widgetVar="clienteDlg"
+                          header="${clienteMB.selected.id gt 0?'Editando':'Inserindo'} Cliente">
 
                     <h:inputHidden value="#{clienteMB.selected.id}" />
 
@@ -153,43 +178,17 @@
                     </p:panelGrid>
 
                     <f:facet name="footer">
-
-                        <table>
-                            <tr>
-                                <td width="100%">
-                                    <p:commandButton value="Gravar" actionListener="#{clienteMB.gravar}" update=":cadCliente"/>
-                                    <p:commandButton value="Cancelar" actionListener="#{clienteMB.listarClientes()}" update=":cadCliente" immediate="true"/>
-                                </td>
-                                <td nowrap="nowrap">
-                                    <p:commandButton 
-                                        onstart="return confirm('Confirma excluir o Cliente?')"
-                                        value="Excluir" 
-                                        rendered="#{clienteMB.selected.id gt 0}"
-                                        disabled="#{not loginMB.usuario.admin}"
-                                        immediate="true"
-                                        icon="ui-icon-trash"
-                                        action="#{clienteMB.excluirCliente(clienteMB.selected.id)}" 
-                                        update=":cadCliente"/>
-                                    
-                                    <p:commandButton 
-                                        value="Adicionar ao Pedido" 
-                                        rendered="#{clienteMB.selected.id gt 0}"
-                                        immediate="true"
-                                        action="#{ clienteMB.addToPedido(clienteMB.selected.id)}" />
-                                    
-                                </td>
-                            </tr>
-                        </table>
-
+                        <p:commandButton value="Gravar" actionListener="#{clienteMB.gravar}" update="frm"/>
+                        <p:commandButton value="Cancelar" actionListener="#{clienteMB.cancela()}" immediate="true"/>
                     </f:facet>
 
-                </p:panel>
+                </p:dialog>
 
             </h:form>
 
-            <h:form id="pedidosForm" rendered="#{clienteMB.showForm and not empty clienteMB.pedidos}">
+            <h:form id="pedidosForm">
                 <br/>
-                <p:dataTable tableStyleClass="width:auto" value="#{clienteMB.pedidos}" var="it">
+                <p:dataTable tableStyleClass="width:auto" value="#{clienteMB.pedidos}" var="it" rendered="#{not empty clienteMB.pedidos}">
 
                     <f:facet name="header">Pedidos de #{clienteMB.selected.nome}</f:facet>
 
@@ -216,9 +215,6 @@
 
         </h:panelGroup>
 
-        <br/>
-        <br/>
-        <br/>
     </ui:define>
 
 </ui:composition>

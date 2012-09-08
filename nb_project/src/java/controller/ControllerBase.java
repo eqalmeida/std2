@@ -9,6 +9,7 @@ import javax.faces.context.FacesContext;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import model.Usuario;
+import org.primefaces.context.RequestContext;
 
 /**
  *
@@ -26,6 +27,14 @@ public abstract class ControllerBase {
         Usuario u = context.getApplication().evaluateExpressionGet(context, "#{loginMB}", LoginBean.class).getUsuario();
 
         return u;
+    }
+    
+    static void showDialog(String name){
+            RequestContext.getCurrentInstance().execute(name+".show()");
+    }
+    
+    static void hideDialog(String name){
+            RequestContext.getCurrentInstance().execute(name+".hide()");
     }
     
 

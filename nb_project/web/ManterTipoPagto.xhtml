@@ -64,7 +64,9 @@
                         </p:column>
 
                         <f:facet name="footer">
-                            <p:commandButton value="Editar"
+                            <p:commandButton 
+                                value="Editar"
+                                icon="ui-icon-pencil"
                                              disabled="#{not(tipoPagtoBean.selected.id gt 0)}"
                                              actionListener="#{tipoPagtoBean.editar(tipoPagtoBean.selected.id)}"
                                              update=":formDlg" />

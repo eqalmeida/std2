@@ -44,18 +44,17 @@
 
                     <td nowrap="nowrap">
                         <h:panelGroup  id="Nbts">
-                        <p:commandButton value="Novo Produto"  actionListener="#{produtoBean.novoProduto(0)}" update=":formNewCar" rendered="#{produtoBean.tipoProduto eq 0}"/>
-                        <p:commandButton value="Novo Veículo"  actionListener="#{produtoBean.novoProduto(1)}" update=":formNewCar" rendered="#{produtoBean.tipoProduto eq 1}"/>
+                            <p:commandButton value="Novo Produto"  actionListener="#{produtoBean.novoProduto(0)}" update=":formNewCar,@form" rendered="#{produtoBean.tipoProduto eq 0}"/>
+                            <p:commandButton value="Novo Veículo"  actionListener="#{produtoBean.novoProduto(1)}" update=":formNewCar,@form" rendered="#{produtoBean.tipoProduto eq 1}"/>
                         </h:panelGroup>
                     </td>
 
                 </tr>
             </table>
 
-            <p:spacer height="2"/>
-
             <p:dataTable lazy="true" var="it" id="tbl" 
                          value="#{produtoBean.lazyList}" rows="10"
+                         selectionMode="single" selection="#{produtoBean.selected}" rowKey="#{it.id}"
                          paginatorAlwaysVisible="false"
                          paginator="true">
 
@@ -63,19 +62,12 @@
                         update="@this"/>  
 
                 <p:column headerText="Descrição" rendered="#{produtoBean.tipoProduto eq 0}">
-                    <p:commandLink 
-                        update=":formNewCar"
-                        value="#{it.descricaoGeral}" 
-                        action="#{produtoBean.editarProduto(it.id)}"/>
+                    #{it.descricaoGeral}
 
                 </p:column>
 
                 <p:column headerText="Placa" sortBy="#{it.placa}" rendered="#{produtoBean.tipoProduto eq 1}">
-                    <p:commandLink 
-                        update=":formNewCar"
-                        value="#{it.placa}" 
-                        action="#{produtoBean.editarProduto(it.id)}"/>
-
+                    #{it.placa}
                 </p:column>
 
                 <p:column headerText="Fabricante" sortBy="#{it.fabricante}" rendered="#{produtoBean.tipoProduto eq 1}">
@@ -97,15 +89,34 @@
                 </p:column>
 
                 <p:column headerText="Estoque" sortBy="#{it.qtdEstoque}"> 
-                    <h:outputText value="#{it.qtdEstoque}" rendered="#{it.qtdEstoque >= 0}" />
+                    <h:outputText value="#{it.qtdEstoque eq -1?'-':it.qtdEstoque}"/>
                 </p:column>
 
-                <p:column style="width: fit-content; text-align: center">
-                    <p:commandLink 
+                <f:facet name="footer">
+                    <p:commandButton
+                        disabled="#{not(produtoBean.selected.id gt 0)}"
+                        update=":formNewCar"
+                        value="Editar"
+                        icon="ui-icon-pencil"
+                        action="#{produtoBean.editarProduto(produtoBean.selected.id)}"/>
+
+                    <p:commandButton
+                        disabled="#{not(produtoBean.selected.id gt 0) or not loginMB.usuario.admin}"
+                        icon="ui-icon-trash"
+                        update=":formTable"
+                        value="Excluir" 
+                        immediate="true" 
+                        onstart="return confirm('Confirma excluir este produto?')"
+                        action="#{produtoBean.excluirProduto(produtoBean.selected.id)}" />
+
+
+
+                    <p:commandButton
+                        disabled="#{not(produtoBean.selected.id gt 0)}"
                         value="Adicionar ao pedido" 
-                        actionListener="#{produtoBean.addToPedido(it.id)}"/>
-                </p:column>
+                        actionListener="#{produtoBean.addToPedido(produtoBean.selected.id)}"/>
 
+                </f:facet>
             </p:dataTable>
 
         </h:form>
@@ -163,29 +174,8 @@
                 </p:panelGrid>
 
                 <f:facet name="footer">
-                    <table width="100%">
-                        <tr>
-                            <td nowrap="nowrap">
-                                <p:commandButton value="Gravar" actionListener="#{produtoBean.inserir}" update=":formTable, frm"/>
-                                <p:commandButton value="Cancela" oncomplete="dialogNewCar.hide()" immediate="true"/>
-                            </td>
-                            <td nowrap="nowrap" width="100%">
-
-                            </td>
-                            <td nowrap="nowrap">
-                                <p:commandButton
-                                    rendered="#{produtoBean.selected.id gt 0}"
-                                    icon="ui-icon-trash"
-                                    disabled="#{not loginMB.usuario.admin}"
-                                    update=":formTable"
-                                    value="Excluir" 
-                                    immediate="true" 
-                                    onstart="return confirm('Confirma excluir este produto?')"
-                                    action="#{produtoBean.excluirProduto(produtoBean.selected.id)}" />
-                            </td>
-                        </tr>
-                    </table>
-
+                    <p:commandButton value="Gravar" actionListener="#{produtoBean.inserir}" update=":formTable, frm"/>
+                    <p:commandButton value="Cancela" oncomplete="dialogNewCar.hide()" immediate="true"/>
                 </f:facet>
 
             </p:dialog>

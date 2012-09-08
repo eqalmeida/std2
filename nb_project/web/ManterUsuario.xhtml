@@ -62,12 +62,15 @@
                 </p:column>
 
                 <f:facet name="footer">
-                    <p:commandButton value="Editar"
+                    <p:commandButton 
+                        value="Editar"
+                        icon="ui-icon-pencil"
                                      actionListener="#{usuarioMB.editar(usuarioMB.selected.id)}"
                                      disabled="#{not (usuarioMB.selected.id gt 0)}"
                                      update=":formDialog"/>
 
-                    <p:commandButton disabled="#{not(usuarioMB.selected.id gt 0)}" 
+                    <p:commandButton 
+                        disabled="#{not(usuarioMB.selected.id gt 0)}" 
                                      value="Excluir" 
                                      update=":formTable, :message" 
                                      icon="ui-icon-trash" 
