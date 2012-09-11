@@ -6,7 +6,9 @@ package model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -91,6 +93,16 @@ public class Produto implements Serializable {
 
         return combustivelList;
     }
+    
+    public String getMarcaModelo(){
+        return (this.fabricante + " " + this.modelo);
+    }
+    
+    public String getValorStr(){
+        NumberFormat nf = NumberFormat.getCurrencyInstance();
+        return nf.format(this.valor);
+    }
+            
 
     public String getCombustivelStr() {
         if (getCombustivelList().containsKey(this.combustivel)) {

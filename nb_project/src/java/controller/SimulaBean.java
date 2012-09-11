@@ -25,7 +25,7 @@ import repo.TipoPagtoJpaController;
  */
 @ManagedBean(name = "simulaMB")
 @SessionScoped
-public class SimulaBean extends ControllerBase implements Serializable{
+public class SimulaBean extends ControllerBase implements Serializable {
 
     private List<Produto> produtos;
     private List<TipoPagto> tipoPagtos;
@@ -139,24 +139,22 @@ public class SimulaBean extends ControllerBase implements Serializable{
         List<Coeficiente> coeficientes = new CoeficienteJpaController(getEmf()).findCoeficienteEntities(tabelaId);
 
         NumberFormat fm = NumberFormat.getCurrencyInstance();
-        
+
         for (Coeficiente c : coeficientes) {
             String str = c.getCoeficientePK().getNumParcelas() + " X ";
-            
+
             BigDecimal val = valorTotal.multiply(new BigDecimal(c.getCoeficiente()));
-            
+
             str += fm.format(val);
-            
+
             parcelas.add(str);
         }
 
         mostrar = true;
-        
-            RequestContext.getCurrentInstance().execute("jan=window.open (\"SimulaParcelaPrint.jsf\",\"mywindow\");");
-            RequestContext.getCurrentInstance().execute("jan.print()");
-        
-        
 
+        RequestContext.getCurrentInstance().execute(
+                "window.open (\"SimulaParcelaPrint.jsf\",\"mywindow\",\"height=600, width=800\");"
+                );
     }
 
     public Produto getVeiculo() {
@@ -175,14 +173,14 @@ public class SimulaBean extends ControllerBase implements Serializable{
         return valorVeiculo;
     }
 
-    public void veiculoChanged(){
+    public void veiculoChanged() {
         // Atualiza o valor
         veiculo = new ProdutoJpaController().findProduto(produtoId);
-        if(veiculo != null){
+        if (veiculo != null) {
             valorVeiculo = veiculo.getValor();
         }
     }
-    
+
     public void setValorVeiculo(BigDecimal valorVeiculo) {
         this.valorVeiculo = valorVeiculo;
     }
@@ -191,7 +189,7 @@ public class SimulaBean extends ControllerBase implements Serializable{
         return tipoPagto;
     }
 
-    public Date getData(){
+    public Date getData() {
         return new Date();
     }
 }

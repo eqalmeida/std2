@@ -21,13 +21,13 @@ hr{
 
 table.prn {
     border-collapse:collapse;
-    border-bottom:  solid 1px #333;
-    border-right: solid 1px #333;
+    border-top: solid 1px #333;
+    border-left:solid 1px #333;
 }
 table.prn td,table.prn th{
     font-size: 12px;
-    border-top: solid 1px #333;
-    border-left:solid 1px #333;
+    border-bottom:  solid 1px #333;
+    border-right: solid 1px #333;
 }
 table.prn td{
     padding: 3px 6px;

@@ -44,6 +44,7 @@
 
                     <td nowrap="nowrap">
                         <h:panelGroup  id="Nbts">
+                            <p:commandButton value="Imprimir" icon="ui-icon-print" actionListener="#{produtoBean.imprimir()}" rendered="#{produtoBean.tipoProduto eq 1}" ajax="false"/>
                             <p:commandButton value="Novo Produto"  actionListener="#{produtoBean.novoProduto(0)}" update=":formNewCar,@form" rendered="#{produtoBean.tipoProduto eq 0}"/>
                             <p:commandButton value="Novo Veículo"  actionListener="#{produtoBean.novoProduto(1)}" update=":formNewCar,@form" rendered="#{produtoBean.tipoProduto eq 1}"/>
                         </h:panelGroup>

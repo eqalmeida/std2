@@ -42,7 +42,7 @@ public class PrintReciboBean extends ControllerBase {
 
 
     public void printRecibo(int id) {
-        RequestContext.getCurrentInstance().execute("jan=window.open (\"PrintRecibo.jsf?pagId="+id+"\",\"mywindow\");");
+        RequestContext.getCurrentInstance().execute("jan=window.open (\"PrintRecibo.jsf?pagId="+id+"\",\"mywindow\",\"height=600, width=800\");");
 
     }
 }
