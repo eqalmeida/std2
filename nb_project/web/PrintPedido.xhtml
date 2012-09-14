@@ -1,142 +1,22 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
-                xmlns:ui="http://java.sun.com/jsf/facelets"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="./WEB-INF/templates/templatePrincipal.xhtml"
+                template="./WEB-INF/templates/templateRel.xhtml"
                 xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:f="http://java.sun.com/jsf/core">
-    <ui:define name="top">
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
 
-        <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
-
-    </ui:define>
-
-    <ui:define name="left">
-        
-        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
-            <ui:param name="act" value="9" />
-        </ui:include>
-
-
+    <ui:define name="header">
+        <h3>PEDIDO</h3>
     </ui:define>
 
     <ui:define name="content">
-
+        
         <f:metadata>
             <f:viewParam name="pedidoId" value="#{showPedidoMB.pedidoId}"/>
         </f:metadata>
 
-        <p:growl autoUpdate="true" id="message"/>
-
-        
-
-        <h:form id="fstatus">
-            <p:dialog widgetVar="statusDlg"
-                      resizable="false" 
-                      header="Mudança de Status">
-
-                <p:panel id="statusPn">
-
-                    <h:outputText value="Justificativa"/><br/>
-                    <p:inputTextarea value="#{showPedidoMB.justif}" label="Justificativa" required="true"/>
-
-                    <f:facet name="footer">
-                        <p:commandButton value="Gravar" update=":formTable, :detPedido, statusPn" actionListener="#{showPedidoMB.gravaStatus()}"/>
-                    </f:facet>
-
-                </p:panel>
-
-            </p:dialog>
-        </h:form>
-
-        <h:panelGroup rendered="#{showPedidoMB.pedidoId == null}" id="shpedido">
-
-            <h:form id="formTable">
-
-                <p:panel>
-                    <h:panelGrid columns="4">
-                        Mês:
-                        <p:selectOneMenu value="#{showPedidoMB.mes}" valueChangeListener="#{showPedidoMB.mesChanged}">
-                            <f:selectItems value="#{app.meses}"/>
-                            <f:ajax render=":formTable:tbl" />
-                        </p:selectOneMenu>
-
-                        Ano:
-                        <p:spinner min="1990" maxlength="5" size="5" value="#{showPedidoMB.ano}" valueChangeListener="#{showPedidoMB.anoChanged}">
-                            <f:ajax render=":formTable:tbl" />
-                        </p:spinner>
-                    </h:panelGrid>
-
-                </p:panel>
-                
-                <p:spacer height="5"/>
-
-                <p:dataTable lazy="true" var="it" id="tbl"
-                             selection="#{showPedidoMB.pedido}" selectionMode="single" 
-                             rowKey="#{it.id}"
-                             value="#{showPedidoMB.lista}" rows="10"
-                             paginatorAlwaysVisible="false" 
-                             paginator="true">
-
-
-                    <f:facet name="footer">
-
-
-
-
-
-                        <p:commandButton value="Imprimir" icon="ui-icon-print" ajax="false" disabled="#{not(showPedidoMB.pedido.id gt 0)}">
-                            <p:printer target=":form"/>
-                        </p:commandButton>
-
-                        <p:commandButton value="Cancelar Pedido" update=":fstatus" actionListener="#{showPedidoMB.changeStatus(3)}" rendered="#{showPedidoMB.pedido.status eq 0}"/>
-                        <p:commandButton value="Parar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(4)}" rendered="#{showPedidoMB.pedido.status eq 0}"/>
-                        <p:commandButton value="Reativar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(0)}" rendered="#{showPedidoMB.pedido.status gt 2}"/>
-
-
-
-
-                    </f:facet>
-
-                    <f:facet name="header">
-                        Pedidos de #{showPedidoMB.mesStr} de #{showPedidoMB.ano}
-                    </f:facet>
-
-                    <p:ajax event="rowSelect" listener="#{showPedidoMB.onRowSelected}"
-                            update=":detPedido, @this"/>  
-
-                    <p:column headerText="Número" sortBy="#{it.id}">
-                        <h:outputText value="#{it.id}" />
-                    </p:column>
-
-
-                    <p:column headerText="Data" sortBy="#{it.data}">
-                        <h:outputText value="#{it.data}">
-                            <f:convertDateTime/>
-                        </h:outputText>
-                    </p:column>
-
-                    <p:column headerText="Cliente" sortBy="#{it.cliente.nome}">
-                        <h:outputText value="#{it.cliente.nome}" />
-                    </p:column>
-
-                    <p:column headerText="Valor" sortBy="#{it.valorTotal}">
-                        <h:outputText value="#{it.valorTotal}">
-                            <f:convertNumber type="currency" />
-                        </h:outputText>
-                    </p:column>
-
-                    <p:column headerText="Status" sortBy="#{it.status}">
-                        <h:outputText value="#{it.statusStr}"/>
-                    </p:column>
-
-                </p:dataTable>
-                <br />
-
-            </h:form>
-
-        </h:panelGroup>
         <h:panelGroup id="detPedido">
 
             <f:facet name="header">Detalhes do Pedido</f:facet>
@@ -240,6 +120,11 @@
                         </h:column>
 
                         <h:column>
+                            <f:facet name="header">Qtd</f:facet>
+                            <h:outputText value="#{it.qtd}"/>
+                        </h:column>
+
+                        <h:column>
                             <f:facet name="header">Desconto</f:facet>
                             <h:outputText value="#{it.desconto}"/>
                         </h:column> 
@@ -283,30 +168,18 @@
                             #{it.numParcelas}
                         </h:column>
 
-                        <h:column>
-                            <p:commandLink disabled="#{not(it.parcelas.size() gt 0)}"
-                                           value="Registrar Pagamento" action="#{showPedidoMB.regPag}">
-                                <f:setPropertyActionListener target="#{showPedidoMB.pedidoPagSelected}" value="#{it}" />
-                            </p:commandLink>
-                            <p:spacer width="5"/>
-                            <p:commandLink  disabled="#{not(it.parcelas.size() gt 0)}" value="Imprimir Boletos" action="#{showPedidoMB.printBoletos}">
-                                <f:setPropertyActionListener target="#{showPedidoMB.pedidoPagSelected}" value="#{it}" />
-                            </p:commandLink>
-
-                        </h:column>
-
                     </h:dataTable>
 
                     <br/>
 
-                    <ui:repeat value="#{showPedidoMB.pedido.pagamentos}" var="it" id="pagTables">
+                    <c:forEach items="#{showPedidoMB.pedido.pagamentos}" var="it" id="pagTables">
 
                         <h:panelGroup rendered="#{it.parcelas.size() gt 0}">
 
                             <h:dataTable 
                                 width="100%"
                                 styleClass="prn"
-                                id="tbl_#{par.id}"
+                                id="tbl_#{it.id}"
                                 value="#{it.parcelas}" 
                                 var="par" >
 
@@ -341,7 +214,7 @@
                             <br/>
 
                         </h:panelGroup>
-                    </ui:repeat>
+                    </c:forEach>
                     <br/>
 
                 </h:panelGroup>
@@ -365,3 +238,4 @@
     </ui:define>
 
 </ui:composition>
+

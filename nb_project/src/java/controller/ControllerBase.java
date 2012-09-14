@@ -33,6 +33,10 @@ public abstract class ControllerBase {
             RequestContext.getCurrentInstance().execute(name+".show()");
     }
     
+    static void showPopup(String url){
+        RequestContext.getCurrentInstance().execute("window.open ('"+url+"','mywindow','height=600, width=800');");    
+    }
+    
     static void hideDialog(String name){
             RequestContext.getCurrentInstance().execute(name+".hide()");
     }

@@ -44,6 +44,11 @@ public class ShowPedidoBean extends ControllerBase {
     private short status;
     private String justif;
     
+    public void printPedido(int id) {
+        showPopup("PrintPedido.jsf?pedidoId="+id);
+//        RequestContext.getCurrentInstance().execute("window.open ('PrintPedido.jsf?pedidoId="+id+"','mywindow','height=600, width=800');");
+    }
+    
     public short getStatus() {
         return status;
     }

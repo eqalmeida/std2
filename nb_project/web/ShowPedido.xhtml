@@ -84,20 +84,16 @@
 
                     <f:facet name="footer">
 
-
-
-
-
-                        <p:commandButton value="Imprimir" icon="ui-icon-print" ajax="false" disabled="#{not(showPedidoMB.pedido.id gt 0)}">
-                            <p:printer target=":form"/>
-                        </p:commandButton>
-
+                        <p:commandButton 
+                            value="Imprimir" 
+                            icon="ui-icon-print" 
+                            
+                            actionListener="#{showPedidoMB.printPedido(showPedidoMB.pedido.id)}"
+                            disabled="#{not(showPedidoMB.pedido.id gt 0)}"/>
+                        
                         <p:commandButton value="Cancelar Pedido" update=":fstatus" actionListener="#{showPedidoMB.changeStatus(3)}" rendered="#{showPedidoMB.pedido.status eq 0}"/>
                         <p:commandButton value="Parar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(4)}" rendered="#{showPedidoMB.pedido.status eq 0}"/>
                         <p:commandButton value="Reativar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(0)}" rendered="#{showPedidoMB.pedido.status gt 2}"/>
-
-
-
 
                     </f:facet>
 
@@ -239,6 +235,10 @@
                             <h:outputText value="#{it.valor}">
                                 <f:convertNumber type="currency"/>
                             </h:outputText>
+                        </p:column>
+                        
+                        <p:column headerText="Qtd">
+                            #{it.qtd}
                         </p:column>
 
                         <p:column>
