@@ -5,8 +5,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="./WEB-INF/templates/templatePrincipal.xhtml"
                 xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:c="http://java.sun.com/jsp/jstl/core">
+                xmlns:f="http://java.sun.com/jsf/core">
     <ui:define name="top">
 
         <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
@@ -14,7 +13,7 @@
     </ui:define>
 
     <ui:define name="left">
-
+        
         <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
             <ui:param name="act" value="9" />
         </ui:include>
@@ -30,7 +29,7 @@
 
         <p:growl autoUpdate="true" id="message"/>
 
-
+        
 
         <h:form id="fstatus">
             <p:dialog widgetVar="statusDlg"
@@ -70,16 +69,15 @@
                     </h:panelGrid>
 
                 </p:panel>
-
+                
                 <p:spacer height="5"/>
 
-                <p:dataTable 
-                    lazy="true" var="it" id="tbl"
-                    selection="#{showPedidoMB.pedido}" selectionMode="single" 
-                    rowKey="#{it.id}"
-                    value="#{showPedidoMB.lista}" rows="10"
-                    paginatorAlwaysVisible="false" 
-                    paginator="true">
+                <p:dataTable lazy="true" var="it" id="tbl"
+                             selection="#{showPedidoMB.pedido}" selectionMode="single" 
+                             rowKey="#{it.id}"
+                             value="#{showPedidoMB.lista}" rows="10"
+                             paginatorAlwaysVisible="false" 
+                             paginator="true">
 
 
                     <f:facet name="footer">
@@ -151,7 +149,7 @@
 
                 <h:panelGroup rendered="#{showPedidoMB.pedido != null}" style="width:100%" styleClass="print">
 
-                    <p:panelGrid columns="4" style="width: 100%" columnClasses="label, field,label, field">
+                    <h:panelGrid columns="4" style="width: 100%" styleClass="prn" columnClasses="label, field,label, field">
 
                         <f:facet name="header">Dados do Pedido</f:facet>
 
@@ -175,11 +173,11 @@
                             <f:convertNumber type="currency"/>
                         </h:outputText>
 
-                    </p:panelGrid>
+                    </h:panelGrid>
 
                     <br />
 
-                    <p:panelGrid columns="4" style="width: 100%" columnClasses="label, field,label, field">
+                    <h:panelGrid columns="4" style="width: 100%" styleClass="prn"  columnClasses="label, field,label, field">
 
                         <f:facet name="header">Dados do Cliente</f:facet>
 
@@ -194,13 +192,13 @@
 
                         <h:outputText value="Endereço:"/>
                         <h:outputText value="#{showPedidoMB.pedido.cliente.endereco}"/>
-                    </p:panelGrid>
+                    </h:panelGrid>
 
 
                     <h:panelGroup rendered="#{showPedidoMB.pedido.veiculo != null}">
                         <br/>
 
-                        <p:panelGrid columns="4" style="width: 100%" columnClasses="label, field,label, field">
+                        <h:panelGrid columns="4" style="width: 100%" styleClass="prn" columnClasses="label, field,label, field">
 
                             <f:facet name="header">Dados do Veículo</f:facet>
 
@@ -221,133 +219,129 @@
 
                             <h:outputText value="Cor:"/>
                             <h:outputText value="#{showPedidoMB.pedido.veiculo.produto.cor}"/>
-                        </p:panelGrid>
+                        </h:panelGrid>
                     </h:panelGroup>
                     <br/>
 
-                    <p:dataTable value="#{showPedidoMB.pedido.itens}" var="it" width="100%">
+                    <h:dataTable value="#{showPedidoMB.pedido.itens}" var="it" styleClass="prn" width="100%">
 
                         <f:facet name="header">Itens do Pedido</f:facet>
 
-                        <p:column>
+                        <h:column>
                             <f:facet name="header">Produto</f:facet>
                             #{it.produto}
-                        </p:column>
+                        </h:column>
 
-                        <p:column>
+                        <h:column>
                             <f:facet name="header">Valor Unit.</f:facet>
                             <h:outputText value="#{it.valor}">
                                 <f:convertNumber type="currency"/>
                             </h:outputText>
-                        </p:column>
+                        </h:column>
 
-                        <p:column>
+                        <h:column>
                             <f:facet name="header">Desconto</f:facet>
                             <h:outputText value="#{it.desconto}"/>
-                        </p:column> 
+                        </h:column> 
 
-                        <p:column>
+                        <h:column>
                             <f:facet name="header">Valor Total</f:facet>
                             <h:outputText value="#{it.valorTotal}">
                                 <f:convertNumber type="currency"/>
                             </h:outputText>
-                        </p:column>
-                    </p:dataTable>
+                        </h:column>
+                    </h:dataTable>
 
                     <br/>
 
 
-                    <p:dataTable var="it" value="#{showPedidoMB.pedido.pagamentos}">
+                    <h:dataTable var="it" value="#{showPedidoMB.pedido.pagamentos}" styleClass="prn" width="100%">
 
                         <f:facet name="header">Formas de Pagamento</f:facet>
 
-                        <p:column>
+                        <h:column>
                             <f:facet name="header">Tipo</f:facet>
                             #{it.tipoPagto}
-                        </p:column>
+                        </h:column>
 
-                        <p:column>
+                        <h:column>
                             <f:facet name="header">Valor</f:facet>
                             <h:outputText value="#{it.valor}">
                                 <f:convertNumber type="currency"/>
                             </h:outputText> 
-                        </p:column>
+                        </h:column>
 
-                        <p:column>
+                        <h:column>
                             <f:facet name="header">Data</f:facet>
                             <h:outputText value="#{it.dataVenc}">
                                 <f:convertDateTime/>
                             </h:outputText>
-                        </p:column>
+                        </h:column>
 
-                        <p:column>
+                        <h:column>
                             <f:facet name="header">Num. Parcelas</f:facet>
                             #{it.numParcelas}
-                        </p:column>
+                        </h:column>
 
-                        <p:column>
-                            
-                            <p:commandButton
-                                disabled="#{not(it.parcelas.size() gt 0)}"
-                                value="Registrar Pagamento" 
-                                action="#{showPedidoMB.regPag(it.id)}">
-                            </p:commandButton>
-                            
+                        <h:column>
+                            <p:commandLink disabled="#{not(it.parcelas.size() gt 0)}"
+                                           value="Registrar Pagamento" action="#{showPedidoMB.regPag}">
+                                <f:setPropertyActionListener target="#{showPedidoMB.pedidoPagSelected}" value="#{it}" />
+                            </p:commandLink>
                             <p:spacer width="5"/>
-                            
-                            <p:commandButton
-                                disabled="#{not(it.parcelas.size() gt 0)}" 
-                                value="Imprimir Boletos" 
-                                action="#{showPedidoMB.printBoletos(it.id)}">
-                            </p:commandButton>
+                            <p:commandLink  disabled="#{not(it.parcelas.size() gt 0)}" value="Imprimir Boletos" action="#{showPedidoMB.printBoletos}">
+                                <f:setPropertyActionListener target="#{showPedidoMB.pedidoPagSelected}" value="#{it}" />
+                            </p:commandLink>
 
-                        </p:column>
+                        </h:column>
 
-                    </p:dataTable>
+                    </h:dataTable>
 
                     <br/>
 
-                    <c:forEach items="#{showPedidoMB.pedido.pagamentos}" var="it" id="pagTables">
+                    <ui:repeat value="#{showPedidoMB.pedido.pagamentos}" var="it" id="pagTables">
 
-                        <h:panelGroup rendered="#{not empty it.parcelas}">
+                        <h:panelGroup rendered="#{it.parcelas.size() gt 0}">
 
-                            <p:dataTable 
-                                id="tbl_#{it.id}"
+                            <h:dataTable 
+                                width="100%"
+                                styleClass="prn"
+                                id="tbl_#{par.id}"
                                 value="#{it.parcelas}" 
                                 var="par" >
 
                                 <f:facet name="header">Parcelas em #{it.tipoPagto}</f:facet>
 
-                                <p:column>
+                                <h:column>
                                     <f:facet name="header">Parcela</f:facet>
                                     #{par.numParcela}
-                                </p:column>
+                                </h:column>
 
-                                <p:column>
+                                <h:column>
                                     <f:facet name="header">Vencimento</f:facet>
                                     <h:outputText value="#{par.vencimento}">
                                         <f:convertDateTime/>
                                     </h:outputText>
-                                </p:column>
+                                </h:column>
 
-                                <p:column>
+                                <h:column>
                                     <f:facet name="header">Valor</f:facet>
                                     <h:outputText value="#{par.valor}">
                                         <f:convertNumber type="currency"/>
                                     </h:outputText>
-                                </p:column>
+                                </h:column>
 
-                                <p:column>
+                                <h:column>
                                     <f:facet name="header">Status</f:facet>
                                     #{par.statusStr}
-                                </p:column>
+                                </h:column>
 
-                            </p:dataTable>
+                            </h:dataTable>
 
                             <br/>
 
                         </h:panelGroup>
-                    </c:forEach>
+                    </ui:repeat>
                     <br/>
 
                 </h:panelGroup>

@@ -191,7 +191,7 @@ public class ProdutoJpaController implements Serializable {
     }
     
     public List<Produto> findVeiculosEmEstoque(){
-        return findProdutosByQuery("SELECT p FROM Produto p WHERE p.tipo = 1 and p.qtdEstoque != 0");
+        return findProdutosByQuery("SELECT p FROM Produto p WHERE p.tipo = 1 and p.qtdEstoque != 0 ORDER BY p.fabricante, p.modelo");
     }
 
     private String getWhere(){

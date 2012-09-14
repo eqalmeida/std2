@@ -98,11 +98,6 @@ public class Produto implements Serializable {
         return (this.fabricante + " " + this.modelo);
     }
     
-    public String getValorStr(){
-        NumberFormat nf = NumberFormat.getCurrencyInstance();
-        return nf.format(this.valor);
-    }
-            
 
     public String getCombustivelStr() {
         if (getCombustivelList().containsKey(this.combustivel)) {

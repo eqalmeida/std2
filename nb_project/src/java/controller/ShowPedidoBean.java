@@ -177,14 +177,9 @@ public class ShowPedidoBean extends ControllerBase {
         }
     }
     
-    public void regPag() {
+    public void regPag(int id) {
         
-        if (pedidoPagSelected == null) {
-            addErrorMessage("Identificação inválida!");
-            return;
-        }
-        
-        String red = "RegPagamento.jsf?id=" + pedidoPagSelected.getId();
+        String red = "RegPagamento.jsf?id=" + id;
         pedidoPagSelected = null;
         try {
             FacesContext.getCurrentInstance().getExternalContext().redirect(red);
@@ -194,14 +189,9 @@ public class ShowPedidoBean extends ControllerBase {
         
     }
     
-    public void printBoletos() {
+    public void printBoletos(int id) {
         
-        if (pedidoPagSelected == null) {
-            addErrorMessage("Identificação inválida!");
-            return;
-        }
-        
-        String red = "PrintBoleto.jsf?id=" + pedidoPagSelected.getId();
+        String red = "PrintBoleto.jsf?id=" + id;
         pedidoPagSelected = null;
         try {
             FacesContext.getCurrentInstance().getExternalContext().redirect(red);
