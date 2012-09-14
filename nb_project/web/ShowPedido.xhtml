@@ -84,13 +84,6 @@
 
                     <f:facet name="footer">
 
-                        <p:commandButton 
-                            value="Imprimir" 
-                            icon="ui-icon-print" 
-                            
-                            actionListener="#{showPedidoMB.printPedido(showPedidoMB.pedido.id)}"
-                            disabled="#{not(showPedidoMB.pedido.id gt 0)}"/>
-                        
                         <p:commandButton value="Cancelar Pedido" update=":fstatus" actionListener="#{showPedidoMB.changeStatus(3)}" rendered="#{showPedidoMB.pedido.status eq 0}"/>
                         <p:commandButton value="Parar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(4)}" rendered="#{showPedidoMB.pedido.status eq 0}"/>
                         <p:commandButton value="Reativar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(0)}" rendered="#{showPedidoMB.pedido.status gt 2}"/>
@@ -236,7 +229,7 @@
                                 <f:convertNumber type="currency"/>
                             </h:outputText>
                         </p:column>
-                        
+
                         <p:column headerText="Qtd">
                             #{it.qtd}
                         </p:column>
@@ -286,15 +279,15 @@
                         </p:column>
 
                         <p:column>
-                            
+
                             <p:commandButton
                                 disabled="#{not(it.parcelas.size() gt 0)}"
                                 value="Registrar Pagamento" 
                                 action="#{showPedidoMB.regPag(it.id)}">
                             </p:commandButton>
-                            
+
                             <p:spacer width="5"/>
-                            
+
                             <p:commandButton
                                 disabled="#{not(it.parcelas.size() gt 0)}" 
                                 value="Imprimir Boletos" 
@@ -348,7 +341,14 @@
 
                         </h:panelGroup>
                     </c:forEach>
-                    <br/>
+
+                    <p:panel>
+                        <p:commandButton 
+                            value="Imprimir" 
+                            icon="ui-icon-print" 
+                            actionListener="#{showPedidoMB.printPedido(showPedidoMB.pedido.id)}"/>
+
+                    </p:panel>
 
                 </h:panelGroup>
 

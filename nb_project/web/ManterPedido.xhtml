@@ -17,16 +17,6 @@
             <ui:param name="act" value="3" />
         </ui:include>
         
-        <h:form id="fmenu">
-            <p:menu>
-                <p:submenu label="Opções">
-                    <p:menuitem icon="ui-icon-document" value="Pagamento" actionListener="#{pedidoMB.novoPag}" update=":formPagDialog"/>
-
-                    <p:menuitem icon="ui-icon-disk" actionListener="#{pedidoMB.gravaPedido}" value="Gravar" update=":formPagDialog, :formItem, :form"/>
-                    <p:menuitem icon="ui-icon-trash" actionListener="#{pedidoMB.cancelaPedido()}" value="Cancelar" onclick="return confirm('Confirma o cancelamento?')" ajax="false"/>
-                </p:submenu>
-            </p:menu>
-        </h:form>
     </ui:define>
 
     <ui:define name="content">
@@ -170,6 +160,14 @@
                          rendered="#{not empty pedidoMB.pedido.itens}">
 
                 <f:facet name="header">Pagamento</f:facet>
+                
+                <f:facet name="footer">
+                    <p:commandButton 
+                        icon="ui-icon-document" 
+                        value="Adicionar Pagamento" 
+                        actionListener="#{pedidoMB.novoPag}" 
+                        update=":formPagDialog"/>
+                </f:facet>
 
                 <p:column headerText="Item">
                     #{it.id}
@@ -265,6 +263,14 @@
 
             </p:dialog>
 
+        </h:form>
+        
+        <h:form>
+            <p:panel>
+                <p:commandButton icon="ui-icon-disk" actionListener="#{pedidoMB.gravaPedido}" value="Gravar" update=":formPagDialog, :formItem, :form"/>
+                <p:commandButton icon="ui-icon-trash" actionListener="#{pedidoMB.cancelaPedido()}" value="Cancelar" onclick="return confirm('Confirma o cancelamento?')" ajax="false"/>
+                
+            </p:panel>
         </h:form>
 
 

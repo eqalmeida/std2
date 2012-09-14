@@ -10,6 +10,7 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -581,7 +582,22 @@ public class PedidoBean extends ControllerBase implements Serializable {
             addErrorMessage("Falha de Login!");
             return;
         }
+        
+        BigDecimal soma = BigDecimal.ZERO;
+        
+        for(PedidoPag pag : pagamentos){
+            soma = soma.add(pag.getValor());
+        }
+        
+        if(soma.doubleValue() < getValorTotalPedido().doubleValue()){
+            addErrorMessage("O valor em pagamentos é inferior ao valor do Pedido!");
+            return;
+        }
 
+        if(soma.doubleValue() > getValorTotalPedido().doubleValue()){
+            addErrorMessage("O valor em pagamentos é superior ao valor do Pedido!");
+            return;
+        }
 
 
         List<PedidoProduto> itensCopy = new ArrayList<PedidoProduto>();
@@ -595,10 +611,8 @@ public class PedidoBean extends ControllerBase implements Serializable {
             em = pedidoService.getEntityManager();
             em.getTransaction().begin();
 
-            addLog("Instancia EM ok");
-
             pedido.setValorTotal(getValorTotalPedido());
-            pedido.setData(Calendar.getInstance().getTime());
+            pedido.setData(new Date());
 
             itensCopy.addAll(pedido.getItens());
             pedido.setItens(null);
@@ -662,13 +676,14 @@ public class PedidoBean extends ControllerBase implements Serializable {
                 em.persist(it);
 
             }
-
+            
+            
 
             /**
              * Grava as formas de pagamento
              */
             for (PedidoPag pag : pagamentos) {
-
+                
                 TipoPagto tipoPagto = pag.getTipoPagto();
                 if (tipoPagto != null) {
                     tipoPagto = em.getReference(tipoPagto.getClass(), tipoPagto.getId());
