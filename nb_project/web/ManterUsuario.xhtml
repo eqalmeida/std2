@@ -17,25 +17,15 @@
         </ui:include>
     </ui:define>
 
+    <ui:define name="title">
+        Cadastro de Usuários
+    </ui:define>
+
     <ui:define name="content">
         <p:growl autoUpdate="true" id="message"/>
 
         <h:form id="formTable">
 
-            <table>
-                <tr>
-                    <td width="100%">
-                        <h3>Cadastro de Usuários</h3>
-                    </td>
-                    <td nowrap="nowrap">
-                        <p:commandButton value="Novo Usuário"
-                                         actionListener="#{usuarioMB.novo()}"
-
-                                         update=":formDialog, @form"/>
-
-                    </td>
-                </tr>
-            </table>
             <p:dataTable var="it" id="tbl" rowKey="#{it.id}"
                          selectionMode="single" selection="#{usuarioMB.selected}"
                          value="#{usuarioMB.lista}">
@@ -63,19 +53,24 @@
 
                 <f:facet name="footer">
                     <p:commandButton 
+                        value="Novo Usuário"
+                        actionListener="#{usuarioMB.novo()}"
+                        update=":formDialog, @form"/>
+
+                    <p:commandButton 
                         value="Editar"
                         icon="ui-icon-pencil"
-                                     actionListener="#{usuarioMB.editar(usuarioMB.selected.id)}"
-                                     disabled="#{not (usuarioMB.selected.id gt 0)}"
-                                     update=":formDialog"/>
+                        actionListener="#{usuarioMB.editar(usuarioMB.selected.id)}"
+                        disabled="#{not (usuarioMB.selected.id gt 0)}"
+                        update=":formDialog"/>
 
                     <p:commandButton 
                         disabled="#{not(usuarioMB.selected.id gt 0)}" 
-                                     value="Excluir" 
-                                     update=":formTable, :message" 
-                                     icon="ui-icon-trash" 
-                                     actionListener="#{usuarioMB.excluir(usuarioMB.selected.id)}" 
-                                     onstart="return confirm('Tem certeza?')"/>  
+                        value="Excluir" 
+                        update=":formTable, :message" 
+                        icon="ui-icon-trash" 
+                        actionListener="#{usuarioMB.excluir(usuarioMB.selected.id)}" 
+                        onstart="return confirm('Tem certeza?')"/>  
 
                     <p:commandButton disabled="#{not(usuarioMB.selected.id gt 0)}" 
                                      value="Alterar Senha" 

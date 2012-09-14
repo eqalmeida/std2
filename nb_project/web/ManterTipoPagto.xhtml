@@ -16,6 +16,10 @@
                 <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
 
             </ui:define>
+            
+            <ui:define name="title">
+                Cadastro de Tipos de Pagamento
+            </ui:define>
 
             <ui:define name="left">
                 <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
@@ -29,18 +33,7 @@
 
                     <p:growl autoUpdate="true" id="message"/>
 
-                    <table>
-                        <tr>
-                            <td width="100%">
-                                <h3>Cadastro de Tipos de Pagamento</h3>
-                            </td>
-                            <td nowrap="nowrap">
-                                <p:commandButton value="Novo Tipo de Pagamento"
-                                                 actionListener="#{tipoPagtoBean.novo()}"
-                                                 update=":formDlg, tbl"/>
-                            </td>
-                        </tr>
-                    </table>
+                                
 
                     <p:dataTable id="tbl" value="#{tipoPagtoBean.lista}" 
                                  rowKey="#{it.id}"
@@ -64,6 +57,9 @@
                         </p:column>
 
                         <f:facet name="footer">
+                                <p:commandButton value="Novo Tipo de Pagamento"
+                                                 actionListener="#{tipoPagtoBean.novo()}"
+                                                 update=":formDlg, tbl"/>
                             <p:commandButton 
                                 value="Editar"
                                 icon="ui-icon-pencil"

@@ -21,53 +21,67 @@
                     <h:panelGroup>
                         <ui:insert name="top">Top</ui:insert>
                     </h:panelGroup>
-
-                    <h:panelGroup>
-                        <h:outputText value="Usuário: #{loginMB.usuario} | " rendered="#{loginMB.usuario != null}"/>
-                        <p:commandLink value="Sair" actionListener="#{loginMB.logoff}"  update=":corpoId" ajax="false" rendered="#{loginMB.usuario != null}"/>
-                    </h:panelGroup>
-
-
                 </h:panelGrid>
 
             </h:form>
         </div>
-        <div id="left-sidebar">
-
-            <ui:insert name="left">Left</ui:insert>
-
-        </div>
-        <div id="content"> 
-            <ui:insert name="content">Content</ui:insert>   
-            
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-
-            <h:form id="loginForm">
-
-                <h:panelGroup>
-                    <p:dialog widgetVar="loginDialog" closable="false" modal="true" visible="#{loginMB.usuario eq null?'true':'false'}" resizable="false" header="Login de Usuário">
-                        <p:panelGrid columns="2">
-                            <h:outputText value="Login:" />
-                            <p:inputText value="#{loginMB.login}" required="true" label="Login"/>
-
-
-                            <h:outputText value="Senha:" />
-                            <p:password value="#{loginMB.senha}" required="true" label="Senha"/>
-                            <f:facet name="footer">
-                                <p:commandButton value="Efetuar Login" actionListener="#{loginMB.login}" update=":loginForm, :menuBarForm" ajax="false"/>
-                            </f:facet>
-                        </p:panelGrid>
-
-                    </p:dialog>
-
-                </h:panelGroup>
-
+        <div id="menuBar">
+            <h:form>
+            <table cellpadding="0" cellspacing="0" width="100%" border="0">
+                <tr>
+                    <td width="100%">
+                        <ui:insert name="title"></ui:insert>
+                    </td>
+                    <td nowrap="nowrap">
+                <h:outputText value="Usuário: #{loginMB.usuario} | " rendered="#{loginMB.usuario != null}"/>
+                <p:commandLink value="Sair" actionListener="#{loginMB.logoff}"  update=":corpoId" ajax="false" rendered="#{loginMB.usuario != null}"/>
+                    </td>
+                </tr>
+            </table>
             </h:form>
+        </div>
+        <div style="width: 100%; margin-right: 20px">
+            <table cellpadding="10px" cellspacing="0" width="100%">
+                <tr>
+                    <td valign="top" nowrap="nowrap" >
+                        <ui:insert name="left">Left</ui:insert>
 
-        </div>    
+                    </td>
+                    <td width="100%" valign="top">
+                        <h:panelGroup rendered="#{loginMB.logedin}">
+                        <ui:insert name="content">Content</ui:insert>
+                        </h:panelGroup>
+
+                        <h:panelGrid rendered="#{not loginMB.logedin}">
+                        <h:form id="loginForm">
+                            
+                            <p:messages/>
+
+                            <h:panelGroup>
+                                    <p:panelGrid columns="2">
+                                        <h:outputText value="Login:" />
+                                        <p:inputText value="#{loginMB.login}" required="true" label="Login"/>
+
+
+                                        <h:outputText value="Senha:" />
+                                        <p:password value="#{loginMB.senha}" required="true" label="Senha"/>
+                                        <f:facet name="footer">
+                                            <p:commandButton value="Efetuar Login" actionListener="#{loginMB.login}" update=":loginForm, :menuBarForm" ajax="false"/>
+                                        </f:facet>
+                                    </p:panelGrid>
+
+                            </h:panelGroup>
+
+                        </h:form>
+                        </h:panelGrid>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
     </h:body>
 
 </html>

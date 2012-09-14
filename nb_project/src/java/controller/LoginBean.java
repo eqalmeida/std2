@@ -99,6 +99,10 @@ public class LoginBean extends ControllerBase {
             }
         }
     }
+    
+    public boolean isLogedin(){
+        return (this.usuarioId != null);
+    }
 
     public void logoff() {
         usuarioId = null;

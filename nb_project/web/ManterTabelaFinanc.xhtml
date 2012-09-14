@@ -17,6 +17,10 @@
 
             </ui:define>
 
+            <ui:define name="title">
+                Cadastro de Tabelas de Financiamento
+            </ui:define>
+
             <ui:define name="left">
                 <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
                     <ui:param name="act" value="5" />
@@ -30,21 +34,6 @@
 
                 <h:form id="form">
 
-                    <table>
-                        <tr>
-                            <td width="100%">
-                                <h3>Cadastro de Tabelas de Financiamento</h3>
-                            </td>
-
-                            <td nowrap="nowrap">
-                                <p:commandButton value="Nova Tabela"
-                                                 action="#{tabelaFinancBean.novo()}"
-                                                 update=":fEdit, :form"/>
-                            </td>
-
-                        </tr>
-                    </table>
-
                     <p:dataTable
                         selectionMode="single" selection="#{tabelaFinancBean.selected}" rowKey="#{it.id}"
                         value="#{tabelaFinancBean.tabelas}" var="it">
@@ -54,6 +43,9 @@
                         <p:ajax event="rowSelect" update="@form" />
 
                         <f:facet name="footer">
+                            <p:commandButton value="Nova Tabela"
+                                             action="#{tabelaFinancBean.novo()}"
+                                             update=":fEdit, :form"/>
                             <p:commandButton
                                 disabled="#{not(tabelaFinancBean.selected.id gt 0)}"
                                 value="Editar Tabela"
@@ -114,7 +106,7 @@
                                      var="coef" tableStyle="width: auto">
 
                             <f:facet name="header">
-                                <h:outputText value="Coeficientes de: #{tabelaFinancBean.selected.descricao}" />
+                                <h:outputText value="Coeficientes da tabela: [#{tabelaFinancBean.selected.descricao}]" />
                             </f:facet>
 
                             <p:column headerText="Num. Parcelas">

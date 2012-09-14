@@ -82,20 +82,13 @@
                     paginator="true">
 
 
-                    <f:facet name="footer">
-
-                        <p:commandButton value="Cancelar Pedido" update=":fstatus" actionListener="#{showPedidoMB.changeStatus(3)}" rendered="#{showPedidoMB.pedido.status eq 0}"/>
-                        <p:commandButton value="Parar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(4)}" rendered="#{showPedidoMB.pedido.status eq 0}"/>
-                        <p:commandButton value="Reativar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(0)}" rendered="#{showPedidoMB.pedido.status gt 2}"/>
-
-                    </f:facet>
 
                     <f:facet name="header">
                         Pedidos de #{showPedidoMB.mesStr} de #{showPedidoMB.ano}
                     </f:facet>
 
                     <p:ajax event="rowSelect" listener="#{showPedidoMB.onRowSelected}"
-                            update=":detPedido, @this"/>  
+                            update=":detPedido, @form"/>  
 
                     <p:column headerText="Número" sortBy="#{it.id}">
                         <h:outputText value="#{it.id}" />
@@ -127,12 +120,40 @@
 
             </h:form>
 
+
         </h:panelGroup>
+
+
         <h:panelGroup id="detPedido">
 
             <f:facet name="header">Detalhes do Pedido</f:facet>
 
             <h:form id="form" rendered="#{showPedidoMB.pedido != null}">
+
+                <p:panel>
+
+                    <table border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td width="100%">
+
+                            </td>
+                            <td nowrap="nowrap">
+
+                                <p:commandButton 
+                                    value="Imprimir" 
+                                    icon="ui-icon-print" 
+                                    actionListener="#{showPedidoMB.printPedido(showPedidoMB.pedido.id)}"/>
+
+                                <p:commandButton value="Cancelar Pedido" update=":fstatus" actionListener="#{showPedidoMB.changeStatus(3)}"  rendered="#{showPedidoMB.pedido.status eq 0}"/>
+                                <p:commandButton value="Parar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(4)}"  rendered="#{showPedidoMB.pedido.status eq 0}"/>
+                                <p:commandButton value="Reativar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(0)}" rendered="#{showPedidoMB.pedido.status gt 2}"/>
+
+
+                            </td>
+                        </tr>
+                    </table>
+                </p:panel>
+                <br />
 
                 <h:panelGroup rendered="#{showPedidoMB.pedido == null}">
                     Pedido #{showPedidoMB.pedidoId} inexistente!
@@ -341,14 +362,6 @@
 
                         </h:panelGroup>
                     </c:forEach>
-
-                    <p:panel>
-                        <p:commandButton 
-                            value="Imprimir" 
-                            icon="ui-icon-print" 
-                            actionListener="#{showPedidoMB.printPedido(showPedidoMB.pedido.id)}"/>
-
-                    </p:panel>
 
                 </h:panelGroup>
 

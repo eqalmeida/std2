@@ -16,15 +16,9 @@
     </ui:define>
 
     <ui:define name="left">
-        <h:form>
-            <p:menu>
-                <p:menuitem 
-                    value="Novo Pagamento" 
-                    actionListener="#{pagMB.novoPagamento}" 
-                    update=":formDialog" />
-
-            </p:menu>
-        </h:form>
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
+            <ui:param name="act" value="9" />
+        </ui:include>
     </ui:define>
 
     <ui:define name="content">
@@ -261,6 +255,17 @@
                 </p:dataTable>
 
             </h:form>            
+            
+        <h:form>
+            <p:panel>
+                <p:commandButton
+                    value="Novo Pagamento" 
+                    actionListener="#{pagMB.novoPagamento}" 
+                    update=":formDialog" />
+
+            </p:panel>
+        </h:form>
+            
         </h:panelGroup>
     </ui:define>
 
