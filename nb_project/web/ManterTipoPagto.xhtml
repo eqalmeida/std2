@@ -16,7 +16,7 @@
                 <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
 
             </ui:define>
-            
+
             <ui:define name="title">
                 Cadastro de Tipos de Pagamento
             </ui:define>
@@ -33,7 +33,7 @@
 
                     <p:growl autoUpdate="true" id="message"/>
 
-                                
+
 
                     <p:dataTable id="tbl" value="#{tipoPagtoBean.lista}" 
                                  rowKey="#{it.id}"
@@ -42,10 +42,6 @@
                                  var="it" >
 
                         <p:ajax event="rowSelect" update=":formPick, @this" listener="#{tipoPagtoBean.onRowSelect}"/>
-
-                        <p:column headerText="Id">
-                            <h:outputText value="#{it.id}"/>
-                        </p:column>
 
                         <p:column headerText="Descrição">
                             <h:outputText value="#{it.descricao}"/>
@@ -57,15 +53,18 @@
                         </p:column>
 
                         <f:facet name="footer">
-                                <p:commandButton value="Novo Tipo de Pagamento"
-                                                 actionListener="#{tipoPagtoBean.novo()}"
-                                                 update=":formDlg, tbl"/>
+                            <p:commandButton 
+                                value="Inserir"
+                                icon="ui-icon-document"
+                                actionListener="#{tipoPagtoBean.novo()}"
+                                update=":formDlg, tbl"/>
+
                             <p:commandButton 
                                 value="Editar"
                                 icon="ui-icon-pencil"
-                                             disabled="#{not(tipoPagtoBean.selected.id gt 0)}"
-                                             actionListener="#{tipoPagtoBean.editar(tipoPagtoBean.selected.id)}"
-                                             update=":formDlg" />
+                                disabled="#{not(tipoPagtoBean.selected.id gt 0)}"
+                                actionListener="#{tipoPagtoBean.editar(tipoPagtoBean.selected.id)}"
+                                update=":formDlg" />
 
                             <p:commandButton value="Excluir"
                                              icon="ui-icon-trash"

@@ -16,32 +16,29 @@ import repo.BoletoJpaController;
  * @author eqalmeida
  */
 public class BoletoLazyList extends LazyDataModel<Boleto> {
-    
+
     private BoletoJpaController service = null;
     private Date dateTo = null;
     private Date dateFrom = null;
+    private boolean atrasados = false;
 
     public BoletoLazyList(BoletoJpaController service) {
         this.service = service;
     }
-    
-    
 
     @Override
     public List<Boleto> load(int startingAt, int maxPerPage, String sortField, SortOrder sortOrder, Map<String, String> filters) {
-/*
-        service.setFilterNome(null);
+        /*
+         service.setFilterNome(null);
 
-        for(String filterP : filters.keySet()){
-            if(filterP.equalsIgnoreCase("nome")){
-                service.setFilterNome(filters.get(filterP));
-                break;
-            }
-        }
-*/     
-        
-        service.setDatas(dateTo, dateFrom);
-        
+         for(String filterP : filters.keySet()){
+         if(filterP.equalsIgnoreCase("nome")){
+         service.setFilterNome(filters.get(filterP));
+         break;
+         }
+         }
+         */
+
         if (sortField != null && sortOrder != SortOrder.UNSORTED) {
             String ord = "";
 
@@ -54,13 +51,20 @@ public class BoletoLazyList extends LazyDataModel<Boleto> {
             service.setSortedField(sortField, ord);
         }
 
+        List<Boleto> lista;
 
-        List<Boleto> lista = service.findBoletoEntities(maxPerPage, startingAt);
+        if (atrasados == false) {
+            service.setDatas(dateTo, dateFrom);
+            lista = service.findBoletoEntities(maxPerPage, startingAt);
+            setRowCount(service.getBoletoCount());
 
-        setRowCount(service.getBoletoCount());
+        }
+        else{
+            lista = service.findBoletosAtrasados(maxPerPage, startingAt);
+            setRowCount(service.getBoletosAtrasadosCount());
+        }
 
         setPageSize(maxPerPage);
-
 
         return (lista);
     }
@@ -77,7 +81,7 @@ public class BoletoLazyList extends LazyDataModel<Boleto> {
             Integer id = Integer.valueOf(Id);
 
             b = service.findBoleto(id);
-            
+
         } catch (Exception ex) {
         }
         return b;
@@ -91,6 +95,7 @@ public class BoletoLazyList extends LazyDataModel<Boleto> {
         this.dateFrom = dateFrom;
     }
 
-    
-    
+    public void setAtrasados(boolean atrasados) {
+        this.atrasados = atrasados;
+    }
 }

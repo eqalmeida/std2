@@ -7,29 +7,6 @@ html, body {
     border-collapse: collapse;
 }
 
-.cxtop{
-    font-size: 7px;
-    margin: 0;
-    text-wrap: none;
-}
-
-.cxdentro{
-    width: 100%;
-    font-weight: bold;
-    font-size: 12px;
-    margin: 3px 0 0 0;
-    text-align: center;
-    text-wrap: none;
-}
-
-.cxdentroL{
-    width: 100%;
-    font-weight: bold;
-    font-size: 12px;
-    margin: 3px 0 0 0;
-    text-align: left;
-    text-wrap: none;
-}
 
 #corpo{
     background-color: #fff;

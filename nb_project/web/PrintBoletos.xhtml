@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link href="./resources/css/print.css" rel="stylesheet" type="text/css" />
+    </h:head>
+
+    <h:body>
+
+
+        <f:metadata>
+            <f:viewParam name="pagId" value="#{printBoletoMB.pagId}"/>
+        </f:metadata>
+
+
+        <h:outputScript name="locales_prime.js" library="js" /> 
+
+        <!--
+                        Verifica se a informação é válida
+        -->
+        <h:panelGroup rendered="#{printBoletoMB.pedidoPag eq null}">
+            <p:panel header="Atenção">
+                A forma de pagamento não foi selecionada!
+            </p:panel>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{printBoletoMB.pedidoPag != null}" style="background: #fff">
+            <h:form id="lbol">
+
+                <ui:param name="bolVar" value="#{app.config.boletosPorPag}"/>
+
+                <ui:repeat value="#{printBoletoMB.pedidoPag.parcelas}" var="it" >
+                    <div style="margin: 0 10px 0 20px; background-color: #fff">
+
+
+
+                        <table class="boleto">
+                            <tr>
+                                <td>
+                                    <div class="cxtop">VALOR COM DESCONTO:</div>
+                                    <div class="cxdentro">
+                                        <h:outputText value="#{it.valor}"><f:convertNumber type="currency"/></h:outputText>
+                                    </div>
+                                </td>
+                                <td rowspan="2">
+                                    <h:graphicImage value="/resources/img/logo_rogerinho_pq.jpeg"/>
+                                </td>
+                                <td rowspan="2">
+                                    PAGÁVEL SOMENTE NA: 
+                                    <b> #{app.config.empresaNome} </b> <br/>
+                                    #{app.config.empresaEndereco} <br/>
+                                    <h:outputText value="Tel.: #{app.config.empresaTelefones}" rendered="#{app.config.empresaTelefones.length() gt 1}"/>
+                                    <h:outputText value="Email: #{app.config.empresaEmail}" rendered="#{app.config.empresaEmail.length() gt 1}"/><br/>
+                                    <h:outputText value="Email: #{app.config.empresaHomepage}" rendered="#{app.config.empresaHomepage.length() gt 1}"/>
+                                </td>
+                                <td>
+                                    <div class="cxtop">VALOR COM DESCONTO:</div>
+                                    <div class="cxdentro">
+                                        <h:outputText value="#{it.valor}"><f:convertNumber type="currency"/></h:outputText>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cxtop">VALOR NORMAL</div>
+                                    <div class="cxdentro">
+                                        <h:outputText value="#{it.valorComMulta}"><f:convertNumber type="currency"/></h:outputText>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cxtop">VALOR NORMAL</div>
+                                    <div class="cxdentro">
+                                        <h:outputText value="#{it.valorComMulta}"><f:convertNumber type="currency"/></h:outputText>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cxtop">VENCIMENTO</div>
+                                    <div class="cxdentro">
+                                        <h:outputText value="#{it.vencimento}"><f:convertDateTime /></h:outputText> 
+                                    </div>
+                                </td>
+                                <td colspan="2">
+                                    <div class="cxtop">CLIENTE</div>
+                                    <h:outputText value="#{it.pedidoPag.pedido.cliente}" />
+                                </td>
+                                <td>
+                                    <div class="cxtop">VENCIMENTO</div>
+                                    <div class="cxdentro">
+                                        <h:outputText value="#{it.vencimento}"><f:convertDateTime /></h:outputText> 
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cxtop">JUROS</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                                <td colspan="2" rowspan="2">
+
+                                    Valor até <h:outputText value="#{it.vencimento}"><f:convertDateTime /></h:outputText> 
+                                    = <h:outputText value="#{it.valor}"><f:convertNumber type="currency" /></h:outputText>
+                                    (valor com desconto)<br/>
+                                    Após o vencimento, <h:outputText value="#{it.valorComMulta}"><f:convertNumber type="currency" /></h:outputText> + #{it.pedidoPag.jurosDiario}% ao dia.
+
+                                </td>
+                                <td>
+                                    <div class="cxtop">JUROS</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cxtop">VALOR TOTAL</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                                <td>
+                                    <div class="cxtop">VALOR TOTAL</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cxtop">VALOR DO RECEBIMENTO</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                                <td colspan="2" rowspan="4">
+                                    <div align="center">
+                                        <h2>ATENÇÃO</h2>
+                                    </div>
+                                    <div style="margin: 10px">
+                                        <h2>Evite pagar Juros!<br/>
+                                            Em prestações em atraso é cobrado o valor sem desconto + multa e juros diários conforme a lei.</h2>
+                                    </div>
+                                </td>
+                                <td nowrap="nowrap">
+                                    <div class="cxtop">VALOR DO RECEBIMENTO</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cxtop">DATA DO RECEBIMENTO</div>
+                                    <div class="cxdentro">___/___/___</div>
+                                </td>
+                                <td>
+                                    <div class="cxtop">DATA DO RECEBIMENTO</div>
+                                    <div class="cxdentro">___/___/___</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cxtop">SALDO DA PARCELA</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                                <td>
+                                    <div class="cxtop">SALDO DA PARCELA</div>
+                                    <div class="cxdentroL">R$</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td nowrap="nowrap">
+                                    <div class="cxtop">NRO PEDIDO / NRO PARCELA</div>
+                                    <div class="cxdentroL">#{it.pedidoPag.pedido.id} / #{it.numParcela} de #{it.pedidoPag.numParcelas}</div>
+                                </td>
+                                <td nowrap="nowrap">
+                                    <div class="cxtop">NRO PEDIDO / NRO PARCELA</div>
+                                    <div class="cxdentroL">#{it.pedidoPag.pedido.id} / #{it.numParcela} de #{it.pedidoPag.numParcelas}</div>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+
+                    </div>
+
+                    <h:panelGroup rendered="#{(it.numParcela mod bolVar) eq 0}">
+                        <p style="page-break-before: always"></p>
+                    </h:panelGroup>
+
+                </ui:repeat>
+
+            </h:form>
+        </h:panelGroup>
+
+
+
+        <script language="javascript">
+            window.print();
+        </script>
+    </h:body>
+
+</html>

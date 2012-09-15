@@ -33,8 +33,6 @@
                 <p:ajax event="rowSelect" update="@this" />
                 <p:ajax event="rowUnselect" update="@this" />
 
-                <p:column headerText="ID">#{it.id}</p:column>
-
                 <p:column headerText="Nome">
                     #{it.nome}
                 </p:column>
@@ -53,7 +51,8 @@
 
                 <f:facet name="footer">
                     <p:commandButton 
-                        value="Novo Usuário"
+                        value="Inserir"
+                        icon="ui-icon-document"
                         actionListener="#{usuarioMB.novo()}"
                         update=":formDialog, @form"/>
 

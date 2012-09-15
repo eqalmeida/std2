@@ -38,25 +38,21 @@
                         selectionMode="single" selection="#{tabelaFinancBean.selected}" rowKey="#{it.id}"
                         value="#{tabelaFinancBean.tabelas}" var="it">
 
-                        <f:facet name="header">Tabelas de Financiamento</f:facet>
-
                         <p:ajax event="rowSelect" update="@form" />
 
                         <f:facet name="footer">
-                            <p:commandButton value="Nova Tabela"
+                            <p:commandButton 
+                                value="Inserir"
+                                icon="ui-icon-document"
                                              action="#{tabelaFinancBean.novo()}"
                                              update=":fEdit, :form"/>
+                            
                             <p:commandButton
                                 disabled="#{not(tabelaFinancBean.selected.id gt 0)}"
-                                value="Editar Tabela"
+                                value="Editar"
+                                icon="ui-icon-pencil"
                                 action="#{tabelaFinancBean.editarTabela(tabelaFinancBean.selected.id)}"
                                 update=":fEdit"/>
-
-                            <p:commandButton 
-                                update=":fCoef"
-                                disabled="#{not(tabelaFinancBean.selected.id gt 0)}"
-                                value="Novo Coeficiente" 
-                                action="#{tabelaFinancBean.novoCoef()}"/>
 
                             <p:commandButton
                                 value="Excluir"
@@ -90,7 +86,7 @@
                         </p:column>
                     </p:dataTable>
 
-                    <h:panelGroup rendered="#{tabelaFinancBean.selected.id > 0}">
+                    <h:panelGroup rendered="#{tabelaFinancBean.selected.id gt 0}">
 
                         <br/>
 
@@ -109,6 +105,16 @@
                                 <h:outputText value="Coeficientes da tabela: [#{tabelaFinancBean.selected.descricao}]" />
                             </f:facet>
 
+                            <f:facet name="footer">
+                                
+                                <p:commandButton 
+                                    update=":fCoef"
+                                    icon="ui-icon-document"
+                                    disabled="#{not(tabelaFinancBean.selected.id gt 0)}"
+                                    value="Inserir" 
+                                    action="#{tabelaFinancBean.novoCoef()}"/>
+
+                            </f:facet>
                             <p:column headerText="Num. Parcelas">
                                 <h:outputText value="#{coef.coeficientePK.numParcelas}"/>
                             </p:column>

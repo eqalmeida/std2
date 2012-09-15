@@ -30,19 +30,6 @@
 
             <h:form id="formTable">
 
-                <table>
-                    <tr>
-                        <td width="100%">
-                            
-                        </td>
-                        <td nowrap="nowrap">
-                            <p:commandButton 
-                                value="Novo Cliente" 
-                                action="#{clienteMB.novoCliente()}" update=":formDialog, @form, :pedidosForm" />
-                        </td>
-                    </tr>
-                </table>
-
                 <p:dataTable lazy="true" var="it" id="tbl"
                              value="#{clienteMB.lazyList}" rows="10"
                              selectionMode="single" selection="#{clienteMB.selected}" rowKey="#{it.id}"
@@ -62,6 +49,12 @@
                     <f:facet name="footer">
 
                         <h:panelGroup style="with:100%;text-align: left">
+                            
+                            <p:commandButton 
+                                value="Inserir" 
+                                icon="ui-icon-document"
+                                action="#{clienteMB.novoCliente()}" update=":formDialog, @form, :pedidosForm" />
+                            
                             <p:commandButton 
                                 value="Editar" 
                                 icon="ui-icon-pencil"

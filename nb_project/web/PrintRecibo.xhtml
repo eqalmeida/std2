@@ -15,15 +15,35 @@
         <f:metadata>
             <f:viewParam name="pagId" value="#{printReciboMB.pagId}"/>
         </f:metadata>
-        
-        <h:outputText value="Recebi(emos) de: #{printReciboMB.pag.pedidoPag.pedido.cliente}, a quantia de "/>
-        <h:outputText value="#{printReciboMB.pag.valor}">
-            <f:convertNumber type="currency"/>
-        </h:outputText>
+
+        <div style="font-size: 16px; margin: 20px">
+            
+
+                <h:outputText value="Recebi(emos) de: #{printReciboMB.pag.pedidoPag.pedido.cliente}"/>
+                <h:outputText value=", portador(a) do RG: #{printReciboMB.pag.pedidoPag.pedido.cliente.rg} " rendered="#{not empty printReciboMB.pag.pedidoPag.pedido.cliente.rg}"/>
+                <h:outputText value=", a quantia de "/>
+                
+                <span style="text-decoration: underline; font-size: 16px">
+                <h:outputText value="#{printReciboMB.pag.valor}">
+                    <f:convertNumber type="currency"/>
+                </h:outputText>
+                </span>
+                
+                <h:outputText value=" referente ao pedido de venda n. #{printReciboMB.pag.pedidoPag.pedido.id}"/>
+            <br/>
+                <h:outputText value="Data: "/>
+                <h:outputText value="#{printReciboMB.pag.data}">
+                    <f:convertDateTime/>
+                </h:outputText>
+                
+                <br/><br/>
+                <br/><br/>
+                <p>Ass: ___________________________________</p>
+                
+            
+        </div>
         <br/>
 
-        <h:outputText value="Data: "/>
-        <h:outputText value="#{printReciboMB.pag.data}"/>
 
     </ui:define>
 

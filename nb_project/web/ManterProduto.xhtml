@@ -10,6 +10,10 @@
         <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
 
     </ui:define>
+    
+    <ui:define name="title">
+        Cadastro de Produtos
+    </ui:define>
 
     <ui:define name="left">
         <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
@@ -22,7 +26,7 @@
 
         <h:form id="formTable">
 
-            <table width="100%">
+            <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                     <td nowrap="nowrap">
                         <p:selectOneButton value="#{produtoBean.tipoProduto}">
@@ -45,13 +49,15 @@
                     <td nowrap="nowrap">
                         <h:panelGroup  id="Nbts">
                             <p:commandButton value="Imprimir" icon="ui-icon-print" actionListener="#{produtoBean.imprimir()}" rendered="#{produtoBean.tipoProduto eq 1}" ajax="false"/>
-                            <p:commandButton value="Novo Produto"  actionListener="#{produtoBean.novoProduto(0)}" update=":formNewCar,@form" rendered="#{produtoBean.tipoProduto eq 0}"/>
-                            <p:commandButton value="Novo Veículo"  actionListener="#{produtoBean.novoProduto(1)}" update=":formNewCar,@form" rendered="#{produtoBean.tipoProduto eq 1}"/>
+                            <p:commandButton icon="ui-icon-document" value="Novo Produto"  actionListener="#{produtoBean.novoProduto(0)}" update=":formNewCar,@form" rendered="#{produtoBean.tipoProduto eq 0}"/>
+                            <p:commandButton icon="ui-icon-document" value="Novo Veículo"  actionListener="#{produtoBean.novoProduto(1)}" update=":formNewCar,@form" rendered="#{produtoBean.tipoProduto eq 1}"/>
                         </h:panelGroup>
                     </td>
 
                 </tr>
             </table>
+            
+            <p:spacer height="5px"/>
 
             <p:dataTable lazy="true" var="it" id="tbl" 
                          value="#{produtoBean.lazyList}" rows="10"

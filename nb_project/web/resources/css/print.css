@@ -1,6 +1,6 @@
 
-body{
-    margin:10px;
+body, *{
+    margin:0;
     font-family:“Trebuchet MS”, Helvetica, sans-serif;
     font-size: 12px;
 }
@@ -28,6 +28,74 @@ table.prn td,table.prn th{
     font-size: 12px;
     border-bottom:  solid 1px #333;
     border-right: solid 1px #333;
+}
+table.prn td{
+    padding: 3px 6px;
+    vertical-align: top;
+}
+table.prn th{
+    vertical-align: top;
+    border-bottom:1px solid #000;
+    padding: 6px 6px;
+    background: #eee;
+}
+
+h2.prn {
+    margin: 0px;
+}
+
+hr.prn{
+    height: 0pt;
+    color: #000;
+    border: solid 1pt #000;
+}
+
+.cxtop{
+    font-size: 7px;
+    margin: 0;
+    text-wrap: none;
+}
+
+.cxdentro{
+    width: 100%;
+    font-weight: bold;
+    font-size: 12px;
+    margin: 3px 0 0 0;
+    text-align: center;
+    text-wrap: none;
+}
+
+.cxdentroL{
+    width: 100%;
+    font-weight: bold;
+    font-size: 12px;
+    margin: 3px 0 0 0;
+    text-align: left;
+    text-wrap: none;
+}
+
+table.boleto{
+    font-family: Tahoma, Geneva, sans-serif;
+    font-size: 11px;
+    border-collapse:collapse;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    width: 100%;
+}
+table.boleto td, table.boleto th{
+    border-left:1px solid #ddd;
+    border-top:1px solid #ddd;
+    padding: 3px;
+}
+
+table.boleto td{
+    vertical-align: top;
+}
+
+table.prn {
+    font-family: Tahoma, Geneva, sans-serif;
+    font-size: 10px;
+    border-collapse:collapse;
 }
 table.prn td{
     padding: 3px 6px;

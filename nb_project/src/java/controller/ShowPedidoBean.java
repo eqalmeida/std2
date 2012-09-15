@@ -196,6 +196,9 @@ public class ShowPedidoBean extends ControllerBase {
     
     public void printBoletos(int id) {
         
+        showPopup("PrintBoletos.jsf?pagId="+id);
+        /*
+        
         String red = "PrintBoleto.jsf?id=" + id;
         pedidoPagSelected = null;
         try {
@@ -203,7 +206,7 @@ public class ShowPedidoBean extends ControllerBase {
         } catch (IOException ex) {
             addErrorMessage(ex.getMessage());
         }
-        
+        */
     }
     
     public void changeStatus(short status) {

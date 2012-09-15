@@ -13,73 +13,75 @@
     </h:head>
 
     <h:body>
-        <div id="header"> 
-            <h:form id="menuBarForm">
+        <div id="around">
+            <div id="header"> 
+                <h:form id="menuBarForm">
 
 
-                <h:panelGrid columns="3" class="topbar">
-                    <h:panelGroup>
-                        <ui:insert name="top">Top</ui:insert>
-                    </h:panelGroup>
-                </h:panelGrid>
-
-            </h:form>
-        </div>
-        <div id="menuBar">
-            <h:form>
-            <table cellpadding="0" cellspacing="0" width="100%" border="0">
-                <tr>
-                    <td width="100%">
-                        <ui:insert name="title"></ui:insert>
-                    </td>
-                    <td nowrap="nowrap">
-                <h:outputText value="Usuário: #{loginMB.usuario} | " rendered="#{loginMB.usuario != null}"/>
-                <p:commandLink value="Sair" actionListener="#{loginMB.logoff}"  update=":corpoId" ajax="false" rendered="#{loginMB.usuario != null}"/>
-                    </td>
-                </tr>
-            </table>
-            </h:form>
-        </div>
-        <div style="width: 100%; margin-right: 20px">
-            <table cellpadding="10px" cellspacing="0" width="100%">
-                <tr>
-                    <td valign="top" nowrap="nowrap" >
-                        <ui:insert name="left">Left</ui:insert>
-
-                    </td>
-                    <td width="100%" valign="top">
-                        <h:panelGroup rendered="#{loginMB.logedin}">
-                        <ui:insert name="content">Content</ui:insert>
+                    <h:panelGrid columns="3" class="topbar">
+                        <h:panelGroup>
+                            <ui:insert name="top">Top</ui:insert>
                         </h:panelGroup>
+                    </h:panelGrid>
 
-                        <h:panelGrid rendered="#{not loginMB.logedin}">
-                        <h:form id="loginForm">
-                            
-                            <p:messages/>
+                </h:form>
+            </div>
+            <div id="menuBar">
+                <h:form>
+                    <table cellpadding="0" cellspacing="0" width="100%" border="0">
+                        <tr>
+                            <td width="100%">
+                                <b><ui:insert name="title"></ui:insert></b>
+                            </td>
+                            <td nowrap="nowrap">
+                                <h:outputText value="Usuário: #{loginMB.usuario} | " rendered="#{loginMB.usuario != null}"/>
+                                <p:commandLink value="Sair" actionListener="#{loginMB.logoff}"  update=":corpoId" ajax="false" rendered="#{loginMB.usuario != null}"/>
+                            </td>
+                        </tr>
+                    </table>
+                </h:form>
+            </div>
+            <div style="width: 100%; margin-right: 20px">
+                <table cellpadding="10px" cellspacing="0" width="100%">
+                    <tr>
+                        <td valign="top" nowrap="nowrap" >
+                            <ui:insert name="left">Left</ui:insert>
 
-                            <h:panelGroup>
-                                    <p:panelGrid columns="2">
-                                        <h:outputText value="Login:" />
-                                        <p:inputText value="#{loginMB.login}" required="true" label="Login"/>
-
-
-                                        <h:outputText value="Senha:" />
-                                        <p:password value="#{loginMB.senha}" required="true" label="Senha"/>
-                                        <f:facet name="footer">
-                                            <p:commandButton value="Efetuar Login" actionListener="#{loginMB.login}" update=":loginForm, :menuBarForm" ajax="false"/>
-                                        </f:facet>
-                                    </p:panelGrid>
-
+                        </td>
+                        <td width="100%" valign="top">
+                            <h:panelGroup rendered="#{loginMB.logedin}">
+                                <ui:insert name="content">Content</ui:insert>
                             </h:panelGroup>
 
-                        </h:form>
-                        </h:panelGrid>
-                    </td>
-                </tr>
-            </table>
+                            <h:panelGrid rendered="#{not loginMB.logedin}">
+                                <h:form id="loginForm">
+
+                                    <p:messages/>
+
+                                    <h:panelGroup>
+                                        <p:panelGrid columns="2">
+                                            <h:outputText value="Login:" />
+                                            <p:inputText value="#{loginMB.login}" required="true" label="Login"/>
+
+
+                                            <h:outputText value="Senha:" />
+                                            <p:password value="#{loginMB.senha}" required="true" label="Senha"/>
+                                            <f:facet name="footer">
+                                                <p:commandButton value="Efetuar Login" actionListener="#{loginMB.login}" update=":loginForm, :menuBarForm" ajax="false"/>
+                                            </f:facet>
+                                        </p:panelGrid>
+
+                                    </h:panelGroup>
+
+                                </h:form>
+                            </h:panelGrid>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <br/>
+            <br/>
         </div>
-        <br/>
-        <br/>
         <br/>
         <br/>
     </h:body>

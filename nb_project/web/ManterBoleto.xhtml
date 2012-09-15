@@ -18,26 +18,53 @@
         </ui:include>
     </ui:define>
 
+    <ui:define name="title">
+        Relatório de Boletos
+    </ui:define>
+
+
     <ui:define name="content">
         <p:growl autoUpdate="true" id="message"/>
 
         <h:outputScript name="locales_prime.js" library="js" /> 
 
         <h:form id="formTable">
-            <p:panel>
-                <h:panelGrid columns="4">
-                    Mês:
-                    <p:selectOneMenu value="#{boletoMB.filtMes}" valueChangeListener="#{boletoMB.mesChanged}">
-                        <f:selectItems value="#{app.meses}"/>
-                        <f:ajax render=":formTable" />
-                    </p:selectOneMenu>
 
-                    Ano:
-                    <p:spinner min="1990" maxlength="5" size="5" value="#{boletoMB.filtAno}" valueChangeListener="#{boletoMB.anoChanged}">
-                        <f:ajax render=":formTable" />
-                    </p:spinner>
-                </h:panelGrid>
-            </p:panel>
+
+            <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td width="100%">
+                        <p:selectOneButton value="#{boletoMB.tipoRel}">
+                            <f:selectItem itemValue="0" itemLabel="Boletos por mês" />
+                            <f:selectItem itemValue="1" itemLabel="Boletos em atraso" />
+                            <p:ajax update=":formTable:tbl, filtData, sumario" listener="#{boletoMB.aplicaFiltro()}"/>
+                        </p:selectOneButton>
+
+                    </td>
+                    <td nowrap="nowrap">
+                        <h:panelGroup  id="filtData">
+                            <h:panelGrid columns="4" rendered="#{boletoMB.tipoRel eq 0}">
+                                Mês:
+                                <p:selectOneMenu value="#{boletoMB.filtMes}">
+                                    <f:selectItems value="#{app.meses}"/>
+                                    <f:ajax render=":formTable" listener="#{boletoMB.aplicaFiltro()}"/>
+                                </p:selectOneMenu>
+
+                                Ano:
+                                <p:spinner min="1990" maxlength="5" size="5" value="#{boletoMB.filtAno}">
+                                    <f:ajax render=":formTable" listener="#{boletoMB.aplicaFiltro()}"/>
+                                </p:spinner>
+                            </h:panelGrid>
+                        </h:panelGroup>
+                    </td>
+                </tr>
+            </table>
+
+            <p:spacer height="5px"/>
+
+
+
+
             <p:spacer height="5"/>
             <p:dataTable lazy="true" var="it" id="tbl"
                          value="#{boletoMB.lazyList}" rows="20"
@@ -79,43 +106,51 @@
 
             </p:dataTable>
 
-            <p:spacer height="10" />
+            <h:panelGroup id="sumario">
 
-            <p:panelGrid columns="2">
-                <h:outputText value="Valor total (mês):"/>
-                <h:outputText value="#{boletoMB.totalMes}" style="font-weight: bold">
-                    <f:convertNumber type="currency"/>
-                </h:outputText>
-            </p:panelGrid>
+                <h:panelGroup rendered="#{boletoMB.tipoRel eq 0}">`
 
-            <br/>
+                    <p:spacer height="10" />
 
-            <p:dataTable value="#{boletoMB.reportList}" var="it">
+                    <p:panelGrid columns="2">
+                        <h:outputText value="Valor total (mês):"/>
+                        <h:outputText value="#{boletoMB.totalMes}" style="font-weight: bold">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:panelGrid>
+
+                    <br/>
+
+                    <p:dataTable value="#{boletoMB.reportList}" var="it">
+
+                        <f:facet name="header">Total Por Status</f:facet>
+
+                        <p:column headerText="Status">
+                            <h:outputText value="#{it[0] eq 0?'ATIVO':it[0] eq 1?'PAGO':it[0] eq 2 ? 'PAGO PARCIAL': it[0] eq 3?'CANCELADO':'PARADO' } " style="font-weight: bold"/>
+                        </p:column>
+
+                        <p:column headerText="Valor Total do Boleto">
+                            <h:outputText value="#{it[1]}">
+                                <f:convertNumber type="currency" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Valor Total Recebido">
+                            <h:outputText value="#{it[2]}">
+                                <f:convertNumber type="currency" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Valor Total Faltante">
+                            <h:outputText value="#{it[3]}">
+                                <f:convertNumber type="currency" />
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+
+                </h:panelGroup>
                 
-                <f:facet name="header">Total Por Status</f:facet>
-
-                <p:column headerText="Status">
-                    <h:outputText value="#{it[0] eq 0?'ATIVO':it[0] eq 1?'PAGO':it[0] eq 2 ? 'PAGO PARCIAL': it[0] eq 3?'CANCELADO':'PARADO' } " style="font-weight: bold"/>
-                </p:column>
-
-                <p:column headerText="Valor Total do Boleto">
-                    <h:outputText value="#{it[1]}">
-                        <f:convertNumber type="currency" />
-                    </h:outputText>
-                </p:column>
-
-                <p:column headerText="Valor Total Recebido">
-                    <h:outputText value="#{it[2]}">
-                        <f:convertNumber type="currency" />
-                    </h:outputText>
-                </p:column>
-
-                <p:column headerText="Valor Total Faltante">
-                    <h:outputText value="#{it[3]}">
-                        <f:convertNumber type="currency" />
-                    </h:outputText>
-                </p:column>
-            </p:dataTable>
+            </h:panelGroup>
 
         </h:form>
     </ui:define>

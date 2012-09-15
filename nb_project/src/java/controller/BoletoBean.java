@@ -34,6 +34,7 @@ public class BoletoBean extends ControllerBase {
     private Short filtMes = null;
     private Integer filtAno = null;
     private BoletoJpaController service = null;
+    private int tipoRel;
 
     /**
      * Creates a new instance of BoletoBean
@@ -46,12 +47,54 @@ public class BoletoBean extends ControllerBase {
 
     @PostConstruct
     private void init() {
-            service = new BoletoJpaController();
+        tipoRel = 0;
+        service = new BoletoJpaController();
+        lazyList = new BoletoLazyList(this.service);
+        aplicaFiltro();
     }
-    
-    private void resetTable(){
+
+    private void resetTable() {
         DataTable dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent(":formTable:tbl");
         dataTable.setFirst(0);
+    }
+
+    public int getTipoRel() {
+        return tipoRel;
+    }
+
+    public void setTipoRel(int tipoRel) {
+        this.tipoRel = tipoRel;
+    }
+
+    public void aplicaFiltro() {
+
+        BoletoLazyList b = (BoletoLazyList) getLazyList();
+
+        if (tipoRel == 1) {
+            b.setAtrasados(true);
+        } else {
+            
+            b.setAtrasados(false);
+            
+            Calendar data = GregorianCalendar.getInstance();
+            data.set(Calendar.YEAR, filtAno);
+            data.set(Calendar.MONTH, filtMes);
+            data.set(Calendar.DATE, 1);
+
+            Date dateFrom, dateTo;
+
+            dateFrom = data.getTime();
+
+            data.add(Calendar.MONTH, 1);
+            data.add(Calendar.DATE, -1);
+            dateTo = data.getTime();
+
+
+
+            b.setDateFrom(dateFrom);
+            b.setDateTo(dateTo);
+        }
+        resetTable();
     }
 
     public void verPedido(int pedidoId) {
@@ -63,41 +106,8 @@ public class BoletoBean extends ControllerBase {
         }
     }
 
-    public void updateDatas() {
-        Calendar data = GregorianCalendar.getInstance();
-        data.set(Calendar.YEAR, filtAno);
-        data.set(Calendar.MONTH, filtMes);
-        data.set(Calendar.DATE, 1);
-
-        Date dateFrom, dateTo;
-
-        dateFrom = data.getTime();
-
-        data.add(Calendar.MONTH, 1);
-        data.add(Calendar.DATE, -1);
-        dateTo = data.getTime();
-
-
-        BoletoLazyList b = (BoletoLazyList) getLazyList();
-
-        b.setDateFrom(dateFrom);
-        b.setDateTo(dateTo);
-
-    }
-
     public LazyDataModel<Boleto> getLazyList() {
-        
-        if(getUsuarioLogado().isAdmin() == false){
-            addErrorMessage("Acesso negado!!!");
-            lazyList = null;
-        }
-        else
-        
-        if (lazyList == null) {
-            lazyList = new BoletoLazyList(this.service);
 
-            updateDatas();
-        }
         return lazyList;
     }
 
@@ -136,23 +146,11 @@ public class BoletoBean extends ControllerBase {
         this.filtAno = filtAno;
     }
 
-    public void mesChanged(ValueChangeEvent ev) {
-        filtMes = (Short) ev.getNewValue();
-        updateDatas();
-        resetTable();
-    }
-
-    public void anoChanged(ValueChangeEvent ev) {
-        filtAno = (Integer) ev.getNewValue();
-        updateDatas();
-        resetTable();
-    }
-    
-    public List<Object[]> getReportList(){
+    public List<Object[]> getReportList() {
         return service.findBoletoReport();
     }
-    
-    public String getStatusToStr(Short num){
+
+    public String getStatusToStr(Short num) {
         return Boleto.listStatus.get(num);
     }
 }
