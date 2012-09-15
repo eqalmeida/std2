@@ -4,30 +4,18 @@
  */
 package controller;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
 import model.Produto;
 import model.ProdutoLazyList;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
@@ -297,6 +285,12 @@ public class ProdutoBean extends ControllerBase implements Serializable {
             RequestContext.getCurrentInstance().execute("dialogNewCar.show()");
     }
     
+    public void imprimirVeiculos(){
+        showPopup("PrintVeiculos.jsf");
+    }
+    
+    
+    /*
     public void imprimir() throws JRException, IOException{
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         List<Produto> veiculos = ctl.findVeiculosEmEstoque();
@@ -308,5 +302,5 @@ public class ProdutoBean extends ControllerBase implements Serializable {
         ServletOutputStream outputStream = response.getOutputStream();
         JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
         
-    }
+    }*/
 }
