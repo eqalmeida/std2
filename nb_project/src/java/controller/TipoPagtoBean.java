@@ -4,6 +4,7 @@
  */
 package controller;
 
+import facade.TipoPagtoFacace;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,7 +17,7 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DualListModel;
 import repo.TabelaFinancJpaController;
-import repo.TipoPagtoJpaController;
+
 
 /**
  *
@@ -31,7 +32,7 @@ public class TipoPagtoBean extends ControllerBase {
     private DualListModel<TabelaFinanc> tabelas;
     private static List<TabelaFinanc> tabelasFinanc;
     private List<TabelaFinanc> tabelasSelecionadas;
-    private TipoPagtoJpaController service = null;
+    private TipoPagtoFacace service = null;
 
     /**
      * Creates a new instance of ProdutoBean
@@ -48,7 +49,7 @@ public class TipoPagtoBean extends ControllerBase {
     }
 
     public List<TipoPagto> getLista() {
-        lista = service.findTipoPagtoEntities();
+        lista = service.findAll();
         return lista;
     }
 
@@ -71,7 +72,7 @@ public class TipoPagtoBean extends ControllerBase {
 
     public void onRowSelect(SelectEvent event) {
 
-        selected = service.findTipoPagto(((TipoPagto) event.getObject()).getId());
+        selected = service.find(((TipoPagto) event.getObject()).getId());
 
         if (selected.getId() != null) {
 
@@ -97,19 +98,19 @@ public class TipoPagtoBean extends ControllerBase {
         RequestContext.getCurrentInstance().execute("tipoDlg.show()");
     }
 
-    public void excluir(Short id) {
+    public void excluir(Short id) throws Exception {
         try {
-            service.destroy(id);
+            selected = service.find(id);
+            service.remove(selected);
             this.selected = new TipoPagto();
         } catch (Exception ex) {
             addErrorMessage("Não foi possível excluir!");
-
         }
 
     }
 
     public void editar(Short id) {
-        selected = service.findTipoPagto(id);
+        selected = service.find(id);
         RequestContext.getCurrentInstance().execute("tipoDlg.show()");
     }
 
@@ -143,7 +144,7 @@ public class TipoPagtoBean extends ControllerBase {
         try {
 
             // Carrega o item do banco
-            selected = service.findTipoPagto(selected.getId());
+            selected = service.find(selected.getId());
 
 
             // Limpa o conteúdo antigo
@@ -167,7 +168,7 @@ public class TipoPagtoBean extends ControllerBase {
 
     @PostConstruct
     public void init() {
-        service = new TipoPagtoJpaController();
+        service = new TipoPagtoFacace();
         TabelaFinancJpaController ctl = new TabelaFinancJpaController(getEmf());
         tabelasFinanc = ctl.findTabelaFinancEntities();
 

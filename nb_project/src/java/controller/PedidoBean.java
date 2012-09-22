@@ -4,6 +4,7 @@
  */
 package controller;
 
+import facade.TipoPagtoFacace;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -33,7 +34,7 @@ import org.primefaces.context.RequestContext;
 import repo.CoeficienteJpaController;
 import repo.PedidoJpaController;
 import repo.TabelaFinancJpaController;
-import repo.TipoPagtoJpaController;
+
 
 /**
  *
@@ -191,8 +192,8 @@ public class PedidoBean extends ControllerBase implements Serializable {
     }
 
     private void populateTiposPag() {
-        TipoPagtoJpaController c = new TipoPagtoJpaController();
-        tipoPagtoList = c.findTipoPagtoEntities();
+        
+        tipoPagtoList = new TipoPagtoFacace().findAll();
     }
 
     public void novoPag() {
@@ -309,10 +310,9 @@ public class PedidoBean extends ControllerBase implements Serializable {
 
     public void gravarPag() {
 
-        TipoPagtoJpaController tpctl = new TipoPagtoJpaController();
 
 //        TipoPagto tipoPagto = tpctl.findTipoPagto(tipoPagtoSelected.shortValue());
-        tipo = tpctl.findTipoPagto(tipo.getId());
+        tipo = new TipoPagtoFacace().find(tipo.getId()); //tpctl.findTipoPagto(tipo.getId());
 
         if (tipo != null) {
             if (tipo.getGeraBoleto()) {
@@ -470,8 +470,8 @@ public class PedidoBean extends ControllerBase implements Serializable {
 
         if (tipoPagtoSelected > 0) {
 
-            TipoPagtoJpaController c = new TipoPagtoJpaController();
-            tipo = c.findTipoPagto(tipoPagtoSelected);
+            
+            tipo = new TipoPagtoFacace().find(tipoPagtoSelected); //c.findTipoPagto(tipoPagtoSelected);
 
             if (tipo != null) {
 

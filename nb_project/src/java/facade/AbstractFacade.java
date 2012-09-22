@@ -1,6 +1,7 @@
 package facade;
 
 import controller.ControllerBase;
+import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -11,7 +12,8 @@ import javax.persistence.criteria.Root;
  *
  * @author eqalmeida
  */
-public abstract class AbstractFacade<T> {
+@SuppressWarnings("serial")
+public abstract class AbstractFacade<T> implements Serializable{
 
     private Class<T> entityClass;
 
@@ -82,7 +84,7 @@ public abstract class AbstractFacade<T> {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.remove(entity);
+            em.remove(em.merge(entity));
             em.getTransaction().commit();
         } finally {
             if (em != null) {

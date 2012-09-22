@@ -1,5 +1,6 @@
 package controller;
 
+import facade.TipoPagtoFacace;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -17,7 +18,7 @@ import org.primefaces.context.RequestContext;
 import repo.CoeficienteJpaController;
 import repo.ProdutoJpaController;
 import repo.TabelaFinancJpaController;
-import repo.TipoPagtoJpaController;
+
 
 /**
  *
@@ -53,14 +54,14 @@ public class SimulaBean extends ControllerBase implements Serializable {
     }
 
     public List<TipoPagto> getTipoPagtos() {
-        tipoPagtos = new TipoPagtoJpaController().findTipoPagtoEntities();
+        tipoPagtos = new TipoPagtoFacace().findAll();
         return tipoPagtos;
     }
 
     public List<TabelaFinanc> getTabelasFinanc() {
         tabelasFinanc = new ArrayList<TabelaFinanc>();
         if (tipoId != null) {
-            tipoPagto = new TipoPagtoJpaController().findTipoPagto(tipoId);
+            tipoPagto = new TipoPagtoFacace().find(tipoId);
             if (tipoPagto != null) {
                 tabelasFinanc.addAll(
                         tipoPagto.getTabelasFinanc());
@@ -124,7 +125,7 @@ public class SimulaBean extends ControllerBase implements Serializable {
             return;
         }
 
-        tipoPagto = new TipoPagtoJpaController().findTipoPagto(tipoId);
+        tipoPagto = new TipoPagtoFacace().find(tipoId);
         if (tipoPagto == null) {
             return;
         }
