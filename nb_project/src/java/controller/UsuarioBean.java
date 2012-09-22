@@ -4,6 +4,7 @@
  */
 package controller;
 
+import facade.UsuarioFacade;
 import java.io.Serializable;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -11,7 +12,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import model.Usuario;
 import org.primefaces.context.RequestContext;
-import repo.UsuarioJpaController;
 
 /**
  *
@@ -23,22 +23,17 @@ public class UsuarioBean extends ControllerBase implements Serializable {
 
     private List<Usuario> lista = null;
     private Usuario selected = null;
-    private UsuarioJpaController service = null;
+    private UsuarioFacade facade = null;
 
-    /**
-     * Creates a new instance of UsuarioBean
-     */
-    public UsuarioBean() {
-    }
 
     @PostConstruct
     private void init() {
-        service = new UsuarioJpaController();
+        facade = new UsuarioFacade();
     }
 
     public List<Usuario> getLista() {
 
-        lista = service.findUsuarioEntities();
+        lista = facade.findAll();
         return lista;
     }
 
@@ -56,7 +51,7 @@ public class UsuarioBean extends ControllerBase implements Serializable {
 
     public void editar(Long id) {
         if (getUsuarioLogado().isAdmin()) {
-            selected = service.findUsuario(id);
+            selected = facade.find(id);
             RequestContext.getCurrentInstance().execute("uDlg.show()");
         } else {
             addErrorMessage("Acesso negado!");
@@ -77,7 +72,8 @@ public class UsuarioBean extends ControllerBase implements Serializable {
     public void excluir(Long id) {
         if (getUsuarioLogado().isAdmin()) {
             try {
-                service.destroy(id);
+                selected = facade.find(id);
+                facade.remove(selected);
             } catch (Exception ex) {
                 addErrorMessage("Não foi possível excluir!");
             }
@@ -93,13 +89,13 @@ public class UsuarioBean extends ControllerBase implements Serializable {
 
                 if (selected.getId() > 0) {
                     //Editando
-                    service.edit(selected);
+                    facade.edit(selected);
                 } else {
                     //Inserindo
                     if (selected.getSenha() == null) {
                         selected.setSenha("123456");
                     }
-                    service.create(selected);
+                    facade.create(selected);
                 }
 
                 RequestContext.getCurrentInstance().execute("uDlg.hide()");

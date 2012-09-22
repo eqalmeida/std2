@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:stella="http://stella.caelum.com.br/faces2"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <ui:composition>
+        <h:inputHidden value="#{cliente.id}" />
+
+        <p:panelGrid columnClasses="label,field,label,field">
+
+            <p:row>
+                <p:column styleClass="label">
+                    <h:outputText value="Nome:"/>
+                </p:column>
+                <p:column colspan="3">
+                    <p:inputText value="#{cliente.nome}" label="Nome" required="true" size="50" maxlength="100"/>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column styleClass="label">CPF:</p:column>
+                <p:column>
+                    <p:inputText value="#{cliente.cpf}" label="CPF" maxlength="20">
+                        <f:validateLength minimum="11" />
+                        <stella:validateCPF  />
+                    </p:inputText>
+                </p:column>
+                <p:column styleClass="label">RG:</p:column>
+                <p:column>
+                    <p:inputText value="#{cliente.rg}" label="RG" maxlength="20"/>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column styleClass="label">Tel. Res.:</p:column>
+                <p:column>
+                    <p:inputText value="#{cliente.telRes}" label="Tel. Res." maxlength="15"/>
+                </p:column>
+                <p:column styleClass="label">Tel. Cel.:</p:column>
+                <p:column>
+                    <p:inputText value="#{cliente.telCel}" label="Tel. Cel." maxlength="15">
+                        <f:validateLength minimum="8"/>
+                    </p:inputText>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column styleClass="label">Tel. COM.:</p:column>
+                <p:column colspan="3">
+                    <p:inputText value="#{cliente.telCom}" label="Tel. COM." maxlength="15">
+                        <f:validateLength minimum="8" />
+                    </p:inputText>
+                </p:column>
+            </p:row>
+
+
+            <p:row>
+                <p:column styleClass="label">Endereço:</p:column>
+                <p:column colspan="3">
+                    <p:inputText value="#{cliente.endRua}" label="Endereço" size="50" maxlength="65">
+                        <f:validateLength minimum="3" />
+                    </p:inputText>
+                </p:column>
+            </p:row>
+
+
+            <p:row>
+                <p:column styleClass="label">Num.:</p:column>
+                <p:column>
+                    <p:inputText value="#{cliente.endNum}" label="Num." maxlength="10"/>
+                </p:column>
+                <p:column styleClass="label">Complemento:</p:column>
+                <p:column>
+                    <p:inputText value="#{cliente.endCompl}" label="Complemento" maxlength="15"/>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column styleClass="label">Bairro:</p:column>
+                <p:column>
+                    <p:inputText value="#{cliente.endBairro}" label="Bairro" maxlength="45"/>
+                </p:column>
+                <p:column styleClass="label">Município:</p:column>
+                <p:column>
+                    <p:inputText value="#{cliente.endMunicipio}" label="Município" maxlength="45"/>
+                </p:column>
+            </p:row>
+
+        </p:panelGrid>
+    </ui:composition>
+</html>
+
