@@ -49,9 +49,9 @@ public class UsuarioBean extends ControllerBase implements Serializable {
         this.selected = usuario;
     }
 
-    public void editar(Long id) {
+    public void editar(Usuario usuario) {
         if (getUsuarioLogado().isAdmin()) {
-            selected = facade.find(id);
+            selected = facade.find(usuario.getId());
             RequestContext.getCurrentInstance().execute("uDlg.show()");
         } else {
             addErrorMessage("Acesso negado!");
@@ -65,15 +65,15 @@ public class UsuarioBean extends ControllerBase implements Serializable {
         RequestContext.getCurrentInstance().execute("uDlg.show()");
     }
 
-    public void editarSenha() {
+    public void editarSenha(Usuario usuario) {
+        selected = usuario;
         RequestContext.getCurrentInstance().execute("usDlg.show()");
     }
 
-    public void excluir(Long id) {
+    public void excluir(Usuario usuario) {
         if (getUsuarioLogado().isAdmin()) {
             try {
-                selected = facade.find(id);
-                facade.remove(selected);
+                facade.remove(usuario);
             } catch (Exception ex) {
                 addErrorMessage("Não foi possível excluir!");
             }

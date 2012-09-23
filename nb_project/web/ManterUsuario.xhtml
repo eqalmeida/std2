@@ -59,7 +59,7 @@
                     <p:commandButton 
                         value="Editar"
                         icon="ui-icon-pencil"
-                        actionListener="#{usuarioMB.editar(usuarioMB.selected.id)}"
+                        actionListener="#{usuarioMB.editar(usuarioMB.selected)}"
                         disabled="#{not (usuarioMB.selected.id gt 0)}"
                         update=":formDialog"/>
 
@@ -68,14 +68,14 @@
                         value="Excluir" 
                         update=":formTable, :message" 
                         icon="ui-icon-trash" 
-                        actionListener="#{usuarioMB.excluir(usuarioMB.selected.id)}" 
+                        actionListener="#{usuarioMB.excluir(usuarioMB.selected)}" 
                         onstart="return confirm('Tem certeza?')"/>  
 
                     <p:commandButton disabled="#{not(usuarioMB.selected.id gt 0)}" 
                                      value="Alterar Senha" 
                                      update=":fsenha" 
                                      icon="ui-icon-key" 
-                                     actionListener="#{usuarioMB.editarSenha}"/>  
+                                     actionListener="#{usuarioMB.editarSenha(usuarioMB.selected)}"/>  
 
                 </f:facet>
 
