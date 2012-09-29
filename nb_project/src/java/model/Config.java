@@ -8,8 +8,6 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -44,9 +42,33 @@ public class Config implements Serializable {
     
     @Column(name="carta_autoriz")
     private String cartaAutoriz;
+    
+    @Column(name="empresa_cnpj", length=30)
+    private String empresaCNPJ;
+    
+    @Column(name="dbversion")
+    private Integer dbversion;
+
+    public String getEmpresaCNPJ() {
+        return empresaCNPJ;
+    }
+
+    public void setEmpresaCNPJ(String empresaCNPJ) {
+        this.empresaCNPJ = empresaCNPJ;
+    }
+
+    public Integer getDbversion() {
+        return dbversion;
+    }
+
+    public void setDbversion(Integer dbversion) {
+        this.dbversion = dbversion;
+    }
 
     public Config() {
     }
+
+    
 
     public String getCartaAutoriz() {
         return cartaAutoriz;

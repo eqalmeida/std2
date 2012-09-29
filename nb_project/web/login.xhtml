@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:stella="http://stella.caelum.com.br/faces2"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./WEB-INF/templates/templatePrincipal.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+    <ui:define name="top">
+
+        <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
+
+    </ui:define>
+
+    <ui:define name="left">
+        <ui:include src="./WEB-INF/inc/menu_lateral.xhtml">
+            <ui:param name="act" value="1" />
+        </ui:include>
+    </ui:define>
+
+    <ui:define name="title">
+        Login do Sistema
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl autoUpdate="true" id="message"/>
+
+
+        <h:panelGrid>
+            <h:form id="loginForm">
+
+                <p:messages/>
+
+                <h:panelGroup>
+                    <p:panelGrid columns="2">
+                        <h:outputText value="Login:" />
+                        <p:inputText value="#{loginMB.login}" required="true" label="Login"/>
+
+
+                        <h:outputText value="Senha:" />
+                        <p:password value="#{loginMB.senha}" required="true" label="Senha"/>
+                        <f:facet name="footer">
+                            <p:commandButton value="Efetuar Login" actionListener="#{loginMB.login}" update=":loginForm, :menuBarForm" ajax="false"/>
+                        </f:facet>
+                    </p:panelGrid>
+
+                </h:panelGroup>
+
+            </h:form>
+        </h:panelGrid>
+
+
+    </ui:define>
+
+</ui:composition>

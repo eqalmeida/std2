@@ -308,12 +308,11 @@
                             </p:commandButton>
 
                             <p:spacer width="5"/>
-
-                            <p:commandButton
-                                disabled="#{not(it.parcelas.size() gt 0)}" 
-                                value="Imprimir Boletos" 
-                                action="#{showPedidoMB.printBoletos(it.id)}">
-                            </p:commandButton>
+                            
+                            <p:menuButton value="Imprimir" disabled="#{not(it.parcelas.size() gt 0)}">
+                                <p:menuitem value="Boletos" action="#{showPedidoMB.printBoletos(it.id)}"/>
+                                <p:menuitem value="Promissórias" action="#{showPedidoMB.printPromissoria(it.id)}"/>
+                            </p:menuButton>
 
                         </p:column>
 

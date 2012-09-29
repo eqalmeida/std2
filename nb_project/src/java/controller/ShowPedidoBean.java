@@ -209,6 +209,11 @@ public class ShowPedidoBean extends ControllerBase {
         */
     }
     
+    public void printPromissoria(int id) {
+        
+        showPopup("PrintPromissorias.jsf?pagId="+id);
+    }
+    
     public void changeStatus(short status) {
         justif = "";
         this.status = status;

@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:h="http://java.sun.com/jsf/html">
+
+    <h:form>
+
+        <p:menu>
+            <p:submenu label="Cadastros">
+                <p:menuitem ajax="false" value="Clientes" action="ManterCliente" styleClass="#{act eq 1?'menuselected':null}" />
+                <p:menuitem ajax="false" value="Produtos" action="ManterProduto" styleClass="#{act eq 2?'menuselected':null}" />
+                <p:menuitem ajax="false" value="Pedido" action="ManterPedido" styleClass="#{act eq 3?'menuselected':null}" />
+                <p:menuitem ajax="false" value="Tipo de Pagto" action="ManterTipoPagto" styleClass="#{act eq 4?'menuselected':null}" />
+                <p:menuitem ajax="false" value="Tabelas Financ." action="ManterTabelaFinanc" styleClass="#{act eq 5?'menuselected':null}" />
+            </p:submenu>
+            <p:submenu label="Configurações">
+                <p:menuitem ajax="false" value="Usuários" action="ManterUsuario"  disabled="#{not loginMB.usuario.admin}" styleClass="#{act eq 6?'menuselected':null}" />
+                <p:menuitem ajax="false" value="Gerais" action="ManterConfig" disabled="#{not loginMB.usuario.admin}" styleClass="#{act eq 7?'menuselected':null}" />  
+            </p:submenu>
+            <p:submenu label="Consultas">
+                <p:menuitem ajax="false" value="Pedidos" action="ShowPedido" styleClass="#{act eq 9?'menuselected':null}" />
+                <p:menuitem ajax="false" disabled="#{not loginMB.usuario.admin}" value="Boletos" action="ManterBoleto" styleClass="#{act eq 8?'menuselected':null}" /> 
+            </p:submenu>
+            <p:submenu label="Relatório">
+                <p:menuitem ajax="false" value="Carta Autorização" action="PrintAutorizacao" styleClass="#{act eq 11?'menuselected':null}" />
+                <p:menuitem ajax="false" value="Simulação" action="SimulaParcela" styleClass="#{act eq 10?'menuselected':null}" />
+            </p:submenu>
+        </p:menu>
+
+    </h:form>
+
+</ui:composition>

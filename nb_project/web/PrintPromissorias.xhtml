@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="bootstrap/css/bootstrap.min.css"/>
+    </h:head>
+
+    <h:body>
+
+
+        <f:metadata>
+            <f:viewParam name="pagId" value="#{printBoletoMB.pagId}"/>
+        </f:metadata>
+
+
+        <h:outputScript name="locales_prime.js" library="js" /> 
+
+        <!--
+                        Verifica se a informação é válida
+        -->
+        <h:panelGroup rendered="#{printBoletoMB.pedidoPag eq null}">
+            <p:panel header="Atenção">
+                A forma de pagamento não foi selecionada!
+            </p:panel>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{printBoletoMB.pedidoPag != null}" style="background: #fff">
+            <h:form id="lbol">
+
+                <ui:param name="bolVar" value="#{app.config.boletosPorPag}"/>
+
+                <ui:repeat value="#{printBoletoMB.pedidoPag.parcelas}" var="it" >
+
+                    <div style="margin: 10px">
+                    <table class="table table-bordered">
+                        <caption><h2>NOTA PROMISSORIA</h2>
+                            <div>REPÚBLICA FEDERATIVA DO BRASIL</div>
+                        </caption>
+
+                        <tr>
+                            <td>Nº: #{it.numParcela} / #{it.pedidoPag.numParcelas}</td>
+
+
+                            <td>
+                                VENCIMENTO, #{it.vencimentoDia} de #{it.vencimentoMes} de #{it.vencimentoAno}.                             
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td></td>
+                            <td>VALOR: R$ <h:outputText value="#{it.valor}"><f:convertNumber type="currency"/></h:outputText></td>
+                        </tr>
+                        
+                        <tr>
+                            <td colspan="2">
+                                Aos #{it.vencimentoDia} dias do mês de #{it.vencimentoMes} do ano de #{it.vencimentoAno}, pagarei por esta única via de NOTA PROMISSÓRIA à <strong>ROGERIO TEODORO ALBACETE SERAFIM</strong> (credor) - CPF/CNPJ: 264.316.688-47
+                                OU à sua ordem a quantia de: <strong>#{it.valorPorExtenso}</strong> em moeda corrente nacional.<br/>
+                                Pagável em: SÃO PAULO
+
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>
+                                <strong>Emitente:</strong> #{it.pedidoPag.pedido.cliente}<br/>
+                                <strong>CPF/CNPJ:</strong> #{it.pedidoPag.pedido.cliente.cpf}<br/>
+                                <strong>Endereço:</strong> #{it.pedidoPag.pedido.cliente.endereco}
+                            </td>
+                            <td>
+                                São Paulo, <h:outputText value="#{app.hoje}">
+                                    <f:convertDateTime pattern=" d 'de' MMMM 'de' yyyy"/>
+                                </h:outputText>
+                                <br/><br/>
+                                
+                                <div>________________________________________</div>
+                                #{it.pedidoPag.pedido.cliente}
+                            </td>
+                        </tr>
+                        
+                    </table>
+                    </div>
+
+                    <h:panelGroup rendered="#{(it.numParcela mod 2) eq 0}">
+                        <p style="page-break-before: always"></p>
+                    </h:panelGroup>
+
+                </ui:repeat>
+
+            </h:form>
+        </h:panelGroup>
+
+
+
+        <script language="javascript">
+            window.print();
+        </script>
+    </h:body>
+
+</html>

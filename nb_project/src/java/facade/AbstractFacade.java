@@ -16,6 +16,7 @@ import javax.persistence.criteria.Root;
 public abstract class AbstractFacade<T> implements Serializable{
 
     private Class<T> entityClass;
+    private EntityManager entityManager = null;
 
     public AbstractFacade(Class<T> entityClass) {
         this.entityClass = entityClass;

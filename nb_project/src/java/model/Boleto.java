@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.Basic;
@@ -25,6 +26,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import util.CurrencyWriter;
 import util.Util;
 
 /**
@@ -96,10 +98,35 @@ public class Boleto implements Serializable {
     
     @Transient
     private BigDecimal valorComMulta;
-
+    
+    
     public Boleto() {
     }
+    
+    public String getValorPorExtenso(){
+        CurrencyWriter cw = new CurrencyWriter();
+        return(cw.write(this.getValor()));
+    }
 
+    public int getVencimentoDia() {
+        Calendar data = Calendar.getInstance();
+        data.setTime(vencimento);
+        return data.get(Calendar.DATE);
+    }
+
+    public String getVencimentoMes() {
+        Calendar data = Calendar.getInstance();
+        data.setTime(vencimento);
+        int mes = data.get(Calendar.MONTH);
+        return Util.monthNames.get(mes);
+    }
+
+    public int getVencimentoAno() {
+        Calendar data = Calendar.getInstance();
+        data.setTime(vencimento);
+        return data.get(Calendar.YEAR);
+    }
+    
     public BigDecimal getValorComMulta() {
         if(this.pedidoPag != null){
             double fator = (this.pedidoPag.getMultaPercent()/100.0) + 1.0;
@@ -107,7 +134,6 @@ public class Boleto implements Serializable {
         }
         return valorComMulta;
     }
-    
     
 
     public BigDecimal getValorPago() {
