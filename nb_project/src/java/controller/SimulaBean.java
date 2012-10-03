@@ -130,14 +130,14 @@ public class SimulaBean extends ControllerBase implements Serializable {
             return;
         }
 
-        tabela = new TabelaFinancJpaController(getEmf()).findTabelaFinanc(tabelaId);
+        tabela = new TabelaFinancJpaController().findTabelaFinanc(tabelaId);
         if (tabela == null) {
             return;
         }
 
         BigDecimal valorTotal = valorVeiculo.add(valorTac).subtract(valorEntrada);
 
-        List<Coeficiente> coeficientes = new CoeficienteJpaController(getEmf()).findCoeficienteEntities(tabelaId);
+        List<Coeficiente> coeficientes = new CoeficienteJpaController().findCoeficienteEntities(tabelaId);
 
         NumberFormat fm = NumberFormat.getCurrencyInstance();
 

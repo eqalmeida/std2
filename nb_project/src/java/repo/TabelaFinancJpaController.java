@@ -4,10 +4,8 @@
  */
 package repo;
 
-import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
@@ -19,29 +17,18 @@ import repo.exceptions.NonexistentEntityException;
  *
  * @author eqalmeida
  */
-public class TabelaFinancJpaController implements Serializable {
+public class TabelaFinancJpaController extends AbstractJpaController {
 
-    public TabelaFinancJpaController(EntityManagerFactory emf) {
-        this.emf = emf;
-    }
-    private EntityManagerFactory emf = null;
-
-    public EntityManager getEntityManager() {
-        return emf.createEntityManager();
+    public TabelaFinancJpaController() {
     }
 
     public void create(TabelaFinanc tabelaFinanc) {
         EntityManager em = null;
-        try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            em.persist(tabelaFinanc);
-            em.getTransaction().commit();
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
+
+        em = getEntityManager();
+        em.getTransaction().begin();
+        em.persist(tabelaFinanc);
+        em.getTransaction().commit();
     }
 
     public void edit(TabelaFinanc tabelaFinanc) throws NonexistentEntityException, Exception {
@@ -60,32 +47,23 @@ public class TabelaFinancJpaController implements Serializable {
                 }
             }
             throw ex;
-        } finally {
-            if (em != null) {
-                em.close();
-            }
         }
     }
 
     public void destroy(Short id) throws NonexistentEntityException {
         EntityManager em = null;
+
+        em = getEntityManager();
+        em.getTransaction().begin();
+        TabelaFinanc tabelaFinanc;
         try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            TabelaFinanc tabelaFinanc;
-            try {
-                tabelaFinanc = em.getReference(TabelaFinanc.class, id);
-                tabelaFinanc.getId();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The tabelaFinanc with id " + id + " no longer exists.", enfe);
-            }
-            em.remove(tabelaFinanc);
-            em.getTransaction().commit();
-        } finally {
-            if (em != null) {
-                em.close();
-            }
+            tabelaFinanc = em.getReference(TabelaFinanc.class, id);
+            tabelaFinanc.getId();
+        } catch (EntityNotFoundException enfe) {
+            throw new NonexistentEntityException("The tabelaFinanc with id " + id + " no longer exists.", enfe);
         }
+        em.remove(tabelaFinanc);
+        em.getTransaction().commit();
     }
 
     public List<TabelaFinanc> findTabelaFinancEntities() {
@@ -98,41 +76,30 @@ public class TabelaFinancJpaController implements Serializable {
 
     private List<TabelaFinanc> findTabelaFinancEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
-        try {
+
 //            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
 //            cq.select(cq.from(TabelaFinanc.class));
 //            Query q = em.createQuery(cq);
-            Query q = em.createQuery("SELECT t FROM TabelaFinanc t ORDER BY t.id");
-            if (!all) {
-                q.setMaxResults(maxResults);
-                q.setFirstResult(firstResult);
-            }
-            return q.getResultList();
-        } finally {
-            em.close();
+        Query q = em.createQuery("SELECT t FROM TabelaFinanc t ORDER BY t.id");
+        if (!all) {
+            q.setMaxResults(maxResults);
+            q.setFirstResult(firstResult);
         }
+        return q.getResultList();
     }
 
     public TabelaFinanc findTabelaFinanc(Short id) {
         EntityManager em = getEntityManager();
-        try {
-            return em.find(TabelaFinanc.class, id);
-        } finally {
-            em.close();
-        }
+        return em.find(TabelaFinanc.class, id);
     }
 
     public int getTabelaFinancCount() {
         EntityManager em = getEntityManager();
-        try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<TabelaFinanc> rt = cq.from(TabelaFinanc.class);
-            cq.select(em.getCriteriaBuilder().count(rt));
-            Query q = em.createQuery(cq);
-            return ((Long) q.getSingleResult()).intValue();
-        } finally {
-            em.close();
-        }
+
+        CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+        Root<TabelaFinanc> rt = cq.from(TabelaFinanc.class);
+        cq.select(em.getCriteriaBuilder().count(rt));
+        Query q = em.createQuery(cq);
+        return ((Long) q.getSingleResult()).intValue();
     }
-    
 }

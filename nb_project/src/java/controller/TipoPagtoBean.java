@@ -78,7 +78,7 @@ public class TipoPagtoBean extends ControllerBase {
 
             tabelasSelecionadas = new ArrayList<TabelaFinanc>(selected.getTabelasFinanc());
 
-            TabelaFinancJpaController ctl2 = new TabelaFinancJpaController(getEmf());
+            TabelaFinancJpaController ctl2 = new TabelaFinancJpaController();
             List<TabelaFinanc> c = ctl2.findTabelaFinancEntities();
 
             tabelasFinanc = new ArrayList<TabelaFinanc>();
@@ -139,7 +139,7 @@ public class TipoPagtoBean extends ControllerBase {
      */
     public void onTransfer() {
 
-        TabelaFinancJpaController ctl2 = new TabelaFinancJpaController(getEmf());
+        TabelaFinancJpaController ctl2 = new TabelaFinancJpaController();
 
         try {
 
@@ -169,7 +169,7 @@ public class TipoPagtoBean extends ControllerBase {
     @PostConstruct
     public void init() {
         service = new TipoPagtoFacace();
-        TabelaFinancJpaController ctl = new TabelaFinancJpaController(getEmf());
+        TabelaFinancJpaController ctl = new TabelaFinancJpaController();
         tabelasFinanc = ctl.findTabelaFinancEntities();
 
         tabelas = new DualListModel<TabelaFinanc>();

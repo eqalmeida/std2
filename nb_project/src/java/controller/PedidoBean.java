@@ -239,7 +239,7 @@ public class PedidoBean extends ControllerBase implements Serializable {
     private void updateValParcela() {
         if (numParcelas != null && numParcelas > 0) {
 
-            Coeficiente coeficiente = new CoeficienteJpaController(ControllerBase.getEmf()).findCoeficiente(new CoeficientePK(getTabela().getId(), numParcelas.shortValue()));
+            Coeficiente coeficiente = new CoeficienteJpaController().findCoeficiente(new CoeficientePK(getTabela().getId(), numParcelas.shortValue()));
 
             getPagamento().setValorParcela(pagamento.getValor().multiply(new BigDecimal(coeficiente.getCoeficiente())).setScale(2, RoundingMode.DOWN));
 
@@ -325,13 +325,13 @@ public class PedidoBean extends ControllerBase implements Serializable {
 
         pagamento.setTipoPagto(tipo);
 
-        TabelaFinancJpaController tfctl = new TabelaFinancJpaController(ControllerBase.getEmf());
+        TabelaFinancJpaController tfctl = new TabelaFinancJpaController();
 
         tabela = tfctl.findTabelaFinanc(tabela.getId());
 
         pagamento.setTabelaFinanc(tabela);
 
-        Coeficiente coeficiente = new CoeficienteJpaController(ControllerBase.getEmf()).findCoeficiente(new CoeficientePK(getTabela().getId(), numParcelas.shortValue()));
+        Coeficiente coeficiente = new CoeficienteJpaController().findCoeficiente(new CoeficientePK(getTabela().getId(), numParcelas.shortValue()));
 
         BigDecimal valParcela = pagamento.getValor().multiply(new BigDecimal(coeficiente.getCoeficiente()));
 
@@ -444,9 +444,9 @@ public class PedidoBean extends ControllerBase implements Serializable {
     public BigDecimal getValorParcela() {
 
         try {
-            TabelaFinancJpaController tfctl = new TabelaFinancJpaController(ControllerBase.getEmf());
+            TabelaFinancJpaController tfctl = new TabelaFinancJpaController();
             tabela = tfctl.findTabelaFinanc(tabela.getId());
-            CoeficienteJpaController cftl = new CoeficienteJpaController(ControllerBase.getEmf());
+            CoeficienteJpaController cftl = new CoeficienteJpaController();
             CoeficientePK pk = new CoeficientePK(tabela.getId(), numParcelas.shortValue());
             Coeficiente coef = cftl.findCoeficiente(pk);
             valorParcela = pagamento.getValor().multiply(new BigDecimal(coef.getCoeficiente()));
@@ -513,7 +513,7 @@ public class PedidoBean extends ControllerBase implements Serializable {
         try {
             if (getTabela().getId() > 0) {
 
-                CoeficienteJpaController c = new CoeficienteJpaController(ControllerBase.getEmf());
+                CoeficienteJpaController c = new CoeficienteJpaController();
 
                 lista = c.findCoeficienteEntities(tabela.getId());
 
@@ -540,8 +540,8 @@ public class PedidoBean extends ControllerBase implements Serializable {
 
             }
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-            System.out.println(ex.getCause());
+//            System.out.println(ex.getMessage());
+//            System.out.println(ex.getCause());
         }
 
     }
@@ -549,7 +549,7 @@ public class PedidoBean extends ControllerBase implements Serializable {
     public void tabelaChanged() {
 
         if (getTabela().getId() > 0) {
-            tabela = new TabelaFinancJpaController(ControllerBase.getEmf()).findTabelaFinanc(tabela.getId());
+            tabela = new TabelaFinancJpaController().findTabelaFinanc(tabela.getId());
 
             populateParcelaList();
         }
@@ -607,7 +607,7 @@ public class PedidoBean extends ControllerBase implements Serializable {
         EntityManager em = null;
 
         try {
-            em = pedidoService.getEntityManager();
+            em = getEntityManager();
             em.getTransaction().begin();
 
             pedido.setValorTotal(getValorTotalPedido());
@@ -797,10 +797,6 @@ public class PedidoBean extends ControllerBase implements Serializable {
                 em.getTransaction().rollback();
             }
 
-        } finally {
-            if (em != null) {
-                em.close();
-            }
         }
 
         pedido.setItens(itensCopy);

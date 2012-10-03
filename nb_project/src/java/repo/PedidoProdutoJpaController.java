@@ -4,16 +4,12 @@
  */
 package repo;
 
-import controller.ControllerBase;
-import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import model.Pedido;
 import model.PedidoProduto;
 import model.PedidoProdutoPK;
 import model.Produto;
@@ -24,15 +20,9 @@ import repo.exceptions.PreexistingEntityException;
  *
  * @author eqalmeida
  */
-public class PedidoProdutoJpaController implements Serializable {
+public class PedidoProdutoJpaController extends AbstractJpaController {
 
     public PedidoProdutoJpaController() {
-        this.emf = ControllerBase.getEmf();
-    }
-    private EntityManagerFactory emf = null;
-
-    public EntityManager getEntityManager() {
-        return emf.createEntityManager();
     }
 
     public void create(PedidoProduto pedidoProduto) throws PreexistingEntityException, Exception {
@@ -61,10 +51,6 @@ public class PedidoProdutoJpaController implements Serializable {
                 throw new PreexistingEntityException("PedidoProduto " + pedidoProduto + " already exists.", ex);
             }
             throw ex;
-        } finally {
-            if (em != null) {
-                em.close();
-            }
         }
     }
 
@@ -101,50 +87,36 @@ public class PedidoProdutoJpaController implements Serializable {
                 }
             }
             throw ex;
-        } finally {
-            if (em != null) {
-                em.close();
-            }
         }
     }
 
     public void destroy(PedidoProdutoPK id) throws NonexistentEntityException {
         EntityManager em = null;
+
+        em = getEntityManager();
+        em.getTransaction().begin();
+        PedidoProduto pedidoProduto;
         try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            PedidoProduto pedidoProduto;
-            try {
-                pedidoProduto = em.getReference(PedidoProduto.class, id);
-                pedidoProduto.getPedidoProdutoPK();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The pedidoProduto with id " + id + " no longer exists.", enfe);
-            }
-            Produto produto = pedidoProduto.getProduto();
-            if (produto != null) {
-                produto.getPedidoProdutoCollection().remove(pedidoProduto);
-                produto = em.merge(produto);
-            }
-            em.remove(pedidoProduto);
-            em.getTransaction().commit();
-        } finally {
-            if (em != null) {
-                em.close();
-            }
+            pedidoProduto = em.getReference(PedidoProduto.class, id);
+            pedidoProduto.getPedidoProdutoPK();
+        } catch (EntityNotFoundException enfe) {
+            throw new NonexistentEntityException("The pedidoProduto with id " + id + " no longer exists.", enfe);
         }
+        Produto produto = pedidoProduto.getProduto();
+        if (produto != null) {
+            produto.getPedidoProdutoCollection().remove(pedidoProduto);
+            produto = em.merge(produto);
+        }
+        em.remove(pedidoProduto);
+        em.getTransaction().commit();
     }
 
     public List<PedidoProduto> findPedidoProdutoEntities(Integer pedidoId) {
         EntityManager em = getEntityManager();
 
-        try {
-            Query query = em.createQuery("SELECT p FROM PedidoProduto p WHERE p.pedido.id = :pedidoId");
-            query.setParameter("pedidoId", pedidoId);
-            return query.getResultList();
-        } finally {
-            em.close();
-        }
-
+        Query query = em.createQuery("SELECT p FROM PedidoProduto p WHERE p.pedido.id = :pedidoId");
+        query.setParameter("pedidoId", pedidoId);
+        return query.getResultList();
     }
 
     public List<PedidoProduto> findPedidoProdutoEntities() {
@@ -157,39 +129,27 @@ public class PedidoProdutoJpaController implements Serializable {
 
     private List<PedidoProduto> findPedidoProdutoEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
-        try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(PedidoProduto.class));
-            Query q = em.createQuery(cq);
-            if (!all) {
-                q.setMaxResults(maxResults);
-                q.setFirstResult(firstResult);
-            }
-            return q.getResultList();
-        } finally {
-            em.close();
+        CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+        cq.select(cq.from(PedidoProduto.class));
+        Query q = em.createQuery(cq);
+        if (!all) {
+            q.setMaxResults(maxResults);
+            q.setFirstResult(firstResult);
         }
+        return q.getResultList();
     }
 
     public PedidoProduto findPedidoProduto(PedidoProdutoPK id) {
         EntityManager em = getEntityManager();
-        try {
-            return em.find(PedidoProduto.class, id);
-        } finally {
-            em.close();
-        }
+        return em.find(PedidoProduto.class, id);
     }
 
     public int getPedidoProdutoCount() {
         EntityManager em = getEntityManager();
-        try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<PedidoProduto> rt = cq.from(PedidoProduto.class);
-            cq.select(em.getCriteriaBuilder().count(rt));
-            Query q = em.createQuery(cq);
-            return ((Long) q.getSingleResult()).intValue();
-        } finally {
-            em.close();
-        }
+        CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+        Root<PedidoProduto> rt = cq.from(PedidoProduto.class);
+        cq.select(em.getCriteriaBuilder().count(rt));
+        Query q = em.createQuery(cq);
+        return ((Long) q.getSingleResult()).intValue();
     }
 }

@@ -41,7 +41,7 @@ public class TabelaFinancBean extends ControllerBase {
 
     @PostConstruct
     private void init() {
-        service = new TabelaFinancJpaController(getEmf());
+        service = new TabelaFinancJpaController();
     }
 
     public List<TabelaFinanc> getTabelas() {
@@ -112,7 +112,7 @@ public class TabelaFinancBean extends ControllerBase {
     }
 
     public List<Coeficiente> getSubItems() {
-        CoeficienteJpaController ctl = new CoeficienteJpaController(getEmf());
+        CoeficienteJpaController ctl = new CoeficienteJpaController();
         if (selected.getId() != null) {
             subItems = ctl.findCoeficienteEntities(selected.getId());
         } else {
@@ -139,7 +139,7 @@ public class TabelaFinancBean extends ControllerBase {
     }
 
     public void gravarCoef() {
-        EntityManager em = getEmf().createEntityManager();
+        EntityManager em = getEntityManager();
         try {
             verificaCoeficiente(subItem);
 
@@ -175,13 +175,11 @@ public class TabelaFinancBean extends ControllerBase {
                 em.getTransaction().rollback();
             }
             addErrorMessage(ex.getMessage());
-        } finally {
-            em.close();
         }
     }
 
     public void excluirCoef() {
-        CoeficienteJpaController ctl = new CoeficienteJpaController(getEmf());
+        CoeficienteJpaController ctl = new CoeficienteJpaController();
         try {
             ctl.destroy(subItem.getCoeficientePK());
             subItem = new Coeficiente();

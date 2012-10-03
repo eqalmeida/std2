@@ -179,7 +179,7 @@ public class PagamentoBean extends ControllerBase implements Serializable {
             return;
         }
 
-        EntityManager em = ControllerBase.getEmf().createEntityManager();
+        EntityManager em = ControllerBase.getEntityManager();
 
         try {
 
@@ -297,7 +297,6 @@ public class PagamentoBean extends ControllerBase implements Serializable {
             addErrorMessage(ex.getMessage());
         } finally {
             pedidoPag = null;
-            em.close();
         }
 
     }

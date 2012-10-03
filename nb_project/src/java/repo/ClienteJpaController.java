@@ -21,7 +21,7 @@ import repo.exceptions.NonexistentEntityException;
  *
  * @author eqalmeida
  */
-public class ClienteJpaController implements Serializable {
+public class ClienteJpaController extends AbstractJpaController {
 
     private String sortedField = null;
     private String order = null;
@@ -42,26 +42,15 @@ public class ClienteJpaController implements Serializable {
     }
 
     public ClienteJpaController() {
-        this.emf = ControllerBase.getEmf();
-    }
-    private EntityManagerFactory emf = null;
-
-    public EntityManager getEntityManager() {
-        return emf.createEntityManager();
     }
 
     public void create(Cliente cliente) {
         EntityManager em = null;
-        try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            em.persist(cliente);
-            em.getTransaction().commit();
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
+
+        em = getEntityManager();
+        em.getTransaction().begin();
+        em.persist(cliente);
+        em.getTransaction().commit();
     }
 
     public void edit(Cliente cliente) throws NonexistentEntityException, Exception {
@@ -80,32 +69,23 @@ public class ClienteJpaController implements Serializable {
                 }
             }
             throw ex;
-        } finally {
-            if (em != null) {
-                em.close();
-            }
         }
     }
 
     public void destroy(Integer id) throws NonexistentEntityException {
         EntityManager em = null;
+
+        em = getEntityManager();
+        em.getTransaction().begin();
+        Cliente cliente;
         try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            Cliente cliente;
-            try {
-                cliente = em.getReference(Cliente.class, id);
-                cliente.getId();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The cliente with id " + id + " no longer exists.", enfe);
-            }
-            em.remove(cliente);
-            em.getTransaction().commit();
-        } finally {
-            if (em != null) {
-                em.close();
-            }
+            cliente = em.getReference(Cliente.class, id);
+            cliente.getId();
+        } catch (EntityNotFoundException enfe) {
+            throw new NonexistentEntityException("The cliente with id " + id + " no longer exists.", enfe);
         }
+        em.remove(cliente);
+        em.getTransaction().commit();
     }
 
     public List<Cliente> findClienteEntities() {
@@ -121,61 +101,45 @@ public class ClienteJpaController implements Serializable {
             query += (" ORDER BY c." + sortedField + " " + order);
         }
 
-        try {
-            Query q = em.createQuery(query);
-            q.setMaxResults(maxResults);
-            q.setFirstResult(firstResult);
-            return q.getResultList();
-        } finally {
-            em.close();
-        }
+
+        Query q = em.createQuery(query);
+        q.setMaxResults(maxResults);
+        q.setFirstResult(firstResult);
+        return q.getResultList();
     }
-    
-    public List<Pedido> findPedidos(Cliente cliente){
+
+    public List<Pedido> findPedidos(Cliente cliente) {
         EntityManager em = getEntityManager();
-        try {
-            Query query = em.createQuery("SELECT p FROM Pedido p WHERE p.cliente.id = :cid");
-            query.setParameter("cid", cliente.getId());
-            return query.getResultList();
-        } finally {
-            em.close();
-        }
+
+        Query query = em.createQuery("SELECT p FROM Pedido p WHERE p.cliente.id = :cid");
+        query.setParameter("cid", cliente.getId());
+        return query.getResultList();
     }
 
     private List<Cliente> findClienteEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
-        try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Cliente.class));
-            Query q = em.createQuery(cq);
-            if (!all) {
-                q.setMaxResults(maxResults);
-                q.setFirstResult(firstResult);
-            }
-            return q.getResultList();
-        } finally {
-            em.close();
+
+        CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+        cq.select(cq.from(Cliente.class));
+        Query q = em.createQuery(cq);
+        if (!all) {
+            q.setMaxResults(maxResults);
+            q.setFirstResult(firstResult);
         }
+        return q.getResultList();
     }
 
     public Cliente findCliente(Integer id) {
         EntityManager em = getEntityManager();
-        try {
-            return em.find(Cliente.class, id);
-        } finally {
-            em.close();
-        }
+
+        return em.find(Cliente.class, id);
     }
 
     public int getClienteCount() {
         EntityManager em = getEntityManager();
-        try {
 
-            String query = ("SELECT COUNT(c) FROM Cliente c" + filterNome);
-            Query q = em.createQuery(query);
-            return ((Long) q.getSingleResult()).intValue();
-        } finally {
-            em.close();
-        }
+        String query = ("SELECT COUNT(c) FROM Cliente c" + filterNome);
+        Query q = em.createQuery(query);
+        return ((Long) q.getSingleResult()).intValue();
     }
 }

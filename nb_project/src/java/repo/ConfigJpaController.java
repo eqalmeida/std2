@@ -4,11 +4,8 @@
  */
 package repo;
 
-import controller.ControllerBase;
-import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
@@ -20,29 +17,15 @@ import repo.exceptions.NonexistentEntityException;
  *
  * @author eqalmeida
  */
-public class ConfigJpaController implements Serializable {
-
-    public ConfigJpaController() {
-        this.emf = ControllerBase.getEmf();
-    }
-    private EntityManagerFactory emf = null;
-
-    public EntityManager getEntityManager() {
-        return emf.createEntityManager();
-    }
+public class ConfigJpaController extends AbstractJpaController {
 
     public void create(Config config) {
         EntityManager em = null;
-        try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            em.persist(config);
-            em.getTransaction().commit();
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
+
+        em = getEntityManager();
+        em.getTransaction().begin();
+        em.persist(config);
+        em.getTransaction().commit();
     }
 
     public void edit(Config config) throws NonexistentEntityException, Exception {
@@ -58,32 +41,23 @@ public class ConfigJpaController implements Serializable {
                 Short id = config.getId();
             }
             throw ex;
-        } finally {
-            if (em != null) {
-                em.close();
-            }
         }
     }
 
     public void destroy(Short id) throws NonexistentEntityException {
         EntityManager em = null;
+
+        em = getEntityManager();
+        em.getTransaction().begin();
+        Config config;
         try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            Config config;
-            try {
-                config = em.getReference(Config.class, id);
-                config.getId();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The config with id " + id + " no longer exists.", enfe);
-            }
-            em.remove(config);
-            em.getTransaction().commit();
-        } finally {
-            if (em != null) {
-                em.close();
-            }
+            config = em.getReference(Config.class, id);
+            config.getId();
+        } catch (EntityNotFoundException enfe) {
+            throw new NonexistentEntityException("The config with id " + id + " no longer exists.", enfe);
         }
+        em.remove(config);
+        em.getTransaction().commit();
     }
 
     public List<Config> findConfigEntities() {
@@ -96,49 +70,38 @@ public class ConfigJpaController implements Serializable {
 
     private List<Config> findConfigEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
-        try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Config.class));
-            Query q = em.createQuery(cq);
-            if (!all) {
-                q.setMaxResults(maxResults);
-                q.setFirstResult(firstResult);
-            }
-            return q.getResultList();
-        } finally {
-            em.close();
+
+        CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+        cq.select(cq.from(Config.class));
+        Query q = em.createQuery(cq);
+        if (!all) {
+            q.setMaxResults(maxResults);
+            q.setFirstResult(firstResult);
         }
+        return q.getResultList();
     }
 
     public Config findConfig() {
         EntityManager em = getEntityManager();
-        try {
-            Config c;
-            c = em.find(Config.class, (short)1);
-            if(c == null){
-                c = new Config((short)1);
-                em.getTransaction().begin();
-                em.persist(c);
-                em.getTransaction().commit();
-            }
-            return c;
-        } finally {
-            em.close();
+
+        Config c;
+        c = em.find(Config.class, (short) 1);
+        if (c == null) {
+            c = new Config((short) 1);
+            em.getTransaction().begin();
+            em.persist(c);
+            em.getTransaction().commit();
         }
+        return c;
     }
-    
 
     public int getConfigCount() {
         EntityManager em = getEntityManager();
-        try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Config> rt = cq.from(Config.class);
-            cq.select(em.getCriteriaBuilder().count(rt));
-            Query q = em.createQuery(cq);
-            return ((Long) q.getSingleResult()).intValue();
-        } finally {
-            em.close();
-        }
+
+        CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+        Root<Config> rt = cq.from(Config.class);
+        cq.select(em.getCriteriaBuilder().count(rt));
+        Query q = em.createQuery(cq);
+        return ((Long) q.getSingleResult()).intValue();
     }
-    
 }

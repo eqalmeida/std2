@@ -38,11 +38,11 @@ public class App {
              */
             Config c = getConfig();
         } catch (Exception e) {
-            
+
             /**
              * Aplica o Patch da versão 1.0 do BD.
              */
-            EntityManager em = ControllerBase.getEmf().createEntityManager();
+            EntityManager em = ControllerBase.getEntityManager();
             em.getTransaction().begin();
             em.createNativeQuery("ALTER TABLE `std_loja`.`config` ADD COLUMN `empresa_cnpj` VARCHAR(30) NULL  AFTER `carta_autoriz` , ADD COLUMN `dbversion` INT NULL  AFTER `empresa_cnpj` ;").executeUpdate();
             em.getTransaction().commit();
@@ -64,24 +64,19 @@ public class App {
     }
 
     public Config getConfig() {
-        EntityManager em = ControllerBase.getEmf().createEntityManager();
+        EntityManager em = ControllerBase.getEntityManager();
 
-        try {
-            List<Config> confs = em.createQuery("SELECT c FROM Config c").getResultList();
-            if (confs.isEmpty()) {
-                em.getTransaction().begin();
-                config = new Config();
-                config.setBoletosPorPag((short) 4);
-                em.persist(config);
-                em.getTransaction().commit();
-            } else {
-                config = confs.get(0);
-            }
-
-
-        } finally {
-            em.close();
+        List<Config> confs = em.createQuery("SELECT c FROM Config c").getResultList();
+        if (confs.isEmpty()) {
+            em.getTransaction().begin();
+            config = new Config();
+            config.setBoletosPorPag((short) 4);
+            em.persist(config);
+            em.getTransaction().commit();
+        } else {
+            config = confs.get(0);
         }
+
         return config;
     }
 
@@ -92,12 +87,13 @@ public class App {
     public String getIpAddr() {
 
         String ip = null;
-        
-        try{
-        FacesContext context = null;
-        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-        ip = request.getRemoteAddr();
-        }catch(Exception e){}
+
+        try {
+            FacesContext context = null;
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            ip = request.getRemoteAddr();
+        } catch (Exception e) {
+        }
         return ip;
     }
 

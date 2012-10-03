@@ -34,19 +34,15 @@ public class LoginBean extends ControllerBase {
             return null;
         }
 
-        EntityManager em = ControllerBase.getEmf().createEntityManager();
+        EntityManager em = ControllerBase.getEntityManager();
 
-        try {
-            Usuario u = em.find(Usuario.class, usuarioId);
-            if (u != null) {
-                if (u.getAtivo() == false) {
-                    return null;
-                }
+        Usuario u = em.find(Usuario.class, usuarioId);
+        if (u != null) {
+            if (u.getAtivo() == false) {
+                return null;
             }
-            return u;
-        } finally {
-            em.close();
         }
+        return u;
 
     }
 
@@ -68,39 +64,34 @@ public class LoginBean extends ControllerBase {
 
     public void login() {
 
-        EntityManager em = ControllerBase.getEmf().createEntityManager();
+        EntityManager em = ControllerBase.getEntityManager();
 
-        try {
 
-            Query query = em.createQuery("SELECT u FROM Usuario u WHERE u.login = :login");
-            query.setParameter("login", login);
 
-            if (query.getResultList().isEmpty()) {
+        Query query = em.createQuery("SELECT u FROM Usuario u WHERE u.login = :login");
+        query.setParameter("login", login);
 
-                addErrorMessage("Login inválido!");
-                return;
-            }
+        if (query.getResultList().isEmpty()) {
 
-            Usuario u = (Usuario) query.getResultList().get(0);
-
-            if (u.getSenha().equals(senha)) {
-                if (u.getAtivo()) {
-                    usuarioId = u.getId();
-                } else {
-                    addErrorMessage("Usuário desativado");
-                }
-            } else {
-                addErrorMessage("Senha inválida!");
-            }
-
-        } finally {
-            if (em != null) {
-                em.close();
-            }
+            addErrorMessage("Login inválido!");
+            return;
         }
+
+        Usuario u = (Usuario) query.getResultList().get(0);
+
+        if (u.getSenha().equals(senha)) {
+            if (u.getAtivo()) {
+                usuarioId = u.getId();
+            } else {
+                addErrorMessage("Usuário desativado");
+            }
+        } else {
+            addErrorMessage("Senha inválida!");
+        }
+
     }
-    
-    public boolean isLogedin(){
+
+    public boolean isLogedin() {
         return (this.usuarioId != null);
     }
 

@@ -4,13 +4,10 @@
  */
 package repo;
 
-import controller.ControllerBase;
-import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.TemporalType;
@@ -30,15 +27,9 @@ import repo.exceptions.NonexistentEntityException;
  *
  * @author eqalmeida
  */
-public class PedidoJpaController implements Serializable {
+public class PedidoJpaController extends AbstractJpaController {
 
     public PedidoJpaController() {
-        this.emf = ControllerBase.getEmf();
-    }
-    private EntityManagerFactory emf = null;
-
-    public EntityManager getEntityManager() {
-        return emf.createEntityManager();
     }
 
     public void create(Pedido pedido) {
@@ -60,9 +51,6 @@ public class PedidoJpaController implements Serializable {
              em.getTransaction().commit();
              */
         } finally {
-            if (em != null) {
-                em.close();
-            }
         }
     }
 
@@ -89,10 +77,6 @@ public class PedidoJpaController implements Serializable {
                 }
             }
             throw ex;
-        } finally {
-            if (em != null) {
-                em.close();
-            }
         }
     }
 
@@ -112,9 +96,6 @@ public class PedidoJpaController implements Serializable {
             em.remove(pedido);
             em.getTransaction().commit();
         } finally {
-            if (em != null) {
-                em.close();
-            }
         }
     }
 
@@ -128,7 +109,7 @@ public class PedidoJpaController implements Serializable {
             em.getTransaction().begin();
             //try {
             pedido = em.find(Pedido.class, pedido.getId());
-            
+
             short statusAnt = pedido.getStatus();
 
             pedido.setStatus(status);
@@ -139,7 +120,7 @@ public class PedidoJpaController implements Serializable {
                     if (b.getStatus() != Boleto.PAGO) {
 
                         int boletoId = b.getId();
-                        
+
                         b = em.find(Boleto.class, boletoId);
 
                         if (status == Boleto.ATIVO && b.getValorPago() != null && b.getValorPago().doubleValue() > 0.0) {
@@ -152,37 +133,34 @@ public class PedidoJpaController implements Serializable {
                     }
                 }
             }
-            
+
             //
             // Tratamento de estoque
             //
-            if(status == Boleto.CANCELADO && statusAnt == Boleto.ATIVO){
-                for(PedidoProduto p : pedido.getItens()){
-                    
+            if (status == Boleto.CANCELADO && statusAnt == Boleto.ATIVO) {
+                for (PedidoProduto p : pedido.getItens()) {
+
                     Produto pr = em.find(Produto.class, p.getProduto().getId());
-                    
+
                     Integer qtd = pr.getQtdEstoque();
-                    if(qtd >= 0){
-                        
-                        pr.setQtdEstoque(qtd+1);
+                    if (qtd >= 0) {
+
+                        pr.setQtdEstoque(qtd + 1);
                         em.merge(pr);
                     }
                 }
-            }
+            } else if (statusAnt == Boleto.CANCELADO && status == Boleto.ATIVO) {
+                for (PedidoProduto p : pedido.getItens()) {
 
-            else if(statusAnt == Boleto.CANCELADO && status == Boleto.ATIVO){
-                for(PedidoProduto p : pedido.getItens()){
-                    
                     Produto pr = em.find(Produto.class, p.getProduto().getId());
-                    
+
                     Integer qtd = pr.getQtdEstoque();
-                    
-                    if(qtd == 0){
-                        throw new IllegalAccessException("O produto "+pr.getDescricaoGeral()+" está sem estoque!");
-                    }
-                    else if(qtd > 0 ){
-                        
-                        pr.setQtdEstoque(qtd-1);
+
+                    if (qtd == 0) {
+                        throw new IllegalAccessException("O produto " + pr.getDescricaoGeral() + " está sem estoque!");
+                    } else if (qtd > 0) {
+
+                        pr.setQtdEstoque(qtd - 1);
                         em.merge(pr);
                     }
                 }
@@ -198,7 +176,7 @@ public class PedidoJpaController implements Serializable {
             em.persist(st);
 
             int pedidoId = pedido.getId();
-            
+
             em.getTransaction().commit();
 
             pedido = em.find(Pedido.class, pedidoId);
@@ -209,10 +187,6 @@ public class PedidoJpaController implements Serializable {
             }
             throw new Exception(e.getMessage());
 
-        } finally {
-            if (em != null) {
-                em.close();
-            }
         }
 
     }
@@ -250,7 +224,6 @@ public class PedidoJpaController implements Serializable {
             q.setFirstResult(firstResults);
             return q.getResultList();
         } finally {
-            em.close();
         }
     }
 
@@ -260,63 +233,50 @@ public class PedidoJpaController implements Serializable {
 
     private List<Pedido> findPedidoEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
-        try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Pedido.class));
-            Query q = em.createQuery(cq);
-            if (!all) {
-                q.setMaxResults(maxResults);
-                q.setFirstResult(firstResult);
-            }
-            return q.getResultList();
-        } finally {
-            em.close();
+
+        CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+        cq.select(cq.from(Pedido.class));
+        Query q = em.createQuery(cq);
+        if (!all) {
+            q.setMaxResults(maxResults);
+            q.setFirstResult(firstResult);
         }
+        return q.getResultList();
     }
 
     public Pedido findPedido(Integer id) {
         EntityManager em = getEntityManager();
-        try {
-            return em.find(Pedido.class, id);
-        } finally {
-            em.close();
-        }
+        return em.find(Pedido.class, id);
     }
 
     public int getPedidoCount() {
         EntityManager em = getEntityManager();
-        try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Pedido> rt = cq.from(Pedido.class);
-            cq.select(em.getCriteriaBuilder().count(rt));
-            Query q = em.createQuery(cq);
-            return ((Long) q.getSingleResult()).intValue();
-        } finally {
-            em.close();
-        }
+
+        CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+        Root<Pedido> rt = cq.from(Pedido.class);
+        cq.select(em.getCriteriaBuilder().count(rt));
+        Query q = em.createQuery(cq);
+        return ((Long) q.getSingleResult()).intValue();
     }
 
     public int getPedidoCount(Calendar data) {
         EntityManager em = getEntityManager();
-        try {
-            Date data1, data2;
 
-            String query = "SELECT COUNT(p) FROM Pedido p WHERE p.data BETWEEN :data1 AND :data2";
+        Date data1, data2;
 
-            Query q = em.createQuery(query);
+        String query = "SELECT COUNT(p) FROM Pedido p WHERE p.data BETWEEN :data1 AND :data2";
 
-            data.set(Calendar.DATE, 1);
-            data1 = data.getTime();
-            data.add(Calendar.MONTH, 1);
-            data.add(Calendar.DATE, -1);
-            data2 = data.getTime();
+        Query q = em.createQuery(query);
 
-            q.setParameter("data1", data1, TemporalType.DATE);
-            q.setParameter("data2", data2, TemporalType.DATE);
+        data.set(Calendar.DATE, 1);
+        data1 = data.getTime();
+        data.add(Calendar.MONTH, 1);
+        data.add(Calendar.DATE, -1);
+        data2 = data.getTime();
 
-            return ((Long) q.getSingleResult()).intValue();
-        } finally {
-            em.close();
-        }
+        q.setParameter("data1", data1, TemporalType.DATE);
+        q.setParameter("data2", data2, TemporalType.DATE);
+
+        return ((Long) q.getSingleResult()).intValue();
     }
 }
