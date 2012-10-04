@@ -18,7 +18,6 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DualListModel;
 import repo.TabelaFinancJpaController;
 
-
 /**
  *
  * @author eqalmeida
@@ -154,7 +153,7 @@ public class TipoPagtoBean extends ControllerBase {
 
             for (Iterator it = tabelas.getTarget().iterator(); it.hasNext();) {
                 TabelaFinanc item;
-                item = ctl2.findTabelaFinanc(Short.parseShort(it.next().toString()));
+                item = ctl2.find(Short.parseShort(it.next().toString()));
 
                 selected.getTabelasFinanc().add(item);
             }

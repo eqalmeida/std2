@@ -22,6 +22,8 @@ public class ConfigBean extends ControllerBase implements Serializable {
     private Config config = null;
     private ConfigJpaController service ;
     
+   
+    
     public ConfigBean() {
     }
     

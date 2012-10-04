@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import javax.faces.bean.ViewScoped;
 import model.Coeficiente;
 import model.Produto;
 import model.TabelaFinanc;
@@ -18,7 +17,6 @@ import org.primefaces.context.RequestContext;
 import repo.CoeficienteJpaController;
 import repo.ProdutoJpaController;
 import repo.TabelaFinancJpaController;
-
 
 /**
  *
@@ -120,7 +118,7 @@ public class SimulaBean extends ControllerBase implements Serializable {
 
 
         parcelas = new ArrayList<String>();
-        veiculo = new ProdutoJpaController().findProduto(produtoId);
+        veiculo = new ProdutoJpaController().find(produtoId);
         if (veiculo == null) {
             return;
         }
@@ -130,7 +128,7 @@ public class SimulaBean extends ControllerBase implements Serializable {
             return;
         }
 
-        tabela = new TabelaFinancJpaController().findTabelaFinanc(tabelaId);
+        tabela = new TabelaFinancJpaController().find(tabelaId);
         if (tabela == null) {
             return;
         }
@@ -154,8 +152,7 @@ public class SimulaBean extends ControllerBase implements Serializable {
         mostrar = true;
 
         RequestContext.getCurrentInstance().execute(
-                "window.open (\"SimulaParcelaPrint.jsf\",\"mywindow\",\"height=600, width=800\");"
-                );
+                "window.open (\"SimulaParcelaPrint.jsf\",\"mywindow\",\"height=600, width=800\");");
     }
 
     public Produto getVeiculo() {
@@ -176,7 +173,7 @@ public class SimulaBean extends ControllerBase implements Serializable {
 
     public void veiculoChanged() {
         // Atualiza o valor
-        veiculo = new ProdutoJpaController().findProduto(produtoId);
+        veiculo = new ProdutoJpaController().find(produtoId);
         if (veiculo != null) {
             valorVeiculo = veiculo.getValor();
         }

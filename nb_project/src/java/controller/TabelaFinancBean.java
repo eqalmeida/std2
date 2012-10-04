@@ -14,7 +14,6 @@ import model.Coeficiente;
 import model.CoeficientePK;
 import model.TabelaFinanc;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.SelectEvent;
 import repo.CoeficienteJpaController;
 import repo.TabelaFinancJpaController;
 
@@ -107,7 +106,7 @@ public class TabelaFinancBean extends ControllerBase {
     }
 
     public void editarTabela(Short id) {
-        selected = service.findTabelaFinanc(id);
+        selected = service.find(id);
         RequestContext.getCurrentInstance().execute("tblDlg.show()");
     }
 
@@ -181,7 +180,7 @@ public class TabelaFinancBean extends ControllerBase {
     public void excluirCoef() {
         CoeficienteJpaController ctl = new CoeficienteJpaController();
         try {
-            ctl.destroy(subItem.getCoeficientePK());
+            ctl.remove(subItem);
             subItem = new Coeficiente();
         } catch (Exception ex) {
             addMessage(ex.getMessage());

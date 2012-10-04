@@ -11,8 +11,6 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 import model.Pedido;
-import model.PedidoProduto;
-import model.Produto;
 import repo.ConfigJpaController;
 import repo.PedidoJpaController;
 
@@ -62,14 +60,14 @@ public class PrintAutorizacaoBean extends ControllerBase implements Serializable
     }
 
     public void mostrarTexto() {
-        pedido = service.findPedido(pedidoId);
-        
-        if(pedido == null){
+        pedido = service.find(pedidoId);
+
+        if (pedido == null) {
             addErrorMessage("Pedido não encontrado");
             return;
         }
 
-        if(pedido.getVeiculo() == null){
+        if (pedido.getVeiculo() == null) {
             addErrorMessage("Pedido não possui veículo");
             return;
         }
@@ -94,16 +92,16 @@ public class PrintAutorizacaoBean extends ControllerBase implements Serializable
 
         texto = texto.replaceAll("AnoVeiculo", pedido.getVeiculo().getProduto().getAno());
 
-        
+
         texto = texto.replaceAll("DataAtual", getDataAtual());
 
         texto = texto.replaceAll("ModeloVeiculo", pedido.getVeiculo().getProduto().getFabricante() + " " + pedido.getVeiculo().getProduto().getModelo());
 
     }
-    
-    private String getDataAtual(){
+
+    private String getDataAtual() {
         Date data = new Date();
         SimpleDateFormat df = new SimpleDateFormat("d 'de' MMMMM 'de' yyyy");
-        return  df.format(data);
+        return df.format(data);
     }
 }

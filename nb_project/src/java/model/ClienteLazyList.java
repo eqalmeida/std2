@@ -66,7 +66,7 @@ public class ClienteLazyList extends LazyDataModel<Cliente> {
             Integer id = Integer.valueOf(Id);
 
 
-            c = getService().findCliente(id);
+            c = getService().find(id);
             
         } catch (Exception ex) {
         }

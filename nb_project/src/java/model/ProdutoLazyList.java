@@ -44,7 +44,7 @@ public class ProdutoLazyList extends LazyDataModel<Produto> {
 
         List<Produto> lista = ctl.findProdutoEntities(maxPerPage, startingAt);
 
-        setRowCount(ctl.getProdutoCount());
+        setRowCount(ctl.count());
 
         setPageSize(maxPerPage);
 
@@ -63,7 +63,7 @@ public class ProdutoLazyList extends LazyDataModel<Produto> {
         try {
             Integer id = Integer.valueOf(Id);
 
-            p = ctl.findProduto(id);
+            p = ctl.find(id);
             
         } catch (Exception ex) {
         }

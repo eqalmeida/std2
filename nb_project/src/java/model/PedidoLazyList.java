@@ -65,7 +65,7 @@ public class PedidoLazyList extends LazyDataModel<Pedido> {
         try {
             Integer id = Integer.valueOf(Id);
 
-            p = service.findPedido(id);
+            p = service.find(id);
 
         } catch (Exception ex) {
         }

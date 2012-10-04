@@ -134,7 +134,7 @@ public class ProdutoBean extends ControllerBase implements Serializable {
     }
 
     public void onRowSelect(SelectEvent event) {
-        selected = ctl.findProduto(((Produto) event.getObject()).getId());
+        selected = ctl.find(((Produto) event.getObject()).getId());
     }
 
     public void novoProduto(Short tipo) {
@@ -156,12 +156,12 @@ public class ProdutoBean extends ControllerBase implements Serializable {
             addErrorMessage("Falha de Login");
             return;
         }
-        
-        if(!getUsuarioLogado().isAdmin()){
+
+        if (!getUsuarioLogado().isAdmin()) {
             addErrorMessage("Acesso negado");
             return;
         }
-            
+
 
         try {
             ctl.destroy(id);
@@ -181,7 +181,7 @@ public class ProdutoBean extends ControllerBase implements Serializable {
         }
 
         if (this.selected.getId() != null) {
-            selected = ctl.findProduto(this.selected.getId());
+            selected = ctl.find(this.selected.getId());
             RequestContext.getCurrentInstance().execute("dialogNewCar.show()");
         }
     }
@@ -265,7 +265,7 @@ public class ProdutoBean extends ControllerBase implements Serializable {
 
             PedidoBean pedidoMB = context.getApplication().evaluateExpressionGet(context, "#{pedidoMB}", PedidoBean.class);
 
-            selected = ctl.findProduto(id);
+            selected = ctl.find(id);
 
             pedidoMB.addProduto(selected);
 
@@ -274,33 +274,31 @@ public class ProdutoBean extends ControllerBase implements Serializable {
             addErrorMessage("Não foi possível adicionar!\n" + ex.getMessage());
         }
     }
-    
-    public void editarProduto(int id){
+
+    public void editarProduto(int id) {
         if (!verificaLogin("")) {
             addErrorMessage("Falha de Login");
             return;
         }
 
-            selected = ctl.findProduto(id);
-            RequestContext.getCurrentInstance().execute("dialogNewCar.show()");
+        selected = ctl.find(id);
+        RequestContext.getCurrentInstance().execute("dialogNewCar.show()");
     }
-    
-    public void imprimirVeiculos(){
+
+    public void imprimirVeiculos() {
         showPopup("PrintVeiculos.jsf");
     }
-    
-    
     /*
-    public void imprimir() throws JRException, IOException{
-        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-        List<Produto> veiculos = ctl.findVeiculosEmEstoque();
-        JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(veiculos);
-        String fileName = context.getRealPath("/reports/estoque.jasper");
-        JasperPrint jasperPrint = JasperFillManager.fillReport(fileName, new HashMap(), beanCollectionDataSource);
-        HttpServletResponse response = (HttpServletResponse)context.getResponse();
-        response.addHeader("content-disposition", "attachment; filename=produtos.pdf");
-        ServletOutputStream outputStream = response.getOutputStream();
-        JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
+     public void imprimir() throws JRException, IOException{
+     ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+     List<Produto> veiculos = ctl.findVeiculosEmEstoque();
+     JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(veiculos);
+     String fileName = context.getRealPath("/reports/estoque.jasper");
+     JasperPrint jasperPrint = JasperFillManager.fillReport(fileName, new HashMap(), beanCollectionDataSource);
+     HttpServletResponse response = (HttpServletResponse)context.getResponse();
+     response.addHeader("content-disposition", "attachment; filename=produtos.pdf");
+     ServletOutputStream outputStream = response.getOutputStream();
+     JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
         
-    }*/
+     }*/
 }

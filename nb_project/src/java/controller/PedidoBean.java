@@ -35,7 +35,6 @@ import repo.CoeficienteJpaController;
 import repo.PedidoJpaController;
 import repo.TabelaFinancJpaController;
 
-
 /**
  *
  * @author eqalmeida
@@ -192,7 +191,7 @@ public class PedidoBean extends ControllerBase implements Serializable {
     }
 
     private void populateTiposPag() {
-        
+
         tipoPagtoList = new TipoPagtoFacace().findAll();
     }
 
@@ -327,7 +326,7 @@ public class PedidoBean extends ControllerBase implements Serializable {
 
         TabelaFinancJpaController tfctl = new TabelaFinancJpaController();
 
-        tabela = tfctl.findTabelaFinanc(tabela.getId());
+        tabela = tfctl.find(tabela.getId());
 
         pagamento.setTabelaFinanc(tabela);
 
@@ -445,7 +444,7 @@ public class PedidoBean extends ControllerBase implements Serializable {
 
         try {
             TabelaFinancJpaController tfctl = new TabelaFinancJpaController();
-            tabela = tfctl.findTabelaFinanc(tabela.getId());
+            tabela = tfctl.find(tabela.getId());
             CoeficienteJpaController cftl = new CoeficienteJpaController();
             CoeficientePK pk = new CoeficientePK(tabela.getId(), numParcelas.shortValue());
             Coeficiente coef = cftl.findCoeficiente(pk);
@@ -459,7 +458,7 @@ public class PedidoBean extends ControllerBase implements Serializable {
     }
 
     public void valorChanged() {
-            populateParcelaList();
+        populateParcelaList();
     }
 
     public void tipoChanged() {
@@ -470,7 +469,7 @@ public class PedidoBean extends ControllerBase implements Serializable {
 
         if (tipoPagtoSelected > 0) {
 
-            
+
             tipo = new TipoPagtoFacace().find(tipoPagtoSelected); //c.findTipoPagto(tipoPagtoSelected);
 
             if (tipo != null) {
@@ -549,14 +548,14 @@ public class PedidoBean extends ControllerBase implements Serializable {
     public void tabelaChanged() {
 
         if (getTabela().getId() > 0) {
-            tabela = new TabelaFinancJpaController().findTabelaFinanc(tabela.getId());
+            tabela = new TabelaFinancJpaController().find(tabela.getId());
 
             populateParcelaList();
         }
 
     }
-    
-    private void addLog(String str){
+
+    private void addLog(String str) {
         System.out.println(str);
     }
 
@@ -581,19 +580,19 @@ public class PedidoBean extends ControllerBase implements Serializable {
             addErrorMessage("Falha de Login!");
             return;
         }
-        
+
         BigDecimal soma = BigDecimal.ZERO;
-        
-        for(PedidoPag pag : pagamentos){
+
+        for (PedidoPag pag : pagamentos) {
             soma = soma.add(pag.getValor());
         }
-        
-        if(soma.doubleValue() < getValorTotalPedido().doubleValue()){
+
+        if (soma.doubleValue() < getValorTotalPedido().doubleValue()) {
             addErrorMessage("O valor em pagamentos é inferior ao valor do Pedido!");
             return;
         }
 
-        if(soma.doubleValue() > getValorTotalPedido().doubleValue()){
+        if (soma.doubleValue() > getValorTotalPedido().doubleValue()) {
             addErrorMessage("O valor em pagamentos é superior ao valor do Pedido!");
             return;
         }
@@ -618,7 +617,7 @@ public class PedidoBean extends ControllerBase implements Serializable {
 
 
             pedido.setUsuario(user);
-            
+
             addLog("Usuario adicionado");
 
             Cliente cliente = pedido.getCliente();
@@ -628,10 +627,10 @@ public class PedidoBean extends ControllerBase implements Serializable {
             }
 
             addLog("Cliente adicionado");
-            
+
             em.persist(pedido);
             em.flush();
-            
+
             addLog("Pedido persistido");
 
             pedido = em.getReference(pedido.getClass(), pedido.getId());
@@ -675,14 +674,14 @@ public class PedidoBean extends ControllerBase implements Serializable {
                 em.persist(it);
 
             }
-            
-            
+
+
 
             /**
              * Grava as formas de pagamento
              */
             for (PedidoPag pag : pagamentos) {
-                
+
                 TipoPagto tipoPagto = pag.getTipoPagto();
                 if (tipoPagto != null) {
                     tipoPagto = em.getReference(tipoPagto.getClass(), tipoPagto.getId());
@@ -802,11 +801,11 @@ public class PedidoBean extends ControllerBase implements Serializable {
         pedido.setItens(itensCopy);
 
     }
-    
+
     /**
      * Cancela o Pedido Atual
      */
-    public void cancelaPedido(){
+    public void cancelaPedido() {
         this.pedido = new Pedido();
     }
 }

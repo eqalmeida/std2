@@ -6,12 +6,10 @@ package controller;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
-import javax.persistence.EntityManager;
 import model.Boleto;
 import model.PagtoRecebido;
 import model.Pedido;
@@ -20,7 +18,6 @@ import model.PedidoPag;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
-import repo.BoletoJpaController;
 import repo.PedidoJpaController;
 import util.Util;
 
@@ -31,7 +28,7 @@ import util.Util;
 @ManagedBean(name = "showPedidoMB")
 @ViewScoped
 public class ShowPedidoBean extends ControllerBase {
-    
+
     private Integer pedidoId;
     private Pedido pedido = null;
     private PedidoJpaController service = null;
@@ -43,67 +40,67 @@ public class ShowPedidoBean extends ControllerBase {
     private PedidoPag pedidoPagSelected = null;
     private short status;
     private String justif;
-    
+
     public void printPedido(int id) {
-        showPopup("PrintPedido.jsf?pedidoId="+id);
+        showPopup("PrintPedido.jsf?pedidoId=" + id);
 //        RequestContext.getCurrentInstance().execute("window.open ('PrintPedido.jsf?pedidoId="+id+"','mywindow','height=600, width=800');");
     }
-    
+
     public short getStatus() {
         return status;
     }
-    
+
     public void setStatus(short status) {
         this.status = status;
     }
-    
+
     public String getJustif() {
         return justif;
     }
-    
+
     public void setJustif(String justif) {
         this.justif = justif;
     }
-    
+
     public void gravaStatus() {
-        
-        if(pedido != null){
-        
-        try {
-            int id = pedido.getId();
-            
-            service.changeStatus(pedido, status, getUsuarioLogado(), justif);
-            
-            pedido = getService().findPedido(id);
+
+        if (pedido != null) {
+
+            try {
+                int id = pedido.getId();
+
+                service.changeStatus(pedido, status, getUsuarioLogado(), justif);
+
+                pedido = getService().find(id);
 
 //            pedido = null;
-            RequestContext.getCurrentInstance().execute("statusDlg.hide()");
-            
-            addMessage("Status alterado");
-            
-        } catch (Exception e) {
-            addErrorMessage(e.getMessage());
+                RequestContext.getCurrentInstance().execute("statusDlg.hide()");
+
+                addMessage("Status alterado");
+
+            } catch (Exception e) {
+                addErrorMessage(e.getMessage());
+            }
         }
-        }
-        
+
     }
-    
+
     public Integer getAno() {
         return ano;
     }
-    
+
     public void setAno(Integer ano) {
         this.ano = ano;
     }
-    
+
     public Integer getMes() {
         return mes;
     }
-    
-    public String getMesStr(){
+
+    public String getMesStr() {
         return Util.monthNames.get(this.mes);
     }
-    
+
     public void setMes(Integer mes) {
         this.mes = mes;
     }
@@ -116,35 +113,35 @@ public class ShowPedidoBean extends ControllerBase {
         ano = data.get(Calendar.YEAR);
         mes = data.get(Calendar.MONTH);
     }
-    
+
     public PedidoJpaController getService() {
         if (service == null) {
             service = new PedidoJpaController();
         }
         return service;
     }
-    
+
     public Integer getPedidoId() {
         return pedidoId;
     }
-    
+
     public void setPedidoId(Integer pedidoId) {
         this.pedidoId = pedidoId;
     }
-    
+
     public Pedido getPedido() {
         if (pedido == null) {
             if (pedidoId != null) {
-                pedido = getService().findPedido(pedidoId);
+                pedido = getService().find(pedidoId);
             }
         }
         return pedido;
     }
-    
+
     public void setPedido(Pedido pedido) {
         this.pedido = pedido;
     }
-    
+
     public LazyDataModel<Pedido> getLista() {
         if (lista == null) {
             lista = new PedidoLazyList(getService());
@@ -154,36 +151,36 @@ public class ShowPedidoBean extends ControllerBase {
         }
         return lista;
     }
-    
+
     public void setLista(LazyDataModel<Pedido> lista) {
         this.lista = lista;
     }
-    
+
     public void mesChanged(ValueChangeEvent ev) {
         mes = (Integer) ev.getNewValue();
         PedidoLazyList p = (PedidoLazyList) getLista();
         p.setMes(mes);
     }
-    
+
     public void anoChanged(ValueChangeEvent ev) {
         ano = (Integer) ev.getNewValue();
         PedidoLazyList p = (PedidoLazyList) getLista();
         p.setAno(ano);
     }
-    
+
     public void verPedido() {
     }
-    
+
     public void onRowSelected(SelectEvent ev) {
         Integer id = ((Pedido) ev.getObject()).getId();
-        pedido = getService().findPedido(id);
+        pedido = getService().find(id);
         if (pedido != null) {
             addMessage("Detalhes de Pedido abaixo");
         }
     }
-    
+
     public void regPag(int id) {
-        
+
         String red = "RegPagamento.jsf?id=" + id;
         pedidoPagSelected = null;
         try {
@@ -191,55 +188,55 @@ public class ShowPedidoBean extends ControllerBase {
         } catch (IOException ex) {
             addErrorMessage(ex.getMessage());
         }
-        
+
     }
-    
+
     public void printBoletos(int id) {
-        
-        showPopup("PrintBoletos.jsf?pagId="+id);
+
+        showPopup("PrintBoletos.jsf?pagId=" + id);
         /*
         
-        String red = "PrintBoleto.jsf?id=" + id;
-        pedidoPagSelected = null;
-        try {
-            FacesContext.getCurrentInstance().getExternalContext().redirect(red);
-        } catch (IOException ex) {
-            addErrorMessage(ex.getMessage());
-        }
-        */
+         String red = "PrintBoleto.jsf?id=" + id;
+         pedidoPagSelected = null;
+         try {
+         FacesContext.getCurrentInstance().getExternalContext().redirect(red);
+         } catch (IOException ex) {
+         addErrorMessage(ex.getMessage());
+         }
+         */
     }
-    
+
     public void printPromissoria(int id) {
-        
-        showPopup("PrintPromissorias.jsf?pagId="+id);
+
+        showPopup("PrintPromissorias.jsf?pagId=" + id);
     }
-    
+
     public void changeStatus(short status) {
         justif = "";
         this.status = status;
         RequestContext.getCurrentInstance().execute("statusDlg.show()");
     }
-    
+
     public PagtoRecebido getPagamento() {
         return pagamento;
     }
-    
+
     public void setPagamento(PagtoRecebido pagamento) {
         this.pagamento = pagamento;
     }
-    
+
     public Boleto getBoleto() {
         return boleto;
     }
-    
+
     public void setBoleto(Boleto boleto) {
         this.boleto = boleto;
     }
-    
+
     public PedidoPag getPedidoPagSelected() {
         return pedidoPagSelected;
     }
-    
+
     public void setPedidoPagSelected(PedidoPag pedidoPagSelected) {
         this.pedidoPagSelected = pedidoPagSelected;
     }

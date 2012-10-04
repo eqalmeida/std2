@@ -7,7 +7,6 @@ package controller;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 import model.PagtoRecebido;
-import org.primefaces.context.RequestContext;
 import repo.PagtoRecebidoJpaController;
 
 /**
@@ -34,13 +33,12 @@ public class PrintReciboBean extends ControllerBase {
 
     public PagtoRecebido getPag() {
         PagtoRecebidoJpaController ctl = new PagtoRecebidoJpaController();
-        pag = ctl.findPagtoRecebido(pagId);
+        pag = ctl.find(pagId);
         return pag;
     }
 
-
     public void printRecibo(int id) {
-        showPopup("PrintRecibo.jsf?pagId="+id);
+        showPopup("PrintRecibo.jsf?pagId=" + id);
 //        RequestContext.getCurrentInstance().execute("jan=window.open (\"PrintRecibo.jsf?pagId="+id+"\",\"mywindow\",\"height=600, width=800\");");
 
     }

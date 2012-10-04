@@ -28,16 +28,6 @@ public class BoletoLazyList extends LazyDataModel<Boleto> {
 
     @Override
     public List<Boleto> load(int startingAt, int maxPerPage, String sortField, SortOrder sortOrder, Map<String, String> filters) {
-        /*
-         service.setFilterNome(null);
-
-         for(String filterP : filters.keySet()){
-         if(filterP.equalsIgnoreCase("nome")){
-         service.setFilterNome(filters.get(filterP));
-         break;
-         }
-         }
-         */
 
         if (sortField != null && sortOrder != SortOrder.UNSORTED) {
             String ord = "";
@@ -80,7 +70,7 @@ public class BoletoLazyList extends LazyDataModel<Boleto> {
         try {
             Integer id = Integer.valueOf(Id);
 
-            b = service.findBoleto(id);
+            b = service.find(id);
 
         } catch (Exception ex) {
         }

@@ -5,7 +5,6 @@
 package repo;
 
 import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import model.PedidoProduto;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +18,7 @@ import repo.exceptions.NonexistentEntityException;
  *
  * @author eqalmeida
  */
-public class ProdutoJpaController extends AbstractJpaController {
+public class ProdutoJpaController extends AbstractJpaController<Produto> {
 
     private String sortedField = null;
     private String order = null;
@@ -40,8 +39,10 @@ public class ProdutoJpaController extends AbstractJpaController {
     }
 
     public ProdutoJpaController() {
+        super(Produto.class);
     }
 
+    @Override
     public void create(Produto produto) {
         if (produto.getPedidoProdutoCollection() == null) {
             produto.setPedidoProdutoCollection(new ArrayList<PedidoProduto>());
@@ -69,6 +70,7 @@ public class ProdutoJpaController extends AbstractJpaController {
         em.getTransaction().commit();
     }
 
+    @Override
     public void edit(Produto produto) throws IllegalOrphanException, NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
@@ -113,7 +115,7 @@ public class ProdutoJpaController extends AbstractJpaController {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
                 Integer id = produto.getId();
-                if (findProduto(id) == null) {
+                if (super.find(id) == null) {
                     throw new NonexistentEntityException("The produto with id " + id + " no longer exists.");
                 }
             }
@@ -122,30 +124,7 @@ public class ProdutoJpaController extends AbstractJpaController {
     }
 
     public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException {
-        EntityManager em = null;
-
-        em = getEntityManager();
-        em.getTransaction().begin();
-        Produto produto;
-        try {
-            produto = em.getReference(Produto.class, id);
-            produto.getId();
-        } catch (EntityNotFoundException enfe) {
-            throw new NonexistentEntityException("The produto with id " + id + " no longer exists.", enfe);
-        }
-        List<String> illegalOrphanMessages = null;
-        Collection<PedidoProduto> pedidoProdutoCollectionOrphanCheck = produto.getPedidoProdutoCollection();
-        for (PedidoProduto pedidoProdutoCollectionOrphanCheckPedidoProduto : pedidoProdutoCollectionOrphanCheck) {
-            if (illegalOrphanMessages == null) {
-                illegalOrphanMessages = new ArrayList<String>();
-            }
-            illegalOrphanMessages.add("This Produto (" + produto + ") cannot be destroyed since the PedidoProduto " + pedidoProdutoCollectionOrphanCheckPedidoProduto + " in its pedidoProdutoCollection field has a non-nullable produto field.");
-        }
-        if (illegalOrphanMessages != null) {
-            throw new IllegalOrphanException(illegalOrphanMessages);
-        }
-        em.remove(produto);
-        em.getTransaction().commit();
+        super.remove(super.find(id));
     }
 
     public List<Produto> findProdutoEntities(int tipo) {
@@ -225,23 +204,10 @@ public class ProdutoJpaController extends AbstractJpaController {
         return q.getResultList();
     }
 
-    public Produto findProduto(Integer id) {
-        EntityManager em = getEntityManager();
-        return em.find(Produto.class, id);
-    }
-
     public int getProdutoCount(int tipo) {
         EntityManager em = getEntityManager();
 
         Query q = em.createQuery("SELECT COUNT(p) FROM Produto p WHERE p.tipo = :tipo").setParameter("tipo", tipo);
-        return ((Long) q.getSingleResult()).intValue();
-    }
-
-    public int getProdutoCount() {
-        EntityManager em = getEntityManager();
-        String query = "SELECT COUNT(p) FROM Produto p";
-        query += getWhere();
-        Query q = em.createQuery(query);
         return ((Long) q.getSingleResult()).intValue();
     }
 }

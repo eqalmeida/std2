@@ -10,21 +10,17 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
-import javax.persistence.EntityManager;
 import model.Cliente;
 import model.ClienteLazyList;
 import model.Pedido;
-import org.primefaces.context.RequestContext;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import repo.ClienteJpaController;
-import repo.PedidoJpaController;
 
 /**
  *
  * @author eqalmeida
  */
-@ManagedBean(name="clienteMB")
+@ManagedBean(name = "clienteMB")
 @javax.faces.bean.ViewScoped
 public class ClienteBean extends ControllerBase implements Serializable {
 
@@ -42,8 +38,8 @@ public class ClienteBean extends ControllerBase implements Serializable {
     }
 
     @PostConstruct
-    private void init(){
-            service = new ClienteJpaController();
+    private void init() {
+        service = new ClienteJpaController();
     }
 
     public void gravar() {
@@ -53,22 +49,21 @@ public class ClienteBean extends ControllerBase implements Serializable {
             } else {
                 service.create(selected);
             }
-            
+
             hideDialog("clienteDlg");
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             addMessage(ex.getMessage());
         }
     }
 
-    public void verPedido(Integer id){
+    public void verPedido(Integer id) {
 
-            String red = "ShowPedido.jsf?pedidoId=" +id;
-            try {
-                FacesContext.getCurrentInstance().getExternalContext().redirect(red);
-            } catch (IOException ex) {
-                addErrorMessage(ex.getMessage());
-            }
+        String red = "ShowPedido.jsf?pedidoId=" + id;
+        try {
+            FacesContext.getCurrentInstance().getExternalContext().redirect(red);
+        } catch (IOException ex) {
+            addErrorMessage(ex.getMessage());
+        }
 
     }
 
@@ -81,37 +76,37 @@ public class ClienteBean extends ControllerBase implements Serializable {
         pedidos = null;
         showDialog("clienteDlg");
     }
-    
-    public void exibirClientes(){
+
+    public void exibirClientes() {
     }
-    
+
     public void excluirCliente(int id) {
-        
-        if(!getUsuarioLogado().isAdmin()){
+
+        if (!getUsuarioLogado().isAdmin()) {
             addErrorMessage("Acesso Negado!");
             return;
         }
-        
+
         try {
-            service.destroy(id);
+            service.remove(selected);
             this.selected = new Cliente();
         } catch (Exception ex) {
             addErrorMessage("Não foi possível excluir este cliente!");
         }
     }
 
-    public void showPedidos(){
-        if(selected != null){
+    public void showPedidos() {
+        if (selected != null) {
             pedidos = new ClienteJpaController().findPedidos(selected);
         }
     }
-    
-    public void editarCliente(int id){
-        selected = service.findCliente(id);
+
+    public void editarCliente(int id) {
+        selected = service.find(id);
         showDialog("clienteDlg");
     }
-    
-    public void cancela(){
+
+    public void cancela() {
         hideDialog("clienteDlg");
     }
 
@@ -122,16 +117,16 @@ public class ClienteBean extends ControllerBase implements Serializable {
     /*
      * Adiciona cliente ao pedido na session
      */
-    public void addToPedido(int id){
+    public void addToPedido(int id) {
         try {
-            selected = service.findCliente(id);
-            
+            selected = service.find(id);
+
             FacesContext context = FacesContext.getCurrentInstance();
-            
+
             PedidoBean pedidoMB = context.getApplication().evaluateExpressionGet(context, "#{pedidoMB}", PedidoBean.class);
-            
+
             pedidoMB.setCliente(selected);
-            
+
             addMessage("Cliente selecionado!");
         } catch (Exception ex) {
             addMessage("Não foi possível selecionar!\n" + ex.getMessage());
@@ -139,7 +134,7 @@ public class ClienteBean extends ControllerBase implements Serializable {
     }
 
     public LazyDataModel<Cliente> getLazyList() {
-        if(lazyList == null) {
+        if (lazyList == null) {
             lazyList = new ClienteLazyList();
         }
         return lazyList;
@@ -148,5 +143,4 @@ public class ClienteBean extends ControllerBase implements Serializable {
     public void setLazyList(LazyDataModel<Cliente> lazyList) {
         this.lazyList = lazyList;
     }
-
 }

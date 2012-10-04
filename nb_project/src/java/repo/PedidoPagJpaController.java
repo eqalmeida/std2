@@ -7,71 +7,17 @@ package repo;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import model.PedidoPag;
-import repo.exceptions.NonexistentEntityException;
 
 /**
  *
  * @author eqalmeida
  */
-public class PedidoPagJpaController extends AbstractJpaController {
+public class PedidoPagJpaController extends AbstractJpaController<PedidoPag> {
 
     public PedidoPagJpaController() {
-    }
-
-    public void create(PedidoPag pedidoPag) {
-        EntityManager em = null;
-
-        em = getEntityManager();
-        em.getTransaction().begin();
-        em.persist(pedidoPag);
-        em.getTransaction().commit();
-    }
-
-    public void edit(PedidoPag pedidoPag) throws NonexistentEntityException, Exception {
-        EntityManager em = null;
-        try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            pedidoPag = em.merge(pedidoPag);
-            em.getTransaction().commit();
-        } catch (Exception ex) {
-            String msg = ex.getLocalizedMessage();
-            if (msg == null || msg.length() == 0) {
-                Integer id = pedidoPag.getId();
-                if (findPedidoPag(id) == null) {
-                    throw new NonexistentEntityException("The pedidoPag with id " + id + " no longer exists.");
-                }
-            }
-            throw ex;
-        }
-    }
-
-    public void destroy(Integer id) throws NonexistentEntityException {
-        EntityManager em = null;
-
-        em = getEntityManager();
-        em.getTransaction().begin();
-        PedidoPag pedidoPag;
-        try {
-            pedidoPag = em.getReference(PedidoPag.class, id);
-            pedidoPag.getId();
-        } catch (EntityNotFoundException enfe) {
-            throw new NonexistentEntityException("The pedidoPag with id " + id + " no longer exists.", enfe);
-        }
-        em.remove(pedidoPag);
-        em.getTransaction().commit();
-    }
-
-    public List<PedidoPag> findPedidoPagEntities() {
-        return findPedidoPagEntities(true, -1, -1);
-    }
-
-    public List<PedidoPag> findPedidoPagEntities(int maxResults, int firstResult) {
-        return findPedidoPagEntities(false, maxResults, firstResult);
+        super(PedidoPag.class);
     }
 
     public List<PedidoPag> findPedidoPagEntities(Integer pedidoId) {
@@ -99,15 +45,5 @@ public class PedidoPagJpaController extends AbstractJpaController {
         EntityManager em = getEntityManager();
 
         return em.find(PedidoPag.class, id);
-    }
-
-    public int getPedidoPagCount() {
-        EntityManager em = getEntityManager();
-
-        CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-        Root<PedidoPag> rt = cq.from(PedidoPag.class);
-        cq.select(em.getCriteriaBuilder().count(rt));
-        Query q = em.createQuery(cq);
-        return ((Long) q.getSingleResult()).intValue();
     }
 }
