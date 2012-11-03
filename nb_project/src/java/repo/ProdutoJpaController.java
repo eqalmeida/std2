@@ -24,6 +24,13 @@ public class ProdutoJpaController extends AbstractJpaController<Produto> {
     private String order = null;
     private Integer fTipo = null;
     private Integer fEstoque = null;
+    private String fPlaca = null;
+
+    public void setfPlaca(String fPlaca) {
+        this.fPlaca = fPlaca;
+    }
+    
+    
 
     public void setfTipo(Integer fTipo) {
         this.fTipo = fTipo;
@@ -158,12 +165,21 @@ public class ProdutoJpaController extends AbstractJpaController<Produto> {
 
         if (fTipo != null) {
             where += (" and p.tipo = " + fTipo);
+
+            if(fPlaca != null && fTipo == 1){
+                where += (" and p.placa LIKE '"+ this.fPlaca +"%'");
+            }
+            
+            if(fTipo==0){
+                this.setfPlaca(null);
+            }
+
         }
 
         if (fEstoque != null) {
             where += (" and p.qtdEstoque != 0");
         }
-
+        
         return where;
     }
 
@@ -183,6 +199,18 @@ public class ProdutoJpaController extends AbstractJpaController<Produto> {
         q.setMaxResults(maxResults);
         q.setFirstResult(firstResult);
         return q.getResultList();
+    }
+
+    public int getProdutoCount() {
+
+        String query = "SELECT COUNT(p) FROM Produto p";
+
+        query += getWhere();
+
+        EntityManager em = getEntityManager();
+
+        Query q = em.createQuery(query);
+        return ((Long) q.getSingleResult()).intValue();
     }
 
     private List<Produto> findProdutoEntities(boolean all, int maxResults, int firstResult, int tipo) {

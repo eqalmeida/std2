@@ -1,13 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -15,17 +13,17 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 import model.Produto;
+import model.AbstractProdutoLazyList;
 import model.ProdutoLazyList;
+import model.VeiculoLazyList;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyDataModel;
 import repo.ProdutoJpaController;
+import repo.exceptions.IllegalOrphanException;
+import repo.exceptions.NonexistentEntityException;
 
-/**
- *
- * @author eqalmeida
- */
 @ManagedBean
 @ViewScoped
 public class ProdutoBean extends ControllerBase implements Serializable {
@@ -53,11 +51,13 @@ public class ProdutoBean extends ControllerBase implements Serializable {
     private void init() {
         ctl = new ProdutoJpaController();
 
-        tipoProduto = 1;
+        corrigePlacas();
 
-        lazyList = new ProdutoLazyList(ctl);
+        tipoProduto = Produto.VEICULO;
 
-        ProdutoLazyList pLazy = (ProdutoLazyList) lazyList;
+        lazyList = createLazyList(tipoProduto);
+
+        VeiculoLazyList pLazy = (VeiculoLazyList) lazyList;
 
         pLazy.getCtl().setfTipo(tipoProduto);
         pLazy.getCtl().setfEstoque(1);
@@ -74,7 +74,7 @@ public class ProdutoBean extends ControllerBase implements Serializable {
     public LazyDataModel<Produto> getLazyList() {
 
         if (lazyList == null) {
-            lazyList = new ProdutoLazyList(ctl);
+            lazyList = createLazyList(tipoProduto);
         }
 
         return lazyList;
@@ -96,6 +96,48 @@ public class ProdutoBean extends ControllerBase implements Serializable {
     public List<Produto> getOutrosProdutos() {
         todosProdutos = ctl.findProdutoEntities(0);
         return todosProdutos;
+    }
+
+    private void corrigePlacas() {
+        List<Produto> produtos = ctl.findProdutosByQuery("SELECT p FROM Produto p WHERE p.tipo = 1 AND not (p.placa LIKE '%-%')");
+
+        System.out.println("Placas a corrigir: " + produtos.size());
+
+        for (Produto produto : produtos) {
+            String placa = produto.getPlaca();
+
+            if (placa.length() < 7) {
+                continue;
+            }
+
+            String novaPlaca = "";
+            for (int i = 0; i < 3; i++) {
+                novaPlaca += placa.charAt(i);
+            }
+
+            novaPlaca += "-";
+            int i;
+            if (Character.isDigit(placa.charAt(3))) {
+                i = 3;
+            } else {
+                i = 4;
+            }
+
+            for (int pos = i; pos < (i + 4); pos++) {
+                novaPlaca += placa.charAt(pos);
+            }
+
+            produto.setPlaca(novaPlaca);
+            try {
+                ctl.edit(produto);
+            } catch (IllegalOrphanException ex) {
+                Logger.getLogger(ProdutoBean.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NonexistentEntityException ex) {
+                Logger.getLogger(ProdutoBean.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(ProdutoBean.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     public void inserir() {
@@ -220,27 +262,58 @@ public class ProdutoBean extends ControllerBase implements Serializable {
         return tipoProduto;
     }
 
+    private AbstractProdutoLazyList createLazyList(int tipo) {
+
+        AbstractProdutoLazyList lazy = null;
+
+        try {
+
+            DataTable dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent(":formTable:tbl");
+            if (dataTable != null) {
+                dataTable.setFirst(0);
+            }
+
+
+            if (tipo == Produto.VEICULO) {
+                lazy = new VeiculoLazyList(ctl);
+            } else {
+                ctl.setfPlaca(null);
+                lazy = new ProdutoLazyList(ctl);
+                dataTable.clearLazyCache();
+            }
+
+            if (emEstoque) {
+                ((AbstractProdutoLazyList) lazyList).getCtl().setfEstoque(1);
+            } else {
+                ((AbstractProdutoLazyList) lazyList).getCtl().setfEstoque(null);
+            }
+            ((AbstractProdutoLazyList) lazyList).getCtl().setfTipo(tipoProduto);
+
+        } catch (Exception e) {
+        } finally {
+            return lazy;
+        }
+    }
+
     public void emEstoqueChanged() {
 
-        DataTable dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent(":formTable:tbl");
-        dataTable.setFirst(0);
+        lazyList = createLazyList(tipoProduto);
 
-        if (emEstoque) {
-            ((ProdutoLazyList) lazyList).getCtl().setfEstoque(1);
-        } else {
-            ((ProdutoLazyList) lazyList).getCtl().setfEstoque(null);
-        }
-        ((ProdutoLazyList) lazyList).getCtl().setfTipo(tipoProduto);
     }
 
     public void tipoChanged(ValueChangeEvent ev) {
+
+        lazyList = createLazyList(tipoProduto);
+
         tipoProduto = (Integer) ev.getNewValue();
-        ((ProdutoLazyList) lazyList).getCtl().setfTipo(tipoProduto);
+        ((AbstractProdutoLazyList) lazyList).getCtl().setfTipo(tipoProduto);
     }
 
     public void setTipoProduto(int tipoProduto) {
 
-        ProdutoLazyList l = (ProdutoLazyList) getLazyList();
+        lazyList = createLazyList(tipoProduto);
+
+        AbstractProdutoLazyList l = (AbstractProdutoLazyList) getLazyList();
         l.getCtl().setfTipo(tipoProduto);
 
         selected = null;

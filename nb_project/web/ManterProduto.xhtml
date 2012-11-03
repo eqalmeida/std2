@@ -73,7 +73,9 @@
 
                 </p:column>
 
-                <p:column headerText="Placa" sortBy="#{it.placa}" rendered="#{produtoBean.tipoProduto eq 1}">
+                <p:column headerText="Placa" sortBy="#{it.placa}" 
+                          filterBy="#{it.placa}"
+                          rendered="#{produtoBean.tipoProduto eq 1}">
                     #{it.placa}
                 </p:column>
 
@@ -138,7 +140,10 @@
                 <p:panelGrid columns="#{2*(produtoBean.selected.tipo + 1)}" columnClasses="label,field,label,field" id="frm">
 
                     <h:outputText value="Placa:"  rendered="#{produtoBean.selected.tipo eq 1}"/>
-                    <p:inputMask value="#{produtoBean.selected.placa}" mask="aaa-9999" required="true" maxlength="8" size="8" rendered="#{produtoBean.selected.tipo == 1}" label="Placa"/>
+                    <p:inputMask value="#{produtoBean.selected.placa}" mask="aaa-9999" required="false" maxlength="8" size="8" rendered="#{produtoBean.selected.tipo == 1}" label="Placa">
+                        <f:validateRegex pattern="^[a-zA-Z]{3}\-\d{4}$" />
+                        <f:validateLength minimum="8" maximum="8"/>
+                    </p:inputMask>
 
                     <h:outputText value="Fabricante:"  rendered="#{produtoBean.selected.tipo eq 1}"/>
                     <p:inputText value="#{produtoBean.selected.fabricante}" required="true" rendered="#{produtoBean.selected.tipo == 1}" label="Fabricante"/>
