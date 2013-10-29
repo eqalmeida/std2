@@ -6,14 +6,14 @@ package controller;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 import model.Boleto;
 import model.PagtoRecebido;
@@ -22,6 +22,7 @@ import model.PedidoPag;
 import model.Usuario;
 import org.primefaces.context.RequestContext;
 import repo.PedidoPagJpaController;
+import util.Acrescimos;
 import util.IPagtoService;
 import util.PagtoServiceFactory;
 import util.Util;
@@ -46,6 +47,7 @@ public class PagamentoBean extends ControllerBase implements Serializable {
     private BigDecimal taxas = null;
     private BigDecimal descontoVal = null;
     private double desconto = 0.0;
+    private Map<Integer, Boolean> checked;
 
     @PostConstruct
     private void inicializa() {
@@ -111,28 +113,53 @@ public class PagamentoBean extends ControllerBase implements Serializable {
      */
     private void updateTotais(Date d) {
 
-        totalJuros = BigDecimal.ZERO;
-        totalMulta = BigDecimal.ZERO;
-        totalParcela = BigDecimal.ZERO;
+        // Instancia da classe de acrescimos.
+        Acrescimos acrescimos = new Acrescimos(d);
+        
+        long dataPagDays = Acrescimos.dateToDays(d);
 
+        checked = new HashMap<Integer, Boolean>();
+        
+        // Adiciona parcelas para tratar acrescimos.
         for (Boleto b : getPedidoPag().getParcelas()) {
-
-            if (b.isAtrasado(d)) {
-                totalJuros = totalJuros.add(b.getJuros(d, 0.0));
-                totalMulta = totalMulta.add(b.getMulta(d, 0.0));
-                totalParcela = totalParcela.add(b.getValorDevido());
+        
+            checked.put(b.getId(), Boolean.FALSE);
+            
+            if(b.getStatus() == Boleto.CANCELADO || b.getStatus() == Boleto.PAGO){
+                continue;
             }
-
+            
+            Date vencimento = b.getVencimentoAtual();
+                        
+            long dataVencDays = Acrescimos.dateToDays(vencimento);
+            
+            if (dataVencDays <= dataPagDays) {
+                acrescimos.addicionaParcela(b);
+                checked.remove(b.getId());
+                checked.put(b.getId(), Boolean.TRUE);
+            }
         }
 
         if (!getUsuarioLogado().isAdmin()) {
             desconto = 0.0;
         }
+        
+        acrescimos.setDesconto(desconto);
+
+        totalJuros = acrescimos.getTotalJuros();
+        totalMulta = acrescimos.getTotalMultas();
+        totalParcela = acrescimos.getTotalValorParcelas();
 
         taxas = totalJuros.add(totalMulta);
-        descontoVal = taxas.multiply(new BigDecimal(desconto)).divide(new BigDecimal(100)).setScale(2, RoundingMode.DOWN);
-        valorDevido = taxas.add(totalParcela).subtract(descontoVal);
+        descontoVal = acrescimos.getDescontoVal();
+        valorDevido = acrescimos.getTotalDevido();
     }
+
+    public Map<Integer, Boolean> getChecked() {
+        return checked;
+    }
+    
+    
 
     /**
      * Prepara para adicionar novo pagamento
@@ -186,12 +213,11 @@ public class PagamentoBean extends ControllerBase implements Serializable {
             /*
              * Soma as Parcelas não Pagas
              */
-            BigDecimal soma = BigDecimal.ZERO;
-            for (Boleto b : pedidoPag.getParcelas()) {
-                soma = soma.add(b.getValorAtualComTaxas(data, desconto));
-            }
-
-            if (valorRecebido.doubleValue() > soma.doubleValue()) {
+            Acrescimos acrescimos = new Acrescimos(data, pedidoPag);
+            
+            acrescimos.setDesconto(desconto);
+            
+            if (valorRecebido.doubleValue() > acrescimos.getTotalDevido().doubleValue()) {
                 throw new Exception("O valor informado é superior ao devido!");
             }
 

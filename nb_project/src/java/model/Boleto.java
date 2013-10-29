@@ -26,6 +26,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import util.Acrescimos;
 import util.CurrencyWriter;
 import util.Util;
 
@@ -127,20 +128,12 @@ public class Boleto implements Serializable {
         return data.get(Calendar.YEAR);
     }
     
-    public BigDecimal getValorComMulta() {
-        if(this.pedidoPag != null){
-            double fator = (this.pedidoPag.getMultaPercent()/100.0) + 1.0;
-            valorComMulta = this.valor.multiply(new BigDecimal(fator));
-        }
-        return valorComMulta;
-    }
-    
-
     public BigDecimal getValorPago() {
         return valorPago;
     }
 
     public void setValorPago(BigDecimal valorPago) {
+        valorPago.setScale(2, RoundingMode.FLOOR);
         this.valorPago = valorPago;
     }
 
@@ -165,6 +158,7 @@ public class Boleto implements Serializable {
     }
 
     public void setValorFaltante(BigDecimal valorFaltante) {
+        valorFaltante.setScale(2, RoundingMode.FLOOR);
         this.valorFaltante = valorFaltante;
     }
 
@@ -204,6 +198,7 @@ public class Boleto implements Serializable {
     }
 
     public BigDecimal getValor() {
+        valor.setScale(2, RoundingMode.FLOOR);
         return valor;
     }
 
@@ -260,55 +255,10 @@ public class Boleto implements Serializable {
         return situacao;
     }
 
-    /**
-     * Converte a Data em um número que representa os dias
-     *
-     */
-    private static long getDias(Date data) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(data);
-        c.set(Calendar.HOUR, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        long d = (c.getTimeInMillis() / (24 * 60 * 60 * 1000));
-        return d;
-    }
-
     public boolean isAtrasado() {
-        return (this.isAtrasado(new Date()));
+        return ( Acrescimos.daysDiff(new Date(), vencimento) < 0);
     }
-    
-    public boolean isAtrasado(Date data) {
 
-        if (status == Boleto.CANCELADO || status == Boleto.PAGO) {
-            return false;
-        }
-
-        long diasDataPag = getDias(data);
-        long diasVencimento = getDias(vencimento);
-        
-        long atraso;
-        if(status == ATIVO || status == Boleto.PARADO){
-            atraso = diasDataPag - diasVencimento;
-        }else{
-            long atual = getDias(getDataPag());
-            
-            if(atual > diasVencimento){
-                atraso = diasDataPag - atual;
-            }else{
-                atraso = diasDataPag - diasVencimento;
-            }
-        }
-        
-        if (atraso >= 0) {
-            return true;
-        }
-
-        return false;
-
-    }
-    
     public BigDecimal getValorAtual(){
         if(this.getStatus() == ATIVO){
             return (getValor());
@@ -321,17 +271,28 @@ public class Boleto implements Serializable {
         }
     }
     
-    /**
-     * Retorna o valor devido na Data informada
-     * @param dataInf Data informada
-     * @return Valor
-     */
-    public BigDecimal getValorAtualComTaxas(Date dataInf, double desconto){
-        
-        BigDecimal jurosAtual = getJuros(dataInf, desconto);
-        BigDecimal multaAtual = getMulta(dataInf, desconto);
-        
-        return(getValorAtual().add(jurosAtual).add(multaAtual));
+    public boolean isPagoEmAtraso(){
+        if(status == PAGO_PARCIAL || status == PAGO){
+            // Calcula o numero de dias de atraso.
+            long diasAtraso = Acrescimos.daysDiff(getVencimento(), getDataPag());
+            
+            // Se foi pago em atraso, a data de pagamento passa a ser o vencimento.
+            return(diasAtraso > 0);
+        }
+        return false;
+    }
+    
+    public Date getVencimentoAtual(){
+        if(status == PAGO_PARCIAL){
+            // Se foi pago em atraso, a data de pagamento passa a ser o vencimento.
+            if(isPagoEmAtraso()){
+                return (getDataPag());
+            }else{
+                return(getVencimento());
+            }
+        } else {
+            return (getVencimento());
+        }
     }
     
     public BigDecimal getValorDevido(){
@@ -346,117 +307,6 @@ public class Boleto implements Serializable {
         }else{
             return this.valor;
         }
-    }
-
-    public BigDecimal getValorDevido(Date data, double desconto) {
-
-        BigDecimal val = BigDecimal.ZERO;
-
-        if (status == ATIVO) {
-            val = getValor();
-        } else if (status == PAGO_PARCIAL) {
-            val = getValorFaltante();
-        }
-
-        val = val.add(getJuros(data, desconto)).add(getMulta(data, desconto));
-
-        return val;
-    }
-
-    public BigDecimal getJuros(Date data, double desconto) {
-        
-        Double j = this.getPedidoPag().getJurosDiario();
-        
-        if(j == null || j == 0.0){
-            return (BigDecimal.ZERO);
-        }
-
-        long diasDataPag = getDias(data);
-
-        if (status == ATIVO) {
-
-            long diasVencimento = getDias(vencimento);
-            long atraso = diasDataPag - diasVencimento;
-
-
-            if (atraso > 0) {
-                BigDecimal temp = getValor().multiply(new BigDecimal(atraso)).multiply(new BigDecimal(j)).divide(new BigDecimal(100.0)).setScale(2, RoundingMode.DOWN);
-                temp = Util.valComDesconto(temp, desconto);
-                return (temp);
-
-            } else {
-                return (BigDecimal.ZERO);
-            }
-        } else if (status == PAGO_PARCIAL) {
-
-            long diasUltPag = getDias(dataPag);
-            long diasVencimentoPrincipal = getDias(vencimento);
-            
-            if(diasVencimentoPrincipal >= diasDataPag){
-                return BigDecimal.ZERO;
-            }
-
-            if(diasUltPag >= diasDataPag){
-                return BigDecimal.ZERO;
-            }
-
-            long atraso;
-
-            if (diasVencimentoPrincipal > diasUltPag) {
-                atraso = diasDataPag - diasVencimentoPrincipal;
-            } else {
-                atraso = diasDataPag - diasUltPag;
-            }
-
-
-            if (atraso > 0) {
-                BigDecimal temp = getValorFaltante().multiply(new BigDecimal(atraso)).multiply(new BigDecimal(j)).divide(new BigDecimal(100.0)).setScale(2, RoundingMode.DOWN);
-                temp = Util.valComDesconto(temp, desconto);
-                return (temp);
-            } else {
-                return (BigDecimal.ZERO);
-            }
-        }
-        return (BigDecimal.ZERO);
-    }
-
-    public BigDecimal getMulta(Date data, double desconto) {
-        
-        Double m = this.getPedidoPag().getMultaPercent();
-        BigDecimal mVal = this.getPedidoPag().getMultaVal();
-        
-        if(m == null){
-            m = 0.0;
-        }
-        
-        if(mVal == null){
-            mVal = BigDecimal.ZERO;
-        }
-        
-        if(m == 0.0 && mVal.doubleValue() == 0.0){
-            return (BigDecimal.ZERO);
-        }
-
-        long diasDataPag = getDias(data);
-
-        if (status == ATIVO) {
-
-            long diasVencimento = getDias(vencimento);
-            long atraso = diasDataPag - diasVencimento;
-
-
-            if (atraso > 0) {
-                BigDecimal temp = getValor().multiply(new BigDecimal(m)).divide(new BigDecimal(100)).setScale(2, RoundingMode.DOWN);
-                temp = temp.add(mVal);
-                temp = Util.valComDesconto(temp, desconto);
-                return (temp);
-
-            } else {
-                return (BigDecimal.ZERO);
-            }
-
-        }
-        return (BigDecimal.ZERO);
     }
 
     public String getStatusStr() {

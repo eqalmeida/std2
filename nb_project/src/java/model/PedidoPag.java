@@ -26,6 +26,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import util.Acrescimos;
 
 /**
  *
@@ -223,22 +224,30 @@ public class PedidoPag implements Serializable {
     }
 
     public BigDecimal getValorDevidoAtual(Date d){
-        BigDecimal valorDevido = BigDecimal.ZERO;
+        
+        Acrescimos acrescimos = new Acrescimos(d);
+        
+        long pagDays = Acrescimos.dateToDays(d);
+
+        //TODO: COrrigir o tratamento da data de vencimento quando pago parcial.
         for(Boleto b : this.getParcelas()){
-            if(b.isAtrasado(d)){
-                valorDevido = valorDevido.add( b.getValorAtualComTaxas(d, 0.0) );
+            
+            long parcelaDays = Acrescimos.dateToDays(b.getVencimentoAtual());
+            
+            if(parcelaDays >= pagDays){
+                acrescimos.addicionaParcela(b);
             }
         }
-        return(valorDevido);
+        return(acrescimos.getTotalDevido());
     }
 
     public BigDecimal getTaxasAtual(Date d){
-        BigDecimal val = BigDecimal.ZERO;
+        
+        Acrescimos acrescimos = new Acrescimos(d);
         for(Boleto b : this.getParcelas()){
-            val = val.add(b.getJuros(d, 0.0));
-            val = val.add(b.getMulta(d, 0.0));
+            acrescimos.addicionaParcela(b);
         }
-        return(val);
+        return(acrescimos.getTotalJuros().add(acrescimos.getTotalMultas()));
     }
 
     @Override

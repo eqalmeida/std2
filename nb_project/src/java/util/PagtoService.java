@@ -23,8 +23,11 @@ public class PagtoService implements IPagtoService {
     @Override
     public BigDecimal regPagto(BigDecimal valorRecebido, Date dataInf) {
 
+        Acrescimos acrescimos = new Acrescimos(dataInf, boleto);
+        
+        acrescimos.setDesconto(desconto);
     
-        BigDecimal valorAtualComTaxas = boleto.getValorAtualComTaxas(dataInf, desconto);
+        BigDecimal valorAtualComTaxas = acrescimos.getTotalDevido();
         BigDecimal sobra;
         BigDecimal valParcela;
         
@@ -48,7 +51,7 @@ public class PagtoService implements IPagtoService {
         }
 
         // Calcula Juros
-        BigDecimal jurosAtual = boleto.getJuros(dataInf, desconto);
+        BigDecimal jurosAtual = acrescimos.getTotalJuros();
         
         boleto.setJuros(temp.add(jurosAtual));
 
@@ -58,7 +61,7 @@ public class PagtoService implements IPagtoService {
             temp = BigDecimal.ZERO;
         }
 
-        BigDecimal multaAtual = boleto.getMulta(dataInf, desconto);
+        BigDecimal multaAtual = acrescimos.getTotalMultas();
 
         boleto.setMulta(temp.add(multaAtual));
 
@@ -87,7 +90,7 @@ public class PagtoService implements IPagtoService {
         }
 
         // Atualiza o Status
-        if (boleto.getValorFaltante().doubleValue() > 0.0) {
+        if (boleto.getValorFaltante().doubleValue() > 0.0099) {
             boleto.setStatus(Boleto.PAGO_PARCIAL);
         } else {
             boleto.setStatus(Boleto.PAGO);

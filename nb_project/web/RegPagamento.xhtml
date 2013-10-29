@@ -51,7 +51,7 @@
                 <h:outputText value="Data:"/>
                 <p:inputText value="#{pagMB.data}" label="Data" required="true">
                     <f:convertDateTime type="date"  timeZone="#{app.timeZone}"/>
-                    <p:ajax listener="#{pagMB.dataChanged()}" update="@form" />
+                    <p:ajax listener="#{pagMB.dataChanged()}" update="@form, :form" />
                 </p:inputText>
 
                 <h:outputText value="Juros:"  />
@@ -116,31 +116,31 @@
 
                 <f:facet name="header">Dados da Forma de Pagamento</f:facet>
                 <p:row>
-                    <p:column>
+                    <p:column style="font-weight: bold; text-wrap: none">
                         <h:outputText value="Cliente:"/>
                     </p:column>
-                    <p:column colspan="3">
+                    <p:column colspan="3" style="width: 80%">
                         <h:outputText value="#{pagMB.pedidoPag.pedido.cliente}"/>
                     </p:column>
                 </p:row>
                 <p:row>
                     <p:column>
-                        <h:outputText value="Tipo de Pagto:"/>
+                        <h:outputText value="Tipo de Pagto:" style="font-weight: bold"/>
                     </p:column>
                     <p:column>
                         <h:outputText value="#{pagMB.pedidoPag.tipoPagto}"/>
                     </p:column>
                     <p:column>
-                        <h:outputText value="Multa por atraso (%):"/>
+                        <h:outputText value="Multa por atraso (%):" style="font-weight: bold"/>
                     </p:column>
-                    <p:column>
+                    <p:column style="width: 40%">
                         <h:outputText value="#{pagMB.pedidoPag.multaPercent}"/>
                     </p:column>
                 </p:row>
 
                 <p:row>
                     <p:column>
-                        <h:outputText value="Multa em valor:"/>
+                        <h:outputText value="Multa em valor:" style="font-weight: bold"/>
                     </p:column>
                     <p:column>
                         <h:outputText value="#{pagMB.pedidoPag.multaVal}">
@@ -148,7 +148,7 @@
                         </h:outputText>
                     </p:column>
                     <p:column>
-                        <h:outputText value="Juros diário (%):"/>
+                        <h:outputText value="Juros diário (%):" style="font-weight: bold"/>
                     </p:column>
                     <p:column>
                         <h:outputText value="#{pagMB.pedidoPag.jurosDiario}"/>
@@ -168,11 +168,15 @@
                         Parcelas
                     </f:facet>
 
-                    <p:column headerText="Parcela">
+                    <p:column>
+                        <p:selectBooleanCheckbox value="#{pagMB.checked[it.id]}" disabled="true"/>
+                    </p:column>
+                    
+                    <p:column headerText="N">
                         #{it.numParcela}
                     </p:column>
 
-                    <p:column headerText="Vencimento">
+                    <p:column headerText="Venc.">
                         <h:outputText value="#{it.vencimento}">
                             <f:convertDateTime/>
                         </h:outputText>    
@@ -208,7 +212,7 @@
                         </h:outputText>
                     </p:column>
 
-                    <p:column headerText="Valor Faltante">
+                    <p:column headerText="V. Faltante">
                         <h:outputText value="#{it.valorFaltante}">
                             <f:convertNumber type="currency"/>
                         </h:outputText>
