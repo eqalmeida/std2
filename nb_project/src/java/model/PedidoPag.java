@@ -225,19 +225,8 @@ public class PedidoPag implements Serializable {
 
     public BigDecimal getValorDevidoAtual(Date d){
         
-        Acrescimos acrescimos = new Acrescimos(d);
+        Acrescimos acrescimos = new Acrescimos(d, this);
         
-        long pagDays = Acrescimos.dateToDays(d);
-
-        //TODO: COrrigir o tratamento da data de vencimento quando pago parcial.
-        for(Boleto b : this.getParcelas()){
-            
-            long parcelaDays = Acrescimos.dateToDays(b.getVencimentoAtual());
-            
-            if(parcelaDays >= pagDays){
-                acrescimos.addicionaParcela(b);
-            }
-        }
         return(acrescimos.getTotalDevido());
     }
 

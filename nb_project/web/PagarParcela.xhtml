@@ -7,6 +7,8 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core">
 
+
+
     <ui:define name="top">
 
         <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
@@ -28,7 +30,10 @@
         <p:growl autoUpdate="true" id="message"/>
 
         <h:outputScript name="locales_prime.js" library="js" /> 
-        
+
+        <!--
+                        Verifica se a informação é válida
+        -->
         <h:panelGroup rendered="#{pagMB.pedidoPag eq null}">
             <p:panel header="Atenção">
                 A forma de pagamento não foi selecionada!
@@ -43,25 +48,12 @@
                     Novo Pagamento
                 </f:facet>
 
-                <h:outputText value="Data do pagamento:"/>
-                <p:calendar value="#{pagMB.data}" label="Data do pagamento" required="true" id="dateId">
-                    <p:ajax event="dateSelect" listener="#{pagMB.dataChanged()}" update="@form, :form" process="@this, parcId"/>
-                </p:calendar>
+                <h:outputText value="Data:"/>
+                <p:inputText value="#{pagMB.data}" label="Data" required="true">
+                    <f:convertDateTime type="date"  timeZone="#{app.timeZone}"/>
+                    <p:ajax listener="#{pagMB.dataChanged()}" update="@form, :form" />
+                </p:inputText>
 
-                <h:outputText value="Parcela:"/>
-                <h:selectOneMenu value="#{pagMB.parcela}" id="parcId">
-                    <f:selectItem itemValue="0" itemLabel="Todas" />
-                    <f:selectItems
-                        value="#{pagMB.parcelaList}" var="p"
-                        itemValue="#{p}" itemLabel="#{p}"/>
-                    <p:ajax listener="#{pagMB.dataChanged()}" update="@form, :form" process="@this, dateId"/>
-                </h:selectOneMenu>
-                
-                <h:outputText value="Vencimento:" rendered="#{pagMB.parcela gt 0}"/>
-                <h:outputText value="#{pagMB.selectedParcela.vencimentoAtual}" rendered="#{pagMB.parcela gt 0}">
-                    <f:convertDateTime  timeZone="#{app.timeZone}" />
-                </h:outputText>
-                
                 <h:outputText value="Juros:"  />
                 <h:outputText value="#{pagMB.totalJuros}">
                     <f:convertNumber type="currency" />
@@ -72,7 +64,7 @@
                     <f:convertNumber type="currency" />
                 </h:outputText>
 
-                <h:outputText value="#{pagMB.parcela eq 0?'Total Parcelas:':'Total Parcela:' }"/>
+                <h:outputText value="Total Parcelas:"  />
                 <h:outputText value="#{pagMB.totalParcela}">
                     <f:convertNumber type="currency" />
                 </h:outputText>
@@ -85,17 +77,8 @@
                     <f:convertNumber type="currency"/>
                 </h:outputText>
 
-                <h:panelGroup>
-                    <h:outputText value="Total Devido em " />
-                    <h:outputText value="#{pagMB.data}"><f:convertDateTime/></h:outputText>
-                    <h:panelGroup rendered="#{pagMB.parcela gt 0}">
-                        <br/>
-                        <h:outputText value="p/ parcela #{pagMB.parcela}" />
-                    </h:panelGroup>
-                    <h:outputText value=":" />
-                </h:panelGroup>
-                
-                <h:outputText value="#{pagMB.valorDevido}" id="vdev" style="font-weight: bold;font-size: 18px">
+                <h:outputText value="Total Devido:" />
+                <h:outputText value="#{pagMB.valorDevido}" id="vdev" style="font-weight: bold">
                     <f:convertNumber type="currency"/>
                 </h:outputText>
 

@@ -101,8 +101,6 @@ public class ProdutoBean extends ControllerBase implements Serializable {
     private void corrigePlacas() {
         List<Produto> produtos = ctl.findProdutosByQuery("SELECT p FROM Produto p WHERE p.tipo = 1 AND not (p.placa LIKE '%-%')");
 
-        System.out.println("Placas a corrigir: " + produtos.size());
-
         for (Produto produto : produtos) {
             String placa = produto.getPlaca();
 
@@ -176,7 +174,7 @@ public class ProdutoBean extends ControllerBase implements Serializable {
     }
 
     public void onRowSelect(SelectEvent event) {
-        selected = ctl.find(((Produto) event.getObject()).getId());
+//        selected = ctl.find(((Produto) event.getObject()).getId());
     }
 
     public void novoProduto(Short tipo) {
@@ -193,7 +191,7 @@ public class ProdutoBean extends ControllerBase implements Serializable {
     public void exibir() {
     }
 
-    public void excluirProduto(int id) {
+    public void excluirProduto() {
         if (!verificaLogin("")) {
             addErrorMessage("Falha de Login");
             return;
@@ -206,7 +204,7 @@ public class ProdutoBean extends ControllerBase implements Serializable {
 
 
         try {
-            ctl.destroy(id);
+            ctl.destroy(selected.getId());
             this.selected = new Produto();
             RequestContext.getCurrentInstance().execute("dialogNewCar.hide()");
         } catch (Exception ex) {
@@ -324,7 +322,7 @@ public class ProdutoBean extends ControllerBase implements Serializable {
         e.getNewValue();
     }
 
-    public void addToPedido(int id) {
+    public void addToPedido() {
 
         if (!verificaLogin("")) {
             addErrorMessage("Falha de Login");
@@ -338,8 +336,6 @@ public class ProdutoBean extends ControllerBase implements Serializable {
 
             PedidoBean pedidoMB = context.getApplication().evaluateExpressionGet(context, "#{pedidoMB}", PedidoBean.class);
 
-            selected = ctl.find(id);
-
             pedidoMB.addProduto(selected);
 
             addMessage("Produto adicionado!");
@@ -348,13 +344,13 @@ public class ProdutoBean extends ControllerBase implements Serializable {
         }
     }
 
-    public void editarProduto(int id) {
+    public void editarProduto() {
         if (!verificaLogin("")) {
             addErrorMessage("Falha de Login");
             return;
         }
 
-        selected = ctl.find(id);
+        selected = ctl.find(selected.getId());
         RequestContext.getCurrentInstance().execute("dialogNewCar.show()");
     }
 

@@ -100,14 +100,14 @@
                 <p:column headerText="Estoque" sortBy="#{it.qtdEstoque}"> 
                     <h:outputText value="#{it.qtdEstoque eq -1?'-':it.qtdEstoque}"/>
                 </p:column>
-
+                
                 <f:facet name="footer">
                     <p:commandButton
                         disabled="#{not(produtoBean.selected.id gt 0)}"
                         update=":formNewCar"
                         value="Editar"
                         icon="ui-icon-pencil"
-                        action="#{produtoBean.editarProduto(produtoBean.selected.id)}"/>
+                        action="#{produtoBean.editarProduto()}"/>
 
                     <p:commandButton
                         disabled="#{not(produtoBean.selected.id gt 0) or not loginMB.usuario.admin}"
@@ -116,14 +116,14 @@
                         value="Excluir" 
                         immediate="true" 
                         onstart="return confirm('Confirma excluir este produto?')"
-                        action="#{produtoBean.excluirProduto(produtoBean.selected.id)}" />
+                        action="#{produtoBean.excluirProduto()}" />
 
 
 
                     <p:commandButton
                         disabled="#{not(produtoBean.selected.id gt 0)}"
                         value="Adicionar ao pedido" 
-                        actionListener="#{produtoBean.addToPedido(produtoBean.selected.id)}"/>
+                        actionListener="#{produtoBean.addToPedido()}"/>
 
                 </f:facet>
             </p:dataTable>

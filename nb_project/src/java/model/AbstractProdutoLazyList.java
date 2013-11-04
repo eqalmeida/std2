@@ -76,4 +76,13 @@ public abstract class AbstractProdutoLazyList extends LazyDataModel<Produto> {
         }
         return p;
     }
+    
+    @Override
+    public void setRowIndex( int rowIndex ) {
+
+       if ( rowIndex == -1 || getPageSize() == 0 ) {
+        super.setRowIndex( -1 );
+       } else
+        super.setRowIndex( rowIndex % getPageSize() );
+    }    
 }

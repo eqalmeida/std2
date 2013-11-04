@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
 import java.io.Serializable;
@@ -10,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -48,6 +45,8 @@ public class PagamentoBean extends ControllerBase implements Serializable {
     private BigDecimal descontoVal = null;
     private double desconto = 0.0;
     private Map<Integer, Boolean> checked;
+    private List<Integer> parcelaList;
+    private int parcela;
 
     @PostConstruct
     private void inicializa() {
@@ -116,9 +115,19 @@ public class PagamentoBean extends ControllerBase implements Serializable {
         // Instancia da classe de acrescimos.
         Acrescimos acrescimos = new Acrescimos(d);
         
+        checked = new HashMap<Integer, Boolean>();
+
         long dataPagDays = Acrescimos.dateToDays(d);
 
-        checked = new HashMap<Integer, Boolean>();
+        if(parcela > 0){
+            
+            Boleto b = getParcelaByNumero(parcela);
+            
+            acrescimos.addicionaParcela(b);
+            checked.remove(b.getId());
+            checked.put(b.getId(), Boolean.TRUE);
+            
+        } else {
         
         // Adiciona parcelas para tratar acrescimos.
         for (Boleto b : getPedidoPag().getParcelas()) {
@@ -138,6 +147,8 @@ public class PagamentoBean extends ControllerBase implements Serializable {
                 checked.remove(b.getId());
                 checked.put(b.getId(), Boolean.TRUE);
             }
+        }
+        
         }
 
         if (!getUsuarioLogado().isAdmin()) {
@@ -173,6 +184,21 @@ public class PagamentoBean extends ControllerBase implements Serializable {
             return;
         }
 
+        parcelaList = new ArrayList<Integer>();
+        parcela = 0;
+        
+        for(Boleto b: pedidoPag.getParcelas()){
+            if (b.getStatus() == Boleto.ATIVO || 
+                    b.getStatus() == Boleto.PAGO_PARCIAL ||
+                    b.getStatus() == Boleto.PARADO){
+                parcelaList.add((int)b.getNumParcela());
+
+                // Marca a parcela mais antiga a pagar
+                if(parcela == 0){
+                    parcela = b.getNumParcela();
+                }
+            }
+        }
 
         data = Calendar.getInstance().getTime();
 
@@ -213,7 +239,18 @@ public class PagamentoBean extends ControllerBase implements Serializable {
             /*
              * Soma as Parcelas não Pagas
              */
-            Acrescimos acrescimos = new Acrescimos(data, pedidoPag);
+            Acrescimos acrescimos;
+            List<Boleto> parcelasAPagar;
+            
+            if(parcela == 0){
+                acrescimos = new Acrescimos(data, pedidoPag);
+                parcelasAPagar = new ArrayList<Boleto>( pedidoPag.getParcelas() );
+            } else {
+                Boleto b = getSelectedParcela();
+                acrescimos = new Acrescimos(data, b);
+                parcelasAPagar = new ArrayList<Boleto>();
+                parcelasAPagar.add(b);
+            }
             
             acrescimos.setDesconto(desconto);
             
@@ -230,14 +267,14 @@ public class PagamentoBean extends ControllerBase implements Serializable {
             if (dataInfL > hoje) {
                 throw new Exception("Data inválida (futura)!");
             }
-
+/*
             for (PagtoRecebido pr : pedidoPag.getPagamentos()) {
                 long dataL = Util.dateToLong(pr.getDataInformada());
                 if (dataL > dataInfL) {
                     throw new Exception("Já existe um pagamento registrado em data posterior!");
                 }
             }
-
+*/
             em.getTransaction().begin();
 
             Usuario usuario = getUsuarioLogado();
@@ -246,7 +283,7 @@ public class PagamentoBean extends ControllerBase implements Serializable {
              * Registra os pagamentos por Boleto
              */
             BigDecimal sobra = valorRecebido;
-            for (Boleto b : pedidoPag.getParcelas()) {
+            for (Boleto b : parcelasAPagar) {
 
                 if (b.getValorDevido().doubleValue() > 0.0) {
                     //sobra = b.regPagamento(sobra, data);
@@ -366,4 +403,34 @@ public class PagamentoBean extends ControllerBase implements Serializable {
     public BigDecimal getDescontoVal() {
         return descontoVal;
     }
+
+    public List<Integer> getParcelaList() {
+        return parcelaList;
+    }
+
+    public void setParcelaList(List<Integer> parcelaList) {
+        this.parcelaList = parcelaList;
+    }
+
+    public int getParcela() {
+        return parcela;
+    }
+
+    public void setParcela(int parcela) {
+        this.parcela = parcela;
+    }
+    
+    public Boleto getSelectedParcela(){
+        return getParcelaByNumero(parcela);
+    }
+
+    private Boleto getParcelaByNumero(int num){
+        for(Boleto b: pedidoPag.getParcelas()){
+            if(b.getNumParcela() == num){
+                return b;
+            }
+        }
+        return null;
+    }
+    
 }

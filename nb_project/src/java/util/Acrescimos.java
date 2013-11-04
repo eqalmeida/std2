@@ -48,7 +48,10 @@ public class Acrescimos {
         long pagDays = dateToDays(dataPagamento);
 
         for(Boleto b : pag.getParcelas()){
-            long parcelaDays = dateToDays(b.getVencimentoAtual());
+            
+            Date venc = getProximoDiaUtil(b.getVencimentoAtual());
+            
+            long parcelaDays = dateToDays(venc);
             if(parcelaDays >= pagDays){
                 addicionaParcela(b);
             }
@@ -82,12 +85,18 @@ public class Acrescimos {
             return;
         }
         
-        Date vencimentoReal = boleto.getVencimentoAtual();
+        Date vencimentoReal = getProximoDiaUtil( boleto.getVencimentoAtual() );
 
         // Calcula quantos dias de atraso.
         long diasDeAtraso = daysDiff(vencimentoReal, dataPagamento);
 
         if (diasDeAtraso > 0) {
+            
+            //
+            // Usa a data original para calculo de juros
+            //
+            vencimentoReal = boleto.getVencimentoAtual() ;
+            diasDeAtraso = daysDiff(vencimentoReal, dataPagamento);
 
             double val = boleto.getValorAtual().doubleValue();
             double m = boleto.getPedidoPag().getMultaPercent();
@@ -115,17 +124,15 @@ public class Acrescimos {
             totalMultas = totalMultas.add(new BigDecimal(multaVal));
 
             double taxaJuros = boleto.getPedidoPag().getJurosDiario();
-            double jurosVal = 0.0;
 
             if (taxaJuros > 0.0) {
-                // Calcula o atraso de um dia.
-                jurosVal = (val * taxaJuros) / 100.0;
-                // Calcula o atraso pelo numero de dias.
-                jurosVal *= diasDeAtraso;
+                // Calcula o juros.
+                double jurosVal = (val * taxaJuros * diasDeAtraso) / 100.0;
+                
+                // Soma o valor de juros acumulado
+                totalJuros = totalJuros.add(new BigDecimal(jurosVal));
             }
 
-            // Soma o valor de juros acumulado
-            totalJuros = totalJuros.add(new BigDecimal(jurosVal));
         }
 
         // Soma o valor da parcela
@@ -199,5 +206,38 @@ public class Acrescimos {
         long daysFrom = dateToDays(from);
         long daysTo = dateToDays(to);
         return (daysTo - daysFrom);
+    }
+
+    /**
+     * Verifica se a data é um dia util.
+     * @param data
+     * @return 
+     */
+    private boolean isDiaUtil(Calendar data) {
+
+        // Primeira regra, verifica se é domingo.
+        if(data.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY ){return false;}
+        
+        // Verifica se é sabado.
+        //if(data.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ){return false;}
+        
+        return true;
+    }
+
+    /**
+     * Verifica próximo dia util a partir da data informada.
+     * @param data
+     * @return 
+     */
+    private Date getProximoDiaUtil(Date data) {
+        
+        Calendar c = Calendar.getInstance();
+        c.setTime(data);
+
+        while(!isDiaUtil(c)){
+            c.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        
+        return c.getTime();
     }
 }
