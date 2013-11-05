@@ -50,7 +50,7 @@
 
                 <h:outputText value="Parcela:"/>
                 <h:selectOneMenu value="#{pagMB.parcela}" id="parcId">
-                    <f:selectItem itemValue="0" itemLabel="Todas" />
+                    <f:selectItem itemValue="0" itemLabel="Vencidas" />
                     <f:selectItems
                         value="#{pagMB.parcelaList}" var="p"
                         itemValue="#{p}" itemLabel="#{p}"/>
@@ -106,7 +106,9 @@
                 </p:inputText>
 
                 <f:facet name="footer">
-                    <p:commandButton value="Registrar" actionListener="#{pagMB.registrar}" update=":form npag_panel" onstart="return confirm('Confirma o pagamento?')"/>
+                    <p:commandButton 
+                        disabled="#{pagMB.valorDevido gt 0.0?'false':'true'}"
+                        value="Registrar" actionListener="#{pagMB.registrar}" update=":form npag_panel" onstart="return confirm('Confirma o pagamento?')"/>
                     <p:commandButton icon="ui-icon-scissors" actionListener="#{pagMB.editarDesconto()}" update=":fdesconto" immediate="true" rendered="#{loginMB.usuario.admin}"/>
                 </f:facet>
 
@@ -271,7 +273,7 @@
                     </p:column>
                     
                     <p:column>
-                        <p:commandButton value="Recibo" action="#{printReciboMB.printRecibo(it.id)}" />
+                        <p:commandButton value="Recibo" onclick="printRecibo(#{it.id});" />
                     </p:column>
                 </p:dataTable>
 
@@ -288,6 +290,11 @@
         </h:form>
             
         </h:panelGroup>
+        <script>
+            function printRecibo(id){
+                window.open ('PrintRecibo.jsf?pagId='+id,'mywindow','height=600, width=800');                
+            }
+        </script>
     </ui:define>
 
 </ui:composition>

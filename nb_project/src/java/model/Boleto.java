@@ -333,6 +333,29 @@ public class Boleto implements Serializable {
         return true;
     }
 
+    /**
+     * Valor da parcela com multa.
+     * @return 
+     */
+    public BigDecimal getValorComMulta() {
+        double val = getValor().doubleValue();
+        
+        if(getPedidoPag() == null){
+            return getValor();
+        }
+        
+        double multaVal = val * getPedidoPag().getMultaPercent().doubleValue() / 100.0;
+        
+        multaVal += getPedidoPag().getMultaVal().doubleValue();
+        val += multaVal;
+        valorComMulta = new BigDecimal(val);
+        valorComMulta.setScale(2, RoundingMode.FLOOR);
+
+        return valorComMulta;
+    }
+    
+    
+
     @Override
     public String toString() {
         return "model.Boleto[ id=" + id + " ]";

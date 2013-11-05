@@ -142,7 +142,8 @@
                                 <p:commandButton 
                                     value="Imprimir" 
                                     icon="ui-icon-print" 
-                                    actionListener="#{showPedidoMB.printPedido(showPedidoMB.pedido.id)}"/>
+                                    onclick="printPedido(#{showPedidoMB.pedido.id});"
+                                    />
 
                                 <p:commandButton value="Cancelar Pedido" update=":fstatus" actionListener="#{showPedidoMB.changeStatus(3)}"  rendered="#{showPedidoMB.pedido.status eq 0}"/>
                                 <p:commandButton value="Parar Pedido"  update=":fstatus" actionListener="#{showPedidoMB.changeStatus(4)}"  rendered="#{showPedidoMB.pedido.status eq 0}"/>
@@ -310,8 +311,8 @@
                             <p:spacer width="5"/>
                             
                             <p:menuButton value="Imprimir" disabled="#{not(it.parcelas.size() gt 0)}">
-                                <p:menuitem value="Boletos" action="#{showPedidoMB.printBoletos(it.id)}"/>
-                                <p:menuitem value="Promissórias" action="#{showPedidoMB.printPromissoria(it.id)}"/>
+                                <p:menuitem value="Boletos" onclick="printBoletos(#{it.id});"/>
+                                <p:menuitem value="Promissórias" onclick="printPromissoria(#{it.id});"/>
                             </p:menuButton>
 
                         </p:column>
@@ -380,6 +381,22 @@
             </h:form>
 
         </h:panelGroup>
+        <script type="text/javascript">
+            function printPedido(id){
+                window.open ('PrintPedido.jsf?pedidoId='+id,'mywindow','height=600, width=800');                
+            }
+
+            function printBoletos(id){
+                window.open ('PrintBoletos.jsf?pagId='+id,'mywindow','height=600, width=800');                
+            }
+            
+            function printPromissoria(id){
+                window.open ('PrintPromissorias.jsf?pagId='+id,'mywindow','height=600, width=800');                
+            }
+            
+            
+        </script>
+        
     </ui:define>
 
 </ui:composition>

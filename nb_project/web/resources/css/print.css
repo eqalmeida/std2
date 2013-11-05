@@ -78,13 +78,13 @@ table.boleto{
     font-family: Tahoma, Geneva, sans-serif;
     font-size: 11px;
     border-collapse:collapse;
-    border-right: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
+    border-right: 1px solid #666;
+    border-bottom: 1px solid #666;
     width: 100%;
 }
 table.boleto td, table.boleto th{
-    border-left:1px solid #ddd;
-    border-top:1px solid #ddd;
+    border-left:1px solid #666;
+    border-top:1px solid #666;
     padding: 3px;
 }
 
