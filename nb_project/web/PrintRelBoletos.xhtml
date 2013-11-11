@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./WEB-INF/templates/templateRel.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <ui:define name="header">
+        <f:metadata>
+            <f:viewParam name="month" value="#{printRelBoletos.month}"/>
+            <f:viewParam name="year" value="#{printRelBoletos.year}"/>
+            <f:viewParam name="type" value="#{printRelBoletos.type}"/>
+        </f:metadata>
+        <h3>Boletos do mes</h3>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:dataTable value="#{printRelBoletos.list}" var="it" styleClass="prn" width="100%">
+
+            <h:column>
+                <f:facet name="header">Vencimento</f:facet>
+                <h:outputText value="#{it.vencimento}">
+                    <f:convertDateTime/>
+                </h:outputText>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Valor</f:facet>
+                <h:outputText value="#{it.valorAtual}">
+                    <f:convertNumber type="currency" />
+                </h:outputText>
+                
+            </h:column>
+            <h:column>
+                <f:facet name="header">Cliente</f:facet>
+                <h:outputText value="#{it.pedidoPag.pedido.cliente}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Status</f:facet>
+                <h:outputText value="#{it.statusStr}"/>
+            </h:column>
+
+
+        </h:dataTable>
+    </ui:define>
+
+</ui:composition>
+

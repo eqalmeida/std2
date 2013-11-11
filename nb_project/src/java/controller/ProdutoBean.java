@@ -51,7 +51,7 @@ public class ProdutoBean extends ControllerBase implements Serializable {
     private void init() {
         ctl = new ProdutoJpaController();
 
-        corrigePlacas();
+        //corrigePlacas();
 
         tipoProduto = Produto.VEICULO;
 

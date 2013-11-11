@@ -1,14 +1,20 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.Enumeration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ComponentSystemEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.servlet.http.HttpServletRequest;
 import model.Usuario;
+import org.hibernate.exception.spi.Configurable;
 
 /**
  *
@@ -82,6 +88,19 @@ public class LoginBean extends ControllerBase {
         if (u.getSenha().equals(senha)) {
             if (u.getAtivo()) {
                 usuarioId = u.getId();
+                
+            
+                if (this.url.contains("login")) {
+                    this.url = "/index.jsf";
+                }
+                FacesContext fc = FacesContext.getCurrentInstance();
+                try {
+                    fc.getExternalContext().redirect(url);
+                } catch (IOException ex) {
+                    Logger.getLogger(LoginBean.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                
             } else {
                 addErrorMessage("Usuário desativado");
             }
@@ -104,7 +123,59 @@ public class LoginBean extends ControllerBase {
         return "";
     }
 
-    public String getUrl() {
-        return url;
+    public void checkLogin(ComponentSystemEvent evt) {
+        if (!isLogedin()) {
+            FacesContext fc = FacesContext.getCurrentInstance();
+            ConfigurableNavigationHandler handler = (ConfigurableNavigationHandler) fc.getApplication().getNavigationHandler();
+            this.url = getURL();
+            handler.performNavigation("login?faces-redirect=true");
+        }
+    }
+
+    public void checkLoginPageError(ComponentSystemEvent evt) {
+        if (isLogedin()) {
+            FacesContext fc = FacesContext.getCurrentInstance();
+            ConfigurableNavigationHandler handler = (ConfigurableNavigationHandler) fc.getApplication().getNavigationHandler();
+            handler.performNavigation("index?faces-redirect=true");
+        }
+    }
+
+    private String getURL() {
+        Enumeration<String> lParameters;
+        String sParameter;
+        StringBuilder sbURL = new StringBuilder();
+        Object oRequest = FacesContext.getCurrentInstance().getExternalContext().getRequest();
+
+        try {
+            if (oRequest instanceof HttpServletRequest) {
+                sbURL.append(((HttpServletRequest) oRequest).getRequestURL().toString());
+
+                lParameters = ((HttpServletRequest) oRequest).getParameterNames();
+
+                if (lParameters.hasMoreElements()) {
+                    if (!sbURL.toString().contains("?")) {
+                        sbURL.append("?");
+                    } else {
+                        sbURL.append("&");
+                    }
+                }
+
+                while (lParameters.hasMoreElements()) {
+                    sParameter = lParameters.nextElement();
+
+                    sbURL.append(sParameter);
+                    sbURL.append("=");
+                    sbURL.append(URLEncoder.encode(((HttpServletRequest) oRequest).getParameter(sParameter), "UTF-8"));
+
+                    if (lParameters.hasMoreElements()) {
+                        sbURL.append("&");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Do nothing
+        }
+
+        return sbURL.toString();
     }
 }

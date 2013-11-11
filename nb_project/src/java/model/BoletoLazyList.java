@@ -29,17 +29,8 @@ public class BoletoLazyList extends LazyDataModel<Boleto> {
     @Override
     public List<Boleto> load(int startingAt, int maxPerPage, String sortField, SortOrder sortOrder, Map<String, String> filters) {
 
-        if (sortField != null && sortOrder != SortOrder.UNSORTED) {
-            String ord = "";
 
-            if (sortOrder == SortOrder.ASCENDING) {
-                ord = "ASC";
-            } else if (sortOrder == SortOrder.DESCENDING) {
-                ord = "DESC";
-            }
-
-            service.setSortedField(sortField, ord);
-        }
+        service.setSortedField("vencimento", "ASC");
 
         List<Boleto> lista;
 

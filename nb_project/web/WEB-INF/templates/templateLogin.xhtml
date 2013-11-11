@@ -13,6 +13,7 @@
     </h:head>
 
     <h:body>
+        <f:event type="preRenderView" listener="#{loginMB.checkLoginPageError}" />
         <div id="around">
             <div id="header"> 
                 <h:form id="menuBarForm">
@@ -33,10 +34,6 @@
                             <td width="100%">
                                 <b><ui:insert name="title"></ui:insert></b>
                             </td>
-                            <td nowrap="nowrap">
-                                <h:outputText value="Usuário: #{loginMB.usuario} | " rendered="#{loginMB.usuario != null}"/>
-                                <p:commandLink value="Sair" actionListener="#{loginMB.logoff}"  update=":corpoId" ajax="false" rendered="#{loginMB.usuario != null}"/>
-                            </td>
                         </tr>
                     </table>
                 </h:form>
@@ -44,10 +41,6 @@
             <div style="width: 100%; margin-right: 20px">
                 <table cellpadding="10px" cellspacing="0" width="100%">
                     <tr>
-                        <td valign="top" nowrap="nowrap" >
-                            <ui:insert name="left">Left</ui:insert>
-
-                        </td>
                         <td width="100%" valign="top">
                             <h:panelGroup rendered="#{loginMB.logedin}">
                                 <ui:insert name="content">Content</ui:insert>

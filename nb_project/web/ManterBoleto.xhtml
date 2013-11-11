@@ -43,7 +43,9 @@
                     </td>
                     <td nowrap="nowrap">
                         <h:panelGroup  id="filtData">
-                            <h:panelGrid columns="4" rendered="#{boletoMB.tipoRel eq 0}">
+                            
+                            <h:panelGrid columns="5" rendered="#{boletoMB.tipoRel eq 0}">
+                                <p:commandButton value="Imprimir" icon="ui-icon-print" onclick="printBoletos(${boletoMB.filtMes}, ${boletoMB.filtAno});" />
                                 Mês:
                                 <p:selectOneMenu value="#{boletoMB.filtMes}">
                                     <f:selectItems value="#{app.meses}"/>
@@ -71,7 +73,7 @@
                          paginatorAlwaysVisible="false" 
                          rowStyleClass="#{it.status eq 1 ? 'verde':it.status eq 4?'azul': it.atrasado ? it.status == 2 ? 'laranja' : 'vermelho' : null }"                         paginator="true">
 
-                <p:column headerText="Vencimento" sortBy="#{it.vencimento}"  style="text-align: center">
+                <p:column headerText="Vencimento" style="text-align: center">
                     <h:outputText value="#{it.vencimento}" >
                         <f:convertDateTime />
                     </h:outputText>
@@ -81,26 +83,26 @@
                     #{it.numParcela} / #{it.pedidoPag.numParcelas}
                 </p:column>
 
-                <p:column headerText="Valor" sortBy="#{it.valor}" style="text-align: center">
+                <p:column headerText="Valor" style="text-align: center">
                     <h:outputText value="#{it.valor}" >
                         <f:convertNumber type="currency"/>
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="Tipo" sortBy="#{it.pedidoPag.tipoPagto.descricao}" style="text-align: center">
+                <p:column headerText="Tipo" style="text-align: center">
                     <h:outputText value="#{it.pedidoPag.tipoPagto.descricao}" >
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="Cliente" sortBy="#{it.cliente.nome}">
+                <p:column headerText="Cliente">
                     #{it.cliente.nome}
                 </p:column>
 
-                <p:column headerText="Status" sortBy="#{it.status}">
+                <p:column headerText="Status">
                     #{it.statusStr}
                 </p:column>
 
-                <p:column headerText="Pedido" sortBy="#{it.pedidoPag.pedido.id}" style="text-align: center">
+                <p:column headerText="Pedido" style="text-align: center">
                     <p:commandLink value="#{it.pedidoPag.pedido.id}" actionListener="#{boletoMB.verPedido(it.pedidoPag.pedido.id)}"/>
                 </p:column>
 
@@ -153,6 +155,15 @@
             </h:panelGroup>
 
         </h:form>
+        
+        <script type="text/javascript">
+            function printBoletos(mes, ano){
+                window.open ('PrintRelBoletos.jsf?month='+mes+'&amp;year='+ano+'&amp;type=1','mywindow','height=600, width=800');                
+            }
+            
+            
+        </script>
+        
     </ui:define>
 
 </ui:composition>
