@@ -117,3 +117,26 @@ hr.prn{
     color: #000;
     border: solid 1pt #000;
 }
+
+table.classic
+{
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table.classic th{
+    border-bottom: solid 2px #000;
+    text-align: left;
+    padding: 5px 10px;
+}
+
+table.classic td{
+    padding: 2px 10px;
+}
+
+h1.classic {
+    font-size: 18px;
+    color: black;
+    font-family: Tahoma;
+}
+

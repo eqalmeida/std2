@@ -61,6 +61,11 @@
                 <h:outputText value="#{pagMB.selectedParcela.vencimentoAtual}" rendered="#{pagMB.parcela gt 0}">
                     <f:convertDateTime  timeZone="#{app.timeZone}" />
                 </h:outputText>
+
+                <h:outputText value="#{pagMB.parcela eq 0?'Valor das Parcelas:':'Valor da Parcela:' }"/>
+                <h:outputText value="#{pagMB.totalParcela}">
+                    <f:convertNumber type="currency" />
+                </h:outputText>
                 
                 <h:outputText value="Juros:"  />
                 <h:outputText value="#{pagMB.totalJuros}">
@@ -69,11 +74,6 @@
 
                 <h:outputText value="Multa:"  />
                 <h:outputText value="#{pagMB.totalMulta}">
-                    <f:convertNumber type="currency" />
-                </h:outputText>
-
-                <h:outputText value="#{pagMB.parcela eq 0?'Total Parcelas:':'Total Parcela:' }"/>
-                <h:outputText value="#{pagMB.totalParcela}">
                     <f:convertNumber type="currency" />
                 </h:outputText>
 

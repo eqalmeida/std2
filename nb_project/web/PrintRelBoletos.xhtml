@@ -13,36 +13,53 @@
             <f:viewParam name="year" value="#{printRelBoletos.year}"/>
             <f:viewParam name="type" value="#{printRelBoletos.type}"/>
         </f:metadata>
-        <h3>Boletos do mes</h3>
+        <h:panelGroup rendered="#{printRelBoletos.type eq 1}">
+            <h1 class="classic">Boletos vencidos</h1>
+        </h:panelGroup>
+        <h:panelGroup rendered="#{printRelBoletos.type eq 0}">
+            <h1 class="classic">Boletos de #{printRelBoletos.month + 1}/#{printRelBoletos.year}</h1>
+        </h:panelGroup>
+        
     </ui:define>
 
+    
     <ui:define name="content">
-        <h:dataTable value="#{printRelBoletos.list}" var="it" styleClass="prn" width="100%">
-
-            <h:column>
-                <f:facet name="header">Vencimento</f:facet>
-                <h:outputText value="#{it.vencimento}">
-                    <f:convertDateTime/>
-                </h:outputText>
-            </h:column>
-            <h:column>
-                <f:facet name="header">Valor</f:facet>
-                <h:outputText value="#{it.valorAtual}">
-                    <f:convertNumber type="currency" />
-                </h:outputText>
-                
-            </h:column>
-            <h:column>
-                <f:facet name="header">Cliente</f:facet>
-                <h:outputText value="#{it.pedidoPag.pedido.cliente}"/>
-            </h:column>
-            <h:column>
-                <f:facet name="header">Status</f:facet>
-                <h:outputText value="#{it.statusStr}"/>
-            </h:column>
-
-
-        </h:dataTable>
+        <table class="classic">
+            <thead>
+            <tr>
+                <th>Vencimento</th>
+                <th>Parcela</th>
+                <th>Valor</th>
+                <th>Cliente</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <ui:repeat value="#{printRelBoletos.list}" var="it" varStatus="status">
+                <tr>
+                    <td>
+                        <h:outputText value="#{it.vencimento}">
+                            <f:convertDateTime/>
+                        </h:outputText>
+                    </td>
+                    <td>
+                        <span>#{it.numParcela} / #{it.pedidoPag.numParcelas}</span>
+                    </td>
+                    <td>
+                        <h:outputText value="#{it.valorAtual}">
+                            <f:convertNumber type="currency" />
+                        </h:outputText>
+                    </td>
+                    <td>
+                        <h:outputText value="#{it.pedidoPag.pedido.cliente}"/>
+                    </td>
+                    <td>
+                        <h:outputText value="#{it.statusStr}"/>
+                    </td>
+                </tr>
+            </ui:repeat>
+            </tbody>
+        </table>
     </ui:define>
 
 </ui:composition>

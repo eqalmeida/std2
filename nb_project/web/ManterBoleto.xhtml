@@ -43,9 +43,11 @@
                     </td>
                     <td nowrap="nowrap">
                         <h:panelGroup  id="filtData">
+                            <h:panelGrid columns="1" rendered="#{boletoMB.tipoRel eq 1}">
+                            <p:commandButton value="Imprimir" icon="ui-icon-print" onclick="printBoletos(1,0,0);" />
+                            </h:panelGrid>
                             
                             <h:panelGrid columns="5" rendered="#{boletoMB.tipoRel eq 0}">
-                                <p:commandButton value="Imprimir" icon="ui-icon-print" onclick="printBoletos(${boletoMB.filtMes}, ${boletoMB.filtAno});" />
                                 Mês:
                                 <p:selectOneMenu value="#{boletoMB.filtMes}">
                                     <f:selectItems value="#{app.meses}"/>
@@ -56,6 +58,7 @@
                                 <p:spinner min="1990" maxlength="5" size="5" value="#{boletoMB.filtAno}">
                                     <f:ajax render=":formTable" listener="#{boletoMB.aplicaFiltro()}"/>
                                 </p:spinner>
+                                <p:commandButton value="Imprimir" icon="ui-icon-print" onclick="printBoletos(0, ${boletoMB.filtMes}, ${boletoMB.filtAno});" />
                             </h:panelGrid>
                         </h:panelGroup>
                     </td>
@@ -63,9 +66,6 @@
             </table>
 
             <p:spacer height="5px"/>
-
-
-
 
             <p:spacer height="5"/>
             <p:dataTable lazy="true" var="it" id="tbl"
@@ -107,7 +107,7 @@
                 </p:column>
 
             </p:dataTable>
-
+            
             <h:panelGroup id="sumario">
 
                 <h:panelGroup rendered="#{boletoMB.tipoRel eq 0}">`
@@ -149,7 +149,7 @@
                             </h:outputText>
                         </p:column>
                     </p:dataTable>
-
+                    
                 </h:panelGroup>
                 
             </h:panelGroup>
@@ -157,8 +157,8 @@
         </h:form>
         
         <script type="text/javascript">
-            function printBoletos(mes, ano){
-                window.open ('PrintRelBoletos.jsf?month='+mes+'&amp;year='+ano+'&amp;type=1','mywindow','height=600, width=800');                
+            function printBoletos(tipo, mes, ano){
+                window.open ('PrintRelBoletos.jsf?month='+mes+'&amp;year='+ano+'&amp;type='+tipo,'mywindow','height=600, width=800');                
             }
             
             
