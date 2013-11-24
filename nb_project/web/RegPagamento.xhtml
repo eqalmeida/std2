@@ -8,9 +8,7 @@
                 xmlns:f="http://java.sun.com/jsf/core">
 
     <ui:define name="top">
-
         <ui:include src="./WEB-INF/inc/logotipo.xhtml" />
-
     </ui:define>
 
     <ui:define name="left">
@@ -67,13 +65,13 @@
                     <f:convertNumber type="currency" />
                 </h:outputText>
                 
-                <h:outputText value="Juros:"  />
-                <h:outputText value="#{pagMB.totalJuros}">
+                <h:outputText value="Multa:"  />
+                <h:outputText value="#{pagMB.totalMulta}">
                     <f:convertNumber type="currency" />
                 </h:outputText>
 
-                <h:outputText value="Multa:"  />
-                <h:outputText value="#{pagMB.totalMulta}">
+                <h:outputText value="Juros:"  />
+                <h:outputText value="#{pagMB.totalJuros}">
                     <f:convertNumber type="currency" />
                 </h:outputText>
 

@@ -129,26 +129,25 @@ public class PagamentoBean extends ControllerBase implements Serializable {
             
         } else {
         
-        // Adiciona parcelas para tratar acrescimos.
-        for (Boleto b : getPedidoPag().getParcelas()) {
-        
-            checked.put(b.getId(), Boolean.FALSE);
-            
-            if(b.getStatus() == Boleto.CANCELADO || b.getStatus() == Boleto.PAGO){
-                continue;
+            // Adiciona parcelas para tratar acrescimos.
+            for (Boleto b : getPedidoPag().getParcelas()) {
+
+                checked.put(b.getId(), Boolean.FALSE);
+
+                if(b.getStatus() == Boleto.CANCELADO || b.getStatus() == Boleto.PAGO){
+                    continue;
+                }
+
+                Date vencimento = b.getVencimentoAtual();
+
+                long dataVencDays = Acrescimos.dateToDays(vencimento);
+
+                if (dataVencDays <= dataPagDays) {
+                    acrescimos.addicionaParcela(b);
+                    checked.remove(b.getId());
+                    checked.put(b.getId(), Boolean.TRUE);
+                }
             }
-            
-            Date vencimento = b.getVencimentoAtual();
-                        
-            long dataVencDays = Acrescimos.dateToDays(vencimento);
-            
-            if (dataVencDays <= dataPagDays) {
-                acrescimos.addicionaParcela(b);
-                checked.remove(b.getId());
-                checked.put(b.getId(), Boolean.TRUE);
-            }
-        }
-        
         }
 
         if (!getUsuarioLogado().isAdmin()) {
@@ -187,12 +186,19 @@ public class PagamentoBean extends ControllerBase implements Serializable {
         parcelaList = new ArrayList<Integer>();
         parcela = 0;
         
+        data = Calendar.getInstance().getTime();
+        
+        int countP = 0;
+
         for(Boleto b: pedidoPag.getParcelas()){
             if (b.getStatus() == Boleto.ATIVO || 
                     b.getStatus() == Boleto.PAGO_PARCIAL ||
                     b.getStatus() == Boleto.PARADO){
                 parcelaList.add((int)b.getNumParcela());
 
+                if(Acrescimos.dateToDays(data) >= Acrescimos.dateToDays(b.getVencimentoAtual())){
+                    countP++ ;
+                }
                 // Marca a parcela mais antiga a pagar
                 if(parcela == 0){
                     parcela = b.getNumParcela();
@@ -200,8 +206,11 @@ public class PagamentoBean extends ControllerBase implements Serializable {
             }
         }
 
-        data = Calendar.getInstance().getTime();
-
+        // Mostra todas as vencidas caso o numero de vencidas seja maior que 1.
+        if(countP > 1){
+            parcela = 0;
+        }
+        
         updateTotais(data);
         valorRecebido = null;
         desconto = 0.0;

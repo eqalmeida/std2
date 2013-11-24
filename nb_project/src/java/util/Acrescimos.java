@@ -19,6 +19,7 @@ public class Acrescimos {
     private BigDecimal totalMultas = BigDecimal.ZERO;
     private BigDecimal totalJuros = BigDecimal.ZERO;
     private double desconto = 0.0;
+    private int qtdParcelas = 0;
 
     /**
      * Construtor
@@ -85,6 +86,9 @@ public class Acrescimos {
             return;
         }
         
+        // Incrementa a quantidade de parcelas.
+        qtdParcelas++ ;
+        
         Date vencimentoReal = getProximoDiaUtil( boleto.getVencimentoAtual() );
 
         // Calcula quantos dias de atraso.
@@ -120,8 +124,11 @@ public class Acrescimos {
                 val += multaVal;
             }
             
+            BigDecimal temp = new BigDecimal(multaVal);
+            temp = temp.setScale(2, RoundingMode.FLOOR);
+            
             // Soma a multa ao total
-            totalMultas = totalMultas.add(new BigDecimal(multaVal));
+            totalMultas = totalMultas.add(temp);
 
             double taxaJuros = boleto.getPedidoPag().getJurosDiario();
 
@@ -130,7 +137,7 @@ public class Acrescimos {
                 double jurosVal = (val * taxaJuros * diasDeAtraso) / 100.0;
                 
                 // Soma o valor de juros acumulado
-                totalJuros = totalJuros.add(new BigDecimal(jurosVal));
+                totalJuros = totalJuros.add(new BigDecimal(jurosVal).setScale(2, RoundingMode.FLOOR)  );
             }
 
         }
@@ -240,4 +247,10 @@ public class Acrescimos {
         
         return c.getTime();
     }
+
+    public int getQtdParcelas() {
+        return qtdParcelas;
+    }
+    
+    
 }

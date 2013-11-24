@@ -89,3 +89,7 @@ tr.azul{
     color: #00c;
 }
 
+.ui-button, button.ui-button.ui-state-default, .ui-button.ui-state-default { font-size: 12px; }
+.ui-button .ui-button-text { font-size: 12px; }
+
+
